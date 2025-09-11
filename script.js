@@ -706,6 +706,9 @@ async function loadDataFromFirebase() {
             
             console.log('✅ Data loaded from Firebase successfully');
             console.log(`Loaded: ${AppState.jobs.length} jobs, ${AppState.notifications.length} notifications`);
+            
+            // Update management stats after data is loaded
+            updateManagementStats();
         } else {
             // No data in Firebase, start with empty state
             console.log('No data in Firebase, starting with empty state');
@@ -873,6 +876,9 @@ function setupFirebaseListeners() {
                     loadStudentNotifications();
                 }
                 
+                // Update management stats after real-time data update
+                updateManagementStats();
+                
                 // Always update notification badge
                 updateNotificationBadge();
                 
@@ -950,6 +956,184 @@ const AppState = {
 
 // Sample Data - Empty array for clean start (removed test data)
 
+// Browser History Management
+let navigationStack = [];
+let isNavigating = false;
+
+function setupBrowserHistory() {
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function(event) {
+        console.log('Browser back/forward button pressed, isNavigating:', isNavigating);
+        
+        if (isNavigating) {
+            console.log('Currently navigating, ignoring popstate');
+            return;
+        }
+        
+        // Get the current state or default to homepage
+        const state = event.state || { page: 'homepage' };
+        console.log('Popstate state:', state);
+        
+        // Update navigation stack
+        if (navigationStack.length > 0) {
+            navigationStack.pop();
+        }
+        console.log('Navigation stack after pop:', navigationStack);
+        
+        // Navigate to the appropriate page based on state
+        navigateToPage(state.page, false); // false = don't push to history
+    });
+    
+    // Add initial state to history
+    if (!history.state) {
+        history.replaceState({ page: 'homepage' }, '', '#');
+        navigationStack = [{ page: 'homepage' }];
+    }
+}
+
+// Helper function to navigate to a page
+function navigateToPage(page, pushToHistory = true) {
+    console.log('Navigating to:', page, 'Push to history:', pushToHistory);
+    
+    switch(page) {
+        case 'homepage':
+            showHomepageInternal();
+            break;
+        case 'student-dashboard':
+            if (AppState.currentStudent) {
+                showStudentDashboardInternal();
+            } else {
+                showHomepageInternal();
+            }
+            break;
+        case 'admin-dashboard':
+            console.log('Navigating to admin-dashboard, currentUser:', AppState.currentUser);
+            if (AppState.currentUser && AppState.currentUser.role === 'admin') {
+                console.log('Admin user found, showing admin dashboard');
+                showAdminDashboardInternal();
+            } else {
+                console.log('No admin user found, redirecting to homepage');
+                showHomepageInternal();
+            }
+            break;
+        case 'shortlisted-view':
+            if (AppState.currentStudent) {
+                showShortlistedViewInternal();
+            } else {
+                showHomepageInternal();
+            }
+            break;
+        case 'notifications':
+            if (AppState.currentStudent) {
+                showNotificationsInternal();
+            } else {
+                showHomepageInternal();
+            }
+            break;
+        case 'profile':
+            if (AppState.currentStudent) {
+                showProfileInternal();
+            } else {
+                showHomepageInternal();
+            }
+            break;
+        default:
+            showHomepageInternal();
+    }
+    
+    // Update navigation stack and history
+    if (pushToHistory) {
+        navigationStack.push({ page: page });
+        pushHistoryState(page, getPageTitle(page));
+    }
+}
+
+// Helper function to get page title
+function getPageTitle(page) {
+    const titles = {
+        'homepage': 'DSI Placement Portal - Home',
+        'student-dashboard': 'Student Dashboard',
+        'admin-dashboard': 'Admin Dashboard',
+        'shortlisted-view': 'Shortlisted Candidates',
+        'notifications': 'Notifications',
+        'profile': 'Profile'
+    };
+    return titles[page] || 'DSI Placement Portal';
+}
+
+// Internal navigation functions (without history management)
+function showHomepageInternal() {
+    hideAllPages();
+    document.getElementById('homepage').classList.add('active');
+    updateNavigationForStudent();
+    
+    // Initialize device detection and download options
+    setTimeout(() => {
+        updateDeviceInfo();
+    }, 100);
+}
+
+function showStudentDashboardInternal() {
+    hideAllPages();
+    document.getElementById('student-portal').classList.add('active');
+    setActiveNav('student-nav');
+    loadStudentDashboard();
+    closeMobileMenu();
+}
+
+function showAdminDashboardInternal() {
+    hideAllPages();
+    document.getElementById('admin-dashboard').classList.add('active');
+    setActiveNav('admin-nav');
+    loadAdminDashboard();
+}
+
+function showShortlistedViewInternal() {
+    hideAllPages();
+    document.getElementById('shortlisted-view').classList.add('active');
+    setActiveNav('shortlisted-nav');
+    closeMobileMenu();
+    
+    // Update global shortlisted data from job-specific data
+    updateGlobalShortlistedData();
+    
+    // Check if data exists
+    if (AppState.shortlistedData.length === 0) {
+        document.getElementById('no-shortlisted-data').style.display = 'block';
+        document.getElementById('shortlisted-data-section').style.display = 'none';
+    } else {
+        document.getElementById('no-shortlisted-data').style.display = 'none';
+        document.getElementById('shortlisted-data-section').style.display = 'block';
+        showCompanyView(); // Show company view by default
+    }
+}
+
+function showNotificationsInternal() {
+    // Implementation for notifications page
+    console.log('Showing notifications page');
+}
+
+function showProfileInternal() {
+    // Implementation for profile page
+    console.log('Showing profile page');
+}
+
+// Helper function to push state to history
+function pushHistoryState(page, title = '') {
+    const state = { page: page };
+    const url = page === 'homepage' ? '#' : `#${page}`;
+    
+    // Set navigating flag to prevent popstate from interfering
+    isNavigating = true;
+    
+    history.pushState(state, title, url);
+    
+    // Reset navigating flag after a short delay
+    setTimeout(() => {
+        isNavigating = false;
+    }, 100);
+}
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
@@ -964,11 +1148,14 @@ async function initializeApp() {
             console.log('💡 For full functionality, serve the app from a web server (localhost, GitHub Pages, etc.)');
         }
         
+        // Set up browser history management
+        setupBrowserHistory();
+        
         // Load data from Firebase (cloud-only)
         await loadDataFromFirebase();
         
-        // Create default notifications if none exist
-        createDefaultNotifications();
+        // Create default notifications if none exist (only once)
+        createDefaultNotificationsOnce();
         
         // Set up real-time listeners
         setupFirebaseListeners();
@@ -1396,6 +1583,9 @@ async function forceRefreshData() {
         if (document.getElementById('all-notifications-list')) {
             loadAllNotifications();
         }
+        
+        // Update management stats after refresh
+        updateManagementStats();
         
         showNotification('Data refreshed from Firebase!', 'success');
         console.log('Data refresh completed');
@@ -2132,7 +2322,10 @@ function showNotificationsManagement() {
 
 function loadAdminNotificationsManagement() {
     const adminNotificationsList = document.getElementById('notifications-management-list');
-    if (!adminNotificationsList) return;
+    if (!adminNotificationsList) {
+        console.log('notifications-management-list element not found, skipping loadAdminNotificationsManagement');
+        return;
+    }
     
     console.log('Loading admin notifications management list, total notifications:', AppState.notifications.length);
     console.log('Notification details:', AppState.notifications.map(n => ({ id: n.id, title: n.title, idType: typeof n.id })));
@@ -3161,26 +3354,34 @@ function updateManagementStats() {
     
     // Update job count
     const jobCount = document.getElementById('total-jobs-count');
+    console.log('Job count element found:', !!jobCount);
     if (jobCount) {
         jobCount.textContent = AppState.jobs ? AppState.jobs.length : 0;
+        console.log('Updated job count to:', jobCount.textContent);
     }
     
     // Update notification count
     const notificationCount = document.getElementById('total-notifications-count');
+    console.log('Notification count element found:', !!notificationCount);
     if (notificationCount) {
         notificationCount.textContent = AppState.notifications ? AppState.notifications.length : 0;
+        console.log('Updated notification count to:', notificationCount.textContent);
     }
     
     // Update student count (both in management cards and student stats)
     const studentCount = document.getElementById('total-students-count');
+    console.log('Student count element found:', !!studentCount);
     if (studentCount) {
         studentCount.textContent = `(${AppState.students ? AppState.students.length : 0})`;
+        console.log('Updated student count to:', studentCount.textContent);
     }
     
     // Update student count in management card stats
     const studentCountCard = document.getElementById('total-students-count-card');
+    console.log('Student count card element found:', !!studentCountCard);
     if (studentCountCard) {
         studentCountCard.textContent = AppState.students ? AppState.students.length : 0;
+        console.log('Updated student count card to:', studentCountCard.textContent);
     }
     
     // Update student statistics in student management page
@@ -3188,8 +3389,10 @@ function updateManagementStats() {
     
     // Update admin count
     const adminCount = document.getElementById('total-admins-count');
+    console.log('Admin count element found:', !!adminCount);
     if (adminCount) {
         adminCount.textContent = AppState.admins ? AppState.admins.length : 0;
+        console.log('Updated admin count to:', adminCount.textContent);
     }
 }
 
@@ -3629,7 +3832,7 @@ function loadStudentNotifications() {
         const notificationElement = document.createElement('div');
         notificationElement.className = `notification-item ${notification.read ? 'read' : 'unread'}`;
         
-        const timeAgo = getTimeAgo(new Date(notification.timestamp));
+        const timeAgo = getTimeAgo(getNotificationTimestamp(notification));
         
         notificationElement.innerHTML = `
             <div class="notification-icon">
@@ -6449,11 +6652,7 @@ function showStudentDashboard() {
         return;
     }
     
-    hideAllPages();
-    document.getElementById('student-portal').classList.add('active');
-    setActiveNav('student-nav');
-    loadStudentDashboard();
-    closeMobileMenu();
+    navigateToPage('student-dashboard');
 }
 
 function showAdminLogin() {
@@ -6468,14 +6667,7 @@ function showAdminLogin() {
 }
 
 function showHomepage() {
-    hideAllPages();
-    document.getElementById('homepage').classList.add('active');
-    updateNavigationForStudent();
-    
-    // Initialize device detection and download options
-    setTimeout(() => {
-        updateDeviceInfo();
-    }, 100);
+    navigateToPage('homepage');
 }
 
 function showStudentLogin() {
@@ -6522,10 +6714,7 @@ function showStudentSection(section) {
 }
 
 function showAdminDashboard() {
-    hideAllPages();
-    document.getElementById('admin-dashboard').classList.add('active');
-    setActiveNav('admin-nav');
-    loadAdminDashboard();
+    navigateToPage('admin-dashboard');
 }
 
 function showStudentManagementPage() {
@@ -6543,23 +6732,7 @@ function showShortlistedView() {
         return;
     }
     
-    hideAllPages();
-    document.getElementById('shortlisted-view').classList.add('active');
-    setActiveNav('shortlisted-nav');
-    closeMobileMenu();
-    
-    // Update global shortlisted data from job-specific data
-    updateGlobalShortlistedData();
-    
-    // Check if data exists
-    if (AppState.shortlistedData.length === 0) {
-        document.getElementById('no-shortlisted-data').style.display = 'block';
-        document.getElementById('shortlisted-data-section').style.display = 'none';
-    } else {
-        document.getElementById('no-shortlisted-data').style.display = 'none';
-        document.getElementById('shortlisted-data-section').style.display = 'block';
-        showCompanyView(); // Show company view by default
-    }
+    navigateToPage('shortlisted-view');
 }
 
 function hideAllPages() {
@@ -6881,30 +7054,37 @@ function handleAdminLogin(event) {
     const username = document.getElementById('admin-username').value;
     const password = document.getElementById('admin-password').value;
     
+    console.log('Admin login attempt:', username);
+    
     // Check against default admin or stored admins
     let isValidAdmin = false;
     
     // Check default admin
     if (username === 'himu' && password === 'Himu*1bca') {
         isValidAdmin = true;
+        console.log('Default admin login successful');
     } else {
         // Check stored admins
         const admin = AppState.admins.find(admin => admin.username === username && admin.password === password);
         if (admin) {
             isValidAdmin = true;
+            console.log('Stored admin login successful');
         }
     }
     
     if (isValidAdmin) {
         AppState.currentUser = { username: username, role: 'admin' };
+        console.log('Setting currentUser:', AppState.currentUser);
         
         // Save login state to localStorage
         localStorage.setItem('currentUser', JSON.stringify(AppState.currentUser));
         localStorage.setItem('loginType', 'admin');
         
         showNotification('Login successful!', 'success');
+        console.log('Calling showAdminDashboard...');
         showAdminDashboard();
     } else {
+        console.log('Invalid admin credentials');
         showNotification('Invalid credentials', 'error');
     }
 }
@@ -6922,6 +7102,13 @@ function logout() {
 
 // Admin Dashboard Functions
 function loadAdminDashboard() {
+    console.log('Loading admin dashboard with data:', {
+        jobs: AppState.jobs?.length || 0,
+        notifications: AppState.notifications?.length || 0,
+        students: AppState.students?.length || 0,
+        admins: AppState.admins?.length || 0
+    });
+    
     loadAdminJobList();
     loadAdminNotifications();
     loadAdminList();
@@ -8505,7 +8692,19 @@ async function addNotification(notification) {
         console.error('Error saving notification:', error);
     }
     
+    // Update all notification displays immediately
     displayNotifications();
+    
+    // Update admin notification displays if they exist
+    if (document.getElementById('admin-notifications-list')) {
+        loadAdminNotifications();
+    }
+    if (document.getElementById('notifications-management-list')) {
+        loadAdminNotificationsManagement();
+    }
+    if (document.getElementById('all-notifications-list')) {
+        loadAllNotifications();
+    }
 }
 
 // Handle real-time notifications with enhanced alerts
@@ -8794,7 +8993,7 @@ function displayNotifications() {
         item.style.opacity = '0';
         item.style.transform = 'translateY(10px)';
         
-        const timeAgo = getTimeAgo(notification.timestamp || notification.time);
+        const timeAgo = getTimeAgo(getNotificationTimestamp(notification));
         
         item.innerHTML = `
             <div class="notification-icon ${notification.type}">
@@ -8866,6 +9065,12 @@ function getTimeAgo(timestamp) {
     if (diffInMins < 60) return `${diffInMins} minute${diffInMins !== 1 ? 's' : ''} ago`;
     if (diffInHours < 24) return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
     return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
+}
+
+// Helper function to get consistent timestamp from notification
+function getNotificationTimestamp(notification) {
+    // Try timestamp first, then time, then fallback to current time
+    return notification.timestamp || notification.time || Date.now();
 }
 
 async function markNotificationRead(notificationId) {
@@ -9440,6 +9645,12 @@ function closeJobShortlistViewModal() {
 function loadAdminNotifications() {
     const adminNotificationsList = document.getElementById('admin-notifications-list');
     
+    // Check if the element exists (it might not exist if we're not on the admin dashboard)
+    if (!adminNotificationsList) {
+        console.log('admin-notifications-list element not found, skipping loadAdminNotifications');
+        return;
+    }
+    
     if (AppState.notifications.length === 0) {
         adminNotificationsList.innerHTML = `
             <div class="admin-notification-item">
@@ -9463,7 +9674,7 @@ function loadAdminNotifications() {
         const item = document.createElement('div');
         item.className = 'admin-notification-item';
         
-        const timeAgo = getTimeAgo(notification.time);
+        const timeAgo = getTimeAgo(getNotificationTimestamp(notification));
         
         item.innerHTML = `
             <div class="admin-notification-icon ${notification.type}">
@@ -9506,7 +9717,7 @@ function closeAddNotificationModal() {
     document.getElementById('notification-action-section').style.display = 'none';
 }
 
-function handleNotificationSubmit(event) {
+async function handleNotificationSubmit(event) {
     event.preventDefault();
     
     const type = document.getElementById('notification-type').value;
@@ -9532,11 +9743,26 @@ function handleNotificationSubmit(event) {
         };
     }
     
-    addNotification(notificationData);
-    showNotification('Notification posted successfully!', 'success');
-    
-    closeAddNotificationModal();
-    loadAdminNotifications();
+    try {
+        // Wait for the notification to be added and saved
+        await addNotification(notificationData);
+        
+        showNotification('Notification posted successfully!', 'success');
+        
+        // Close modal and refresh admin notifications display
+        closeAddNotificationModal();
+        
+        // Update all admin notification displays immediately
+        console.log('Updating notification displays after posting...');
+        loadAdminNotifications();
+        loadAdminNotificationsManagement();
+        loadAllNotifications();
+        console.log('Notification displays updated');
+        
+    } catch (error) {
+        console.error('Error posting notification:', error);
+        showNotification('Error posting notification. Please try again.', 'error');
+    }
 }
 
 // All Notifications Management Functions
@@ -9553,6 +9779,12 @@ function closeAllNotificationsModal() {
 
 function loadAllNotifications() {
     const allNotificationsList = document.getElementById('all-notifications-list');
+    
+    // Check if the element exists (it might not exist if we're not on the admin dashboard)
+    if (!allNotificationsList) {
+        console.log('all-notifications-list element not found, skipping loadAllNotifications');
+        return;
+    }
     
     if (AppState.notifications.length === 0) {
         allNotificationsList.innerHTML = `
@@ -9573,7 +9805,7 @@ function loadAllNotifications() {
         const item = document.createElement('div');
         item.className = 'admin-notification-item-full';
         
-        const timeAgo = getTimeAgo(notification.time);
+        const timeAgo = getTimeAgo(getNotificationTimestamp(notification));
         const typeBadge = getNotificationTypeBadge(notification.type);
         
         item.innerHTML = `
@@ -10495,6 +10727,44 @@ function createDefaultNotifications() {
     }
 }
 
+function createDefaultNotificationsOnce() {
+    // Check if we've already created default notifications in this session
+    const hasCreatedDefaults = localStorage.getItem('defaultNotificationsCreated');
+    
+    if (!hasCreatedDefaults && AppState.notifications.length === 0) {
+        const defaultNotifications = [
+            {
+                id: Date.now() + 1,
+                title: 'Welcome to DSI Placement Portal',
+                message: 'Check this section regularly for important updates about placements and shortlisted candidates.',
+                type: 'info',
+                timestamp: new Date().toISOString(),
+                read: false
+            },
+            {
+                id: Date.now() + 2,
+                title: 'Test Notification - Firebase Working!',
+                message: `This test notification was created at ${new Date().toLocaleTimeString()}. If you can see this, Firebase is working correctly!`,
+                type: 'success',
+                timestamp: new Date().toISOString(),
+                read: false
+            }
+        ];
+        
+        AppState.notifications = defaultNotifications;
+        
+        // Save to Firebase
+        saveDataToStorage().then(() => {
+            localStorage.setItem('defaultNotificationsCreated', 'true');
+            console.log('✅ Default notifications created (first time only)');
+        }).catch(error => {
+            console.error('❌ Error saving default notifications:', error);
+        });
+    } else {
+        console.log('✅ Default notifications already created or exist:', AppState.notifications.length);
+    }
+}
+
 // Ensure notifications exist when student logs in
 function ensureNotificationsExist() {
     console.log('🔔 Ensuring notifications exist...');
@@ -10620,7 +10890,7 @@ function createAndDisplayNotificationsDirectly() {
         const notificationElement = document.createElement('div');
         notificationElement.className = `notification-item ${notification.read ? 'read' : 'unread'}`;
         
-        const timeAgo = getTimeAgo(new Date(notification.timestamp));
+        const timeAgo = getTimeAgo(getNotificationTimestamp(notification));
         
         notificationElement.innerHTML = `
             <div class="notification-icon">
