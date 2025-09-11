@@ -11,12 +11,55 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff6f00">
+    
+    <!-- iOS PWA Support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="DSI Jobs">
+    <meta name="apple-mobile-web-app-orientations" content="portrait">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- iOS Icons -->
     <link rel="apple-touch-icon" href="DSi.png">
+    <link rel="apple-touch-icon" sizes="57x57" href="DSi.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="DSi.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="DSi.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="DSi.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="DSi.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="DSi.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="DSi.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="DSi.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="DSi.png">
+    
+    <!-- iOS Splash Screens -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-startup-image" href="DSi.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="DSi.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="DSi.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="DSi.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="DSi.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="DSi.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)">
+    
+    <!-- Standard Icons -->
     <link rel="icon" type="image/png" sizes="192x192" href="DSi.png">
     <link rel="icon" type="image/png" sizes="512x512" href="DSi.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="DSi.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="DSi.png">
+    
+    <!-- Microsoft Tiles -->
+    <meta name="msapplication-TileColor" content="#ff6f00">
+    <meta name="msapplication-TileImage" content="DSi.png">
+    <meta name="msapplication-config" content="browserconfig.xml">
+    
+    <!-- Android Chrome -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="DSI Jobs">
+    
+    <!-- Additional PWA Meta Tags -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <!-- Firebase Configuration (Embedded) -->
     <script>
@@ -130,9 +173,10 @@
                     </div>
                 </div>
                 <div class="nav-menu" id="nav-menu">
-                    <a href="#" onclick="showStudentDashboard()" class="nav-link active" id="student-nav">Student Portal</a>
-                    <a href="#" onclick="showShortlistedView()" class="nav-link" id="shortlisted-nav">Shortlisted</a>
-                    <a href="#" onclick="showAdminLogin()" class="nav-link" id="admin-nav">Admin Panel</a>
+                    <a href="#" onclick="showHomepage()" class="nav-link active" id="homepage-nav">Home</a>
+                    <a href="#" onclick="showStudentLogin()" class="nav-link" id="student-login-nav">Student Login</a>
+                    <a href="#" onclick="showAdminLogin()" class="nav-link" id="admin-nav">Admin Login</a>
+                    <a href="#" onclick="showStudentDashboard()" class="nav-link" id="student-nav" style="display: none;">Student Portal</a>
                 </div>
                 <button class="mobile-menu-toggle" id="mobile-menu-toggle" onclick="toggleMobileMenu()">
                     <span></span>
@@ -143,6 +187,10 @@
                     <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
                         <i class="fas fa-moon"></i>
                     </button>
+                    <div class="notification-toggle" onclick="toggleNotificationSettings()" title="Notification Settings">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="nav-notification-badge" style="display: none;">0</span>
+                    </div>
                     <div class="connection-status">
                         <div id="connection-indicator" class="connection-indicator">
                             <i class="fas fa-wifi"></i>
@@ -153,8 +201,67 @@
             </div>
         </nav>
 
+        <!-- Homepage -->
+        <div id="homepage" class="page-content active">
+            <div class="container">
+                <div class="homepage-content">
+                    <div class="homepage-hero">
+                        <h1 class="homepage-title">Welcome to DSI Placement Portal</h1>
+                        <p class="homepage-subtitle">Find your dream job and connect with top companies</p>
+                        
+                        <!-- Download Section -->
+                        <div class="download-section">
+                            <div class="download-content">
+                                <h3>Get the App</h3>
+                                <p>Click to install our app directly to your device</p>
+                                <div class="download-buttons">
+                                    <button class="download-btn" onclick="downloadApp()" id="download-btn">
+                                        <i class="fas fa-download"></i>
+                                        <span class="download-text">Install Now</span>
+                                    </button>
+                                    <button class="install-btn" onclick="installPWA()" id="install-btn" style="display: none;">
+                                        <i class="fas fa-mobile-alt"></i>
+                                        <span>Install App</span>
+                                    </button>
+                                </div>
+                                <div class="device-info">
+                                    <span id="device-type">Detecting device...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="login-options">
+                        <div class="login-option-card" onclick="showStudentLogin()">
+                            <div class="login-option-icon">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <h3>Student Login</h3>
+                            <p>Access your student portal to view jobs and apply</p>
+                            <button class="login-option-btn">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Login as Student
+                            </button>
+                        </div>
+                        
+                        <div class="login-option-card" onclick="showAdminLogin()">
+                            <div class="login-option-icon">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <h3>Admin Login</h3>
+                            <p>Manage jobs, students, and placement activities</p>
+                            <button class="login-option-btn">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Login as Admin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Student Dashboard -->
-        <div id="student-dashboard" class="page-content active">
+        <div id="student-dashboard" class="page-content">
             <div class="container">
 
                 <!-- Shortlisted Notification Banner -->
@@ -230,6 +337,10 @@
         <div id="shortlisted-view" class="page-content">
             <div class="container">
                 <div class="dashboard-header">
+                    <button onclick="showStudentDashboard()" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Student Portal
+                    </button>
                     <h1 class="page-title animate-fade-in">Shortlisted Candidates</h1>
                     <p class="page-subtitle animate-fade-in-delay">View shortlisted candidates for placements</p>
                 </div>
@@ -249,6 +360,10 @@
                 <!-- Shortlisted Display Options -->
                 <div id="shortlisted-data-section" class="shortlisted-section" style="display: none;">
                     <div class="section-header">
+                        <button onclick="showStudentDashboard()" class="back-btn">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Student Portal
+                        </button>
                         <h2>Shortlisted Candidates</h2>
                         <div class="shortlisted-actions">
                             <button onclick="exportShortlistedData()" class="export-btn">
@@ -309,6 +424,650 @@
             </div>
         </div>
 
+        <!-- Student Login -->
+        <div id="student-login" class="page-content">
+            <div class="login-container">
+                <div class="login-card animate-scale-in">
+                    <div class="login-header">
+                        <i class="fas fa-user-graduate"></i>
+                        <h2>Student Login</h2>
+                        <p>Access your personal placement portal</p>
+                    </div>
+                    <form id="student-login-form" onsubmit="handleStudentLogin(event)">
+                        <div class="form-group">
+                            <label for="student-usn">USN/User ID</label>
+                            <input type="text" id="student-usn" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="student-password">Password</label>
+                            <input type="password" id="student-password" required>
+                        </div>
+                        <button type="submit" class="login-btn">
+                            <span>Login</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+                    <div class="login-footer">
+                        <p>Don't have an account? Contact your placement officer.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Portal -->
+        <div id="student-portal" class="page-content">
+            <div class="container">
+                <div class="dashboard-header">
+                    <div class="header-content">
+                        <div class="header-text">
+                            <h1 class="page-title animate-fade-in">Student Portal</h1>
+                            <p class="page-subtitle animate-fade-in-delay">Welcome to your personal placement dashboard</p>
+                        </div>
+                        <div class="header-actions">
+                            <button onclick="studentLogout()" class="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Portal Navigation -->
+                <div class="student-portal-nav animate-slide-up">
+                    <button onclick="showStudentSection('notifications')" class="portal-nav-btn active" id="nav-notifications">
+                        <i class="fas fa-bell"></i>
+                        Notifications
+                    </button>
+                    <button onclick="showStudentSection('available-jobs')" class="portal-nav-btn" id="nav-available-jobs">
+                        <i class="fas fa-briefcase"></i>
+                        Available Jobs
+                    </button>
+                    <button onclick="showStudentSection('my-portal')" class="portal-nav-btn" id="nav-my-portal">
+                        <i class="fas fa-user"></i>
+                        My Portal
+                    </button>
+                    <button onclick="showStudentSection('offer-letter')" class="portal-nav-btn" id="nav-offer-letter">
+                        <i class="fas fa-file-upload"></i>
+                        Offer Letter
+                    </button>
+                    <button onclick="showStudentSection('shortlisted')" class="portal-nav-btn" id="nav-shortlisted">
+                        <i class="fas fa-list-check"></i>
+                        Shortlisted
+                    </button>
+                </div>
+
+                <!-- Notifications Section -->
+                <div id="student-notifications-section" class="student-section active">
+                    <div class="section-header">
+                        <h3><i class="fas fa-bell"></i> Notifications</h3>
+                        <p>Latest updates and announcements</p>
+                    </div>
+                    <div id="student-notifications-list" class="notifications-list">
+                        <!-- Notifications will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Available Jobs Section -->
+                <div id="student-available-jobs-section" class="student-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-briefcase"></i> Available Jobs</h3>
+                        <p>All available job opportunities - eligibility status shown for each job</p>
+                    </div>
+                    <div id="eligible-jobs-list" class="eligible-jobs-grid">
+                        <!-- Eligible jobs will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- My Portal Section -->
+                <div id="student-my-portal-section" class="student-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-user"></i> My Portal</h3>
+                        <p>Your personal information and status</p>
+                    </div>
+                    
+                    <!-- Student Information Card -->
+                    <div class="student-info-card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-user"></i> Student Information</h4>
+                        </div>
+                        <div class="student-info-grid">
+                            <div class="info-item">
+                                <label>USN:</label>
+                                <span id="student-info-usn">-</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Email:</label>
+                                <span id="student-info-email">-</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Current CGPA:</label>
+                                <span id="student-info-cgpa">-</span>
+                            </div>
+                            <div class="info-item">
+                                <label>10th Marks:</label>
+                                <span id="student-info-10th">-</span>
+                            </div>
+                            <div class="info-item">
+                                <label>12th Marks:</label>
+                                <span id="student-info-12th">-</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Eligible for Jobs:</label>
+                                <span id="student-info-eligible" class="eligible-status">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Management Page -->
+        <div id="job-management-page" class="page-content">
+            <div class="admin-container">
+                <div class="page-header">
+                    <button onclick="showAdminDashboard()" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </button>
+                    <h1>Job Management</h1>
+                    <p>Manage job postings, applications, and company details</p>
+                </div>
+
+                <div class="management-section">
+                    <div class="section-header">
+                        <h2>Job Postings</h2>
+                        <button onclick="showAddJobModal()" class="add-job-btn">
+                            <i class="fas fa-plus"></i>
+                            Add New Job
+                        </button>
+                    </div>
+                    <div id="admin-job-list" class="admin-job-grid">
+                        <!-- Admin job list will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications Management Page -->
+        <div id="notifications-management-page" class="page-content">
+            <div class="admin-container">
+                <div class="page-header">
+                    <button onclick="showAdminDashboard()" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </button>
+                    <h1>Notifications Management</h1>
+                    <p>Create, edit, and manage system notifications</p>
+                </div>
+
+                <div class="management-section">
+                    <div class="section-header">
+                        <h2>System Notifications</h2>
+                        <button onclick="showAddNotificationModal()" class="add-notification-btn">
+                            <i class="fas fa-plus"></i>
+                            Add Notification
+                        </button>
+                    </div>
+                    <div id="notifications-management-list" class="admin-notifications-grid">
+                        <!-- Admin notifications list will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Data Management Page -->
+        <div id="student-management-page" class="page-content">
+            <div class="admin-container">
+                <div class="page-header">
+                    <button onclick="showAdminDashboard()" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </button>
+                    <h1>Student Data Management</h1>
+                    <p>Manage student records, eligibility, and data export</p>
+                </div>
+
+                <!-- Student Statistics -->
+                <div class="student-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-students-count-stats">0</h3>
+                            <p>Total Students</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon eligible">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="eligible-students-count">0</h3>
+                            <p>Eligible Students</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon ineligible">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="ineligible-students-count">0</h3>
+                            <p>Ineligible Students</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon placed">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="placed-students-count">0</h3>
+                            <p>Placed Students</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Management Actions -->
+                <div class="student-actions-grid">
+                    <button onclick="showStudentUploadModal()" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Upload Student Data</h3>
+                            <p>Upload CSV/Excel files with student information</p>
+                        </div>
+                    </button>
+                    
+                    <button onclick="showAddStudentModal()" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Add Student Manually</h3>
+                            <p>Add individual student records manually</p>
+                        </div>
+                    </button>
+                    
+                    <button onclick="showEligibilityCriteriaModal()" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Set Eligibility Criteria</h3>
+                            <p>Configure minimum marks and CGPA requirements</p>
+                        </div>
+                    </button>
+                    
+                    <button onclick="showOfferLetterUploadModal()" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Upload Offer Letter</h3>
+                            <p>Upload offer letters and update placement status</p>
+                        </div>
+                    </button>
+                    
+                    <div class="action-card export-card">
+                        <div class="action-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Export Data</h3>
+                            <p>Export student data in various formats</p>
+                        </div>
+                        <div class="export-dropdown">
+                            <button onclick="toggleExportDropdown()" class="export-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="export-dropdown-menu">
+                                <div class="export-option" onclick="exportStudentData('csv')">
+                                    <i class="fas fa-file-csv"></i>
+                                    Export as CSV
+                                </div>
+                                <div class="export-option" onclick="exportStudentData('excel')">
+                                    <i class="fas fa-file-excel"></i>
+                                    Export as Excel
+                                </div>
+                                <div class="export-option" onclick="exportStudentData('pdf')">
+                                    <i class="fas fa-file-pdf"></i>
+                                    Export as PDF
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="showPlacedStudentsPage()" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>View Placed Students</h3>
+                            <p>View all placed students with offer letter details</p>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="search-section">
+                    <div class="search-container">
+                        <div class="search-input-group">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="student-search" placeholder="Search students by USN, email, name..." onkeyup="filterStudents()">
+                        </div>
+                        <div class="filter-options">
+                            <select id="eligibility-filter" onchange="filterStudents()">
+                                <option value="all">All Students</option>
+                                <option value="eligible">Eligible Only</option>
+                                <option value="ineligible">Ineligible Only</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Records -->
+                <div class="management-section">
+                    <div class="section-header">
+                        <h2>Student Records</h2>
+                        <div class="section-actions">
+                            <button onclick="addSampleStudentData()" class="sample-data-btn">
+                                <i class="fas fa-plus-circle"></i>
+                                Add Sample Data
+                            </button>
+                        </div>
+                    </div>
+                    <div id="admin-student-list" class="admin-student-grid">
+                        <!-- Admin student list will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placed Students Page -->
+        <div id="placed-students-page" class="page-content">
+            <div class="admin-container">
+                <div class="page-header">
+                    <button onclick="showStudentManagementPage()" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Student Management
+                    </button>
+                    <h1>Placed Students</h1>
+                    <p>View all placed students with their offer letter details and placement information</p>
+                </div>
+
+                <!-- Placed Students Statistics -->
+                <div class="placed-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon placed">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-placed-count">0</h3>
+                            <p>Total Placed Students</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="avg-salary">0</h3>
+                            <p>Average Salary (LPA)</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="recent-placements">0</h3>
+                            <p>Recent Placements (30 days)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="search-section">
+                    <div class="search-container">
+                        <div class="search-input-group">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="placed-student-search" placeholder="Search placed students by USN, name, company..." onkeyup="filterPlacedStudents()">
+                        </div>
+                        <div class="filter-options">
+                            <select id="salary-filter" onchange="filterPlacedStudents()">
+                                <option value="all">All Salary Ranges</option>
+                                <option value="below10">Below 10 LPA</option>
+                                <option value="below20">10-20 LPA</option>
+                                <option value="above20">20+ LPA</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Placed Students List -->
+                <div class="management-section">
+                    <div class="section-header">
+                        <h2>Placed Students List</h2>
+                        <div class="section-actions">
+                            <button onclick="exportPlacedStudentsData()" class="export-btn">
+                                <i class="fas fa-download"></i>
+                                Export Placed Students
+                            </button>
+                        </div>
+                    </div>
+                    <div id="placed-students-list" class="placed-students-grid">
+                        <!-- Placed students list will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Management Page -->
+        <div id="admin-management-page" class="page-content">
+            <div class="admin-container">
+                <div class="page-header">
+                    <button onclick="showAdminDashboard()" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </button>
+                    <h1>Admin Management</h1>
+                    <p>Manage admin accounts, permissions, and access control</p>
+                </div>
+
+                <div class="management-section">
+                    <div class="section-header">
+                        <h2>Admin Accounts</h2>
+                        <div class="section-actions">
+                            <button onclick="showAddAdminModal()" class="add-admin-btn">
+                                <i class="fas fa-plus"></i>
+                                Add Admin
+                            </button>
+                        </div>
+                    </div>
+                    <div id="admin-list" class="admin-grid">
+                        <!-- Admin list will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Tools Page -->
+        <div id="admin-tools-page" class="page-content">
+            <div class="admin-container">
+                <div class="page-header">
+                    <button onclick="showAdminDashboard()" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </button>
+                    <h1>Admin Management Tools</h1>
+                    <p>System tools, analytics, and advanced management features</p>
+                </div>
+
+                <div class="admin-tools-grid">
+                    <!-- Data Management Section -->
+                    <div class="tool-section">
+                        <h3>Data Management</h3>
+                        <div class="tool-cards-row">
+                            <div class="tool-card" onclick="downloadWebsiteAsPDF()">
+                                <div class="tool-icon">
+                                    <i class="fas fa-file-pdf"></i>
+                                </div>
+                                <h4>Download Website as PDF</h4>
+                                <p>Export the entire website as a PDF document</p>
+                            </div>
+                            
+                            <div class="tool-card" onclick="refreshData()">
+                                <div class="tool-icon">
+                                    <i class="fas fa-sync-alt"></i>
+                                </div>
+                                <h4>Refresh Data</h4>
+                                <p>Reload all data from Firebase</p>
+                            </div>
+                            
+                            <div class="tool-card" onclick="clearAllNotifications()">
+                                <div class="tool-icon">
+                                    <i class="fas fa-bell-slash"></i>
+                                </div>
+                                <h4>Clear All Notifications</h4>
+                                <p>Remove all system notifications</p>
+                            </div>
+                            
+                            <div class="tool-card" onclick="clearAllJobs()">
+                                <div class="tool-icon">
+                                    <i class="fas fa-briefcase-slash"></i>
+                                </div>
+                                <h4>Clear All Jobs</h4>
+                                <p>Remove all job postings</p>
+                            </div>
+                            
+                            <div class="tool-card" onclick="clearAllShortlistedData()">
+                                <div class="tool-icon">
+                                    <i class="fas fa-users-slash"></i>
+                                </div>
+                                <h4>Clear All Shortlisted Data</h4>
+                                <p>Remove all shortlisted candidates</p>
+                            </div>
+                            
+                            <div class="tool-card" onclick="clearAllStudentData()">
+                                <div class="tool-icon">
+                                    <i class="fas fa-user-times"></i>
+                                </div>
+                                <h4>Clear All Student Data</h4>
+                                <p>Remove all student records and data</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Testing Section -->
+                    <div class="tool-section">
+                        <h3>System Testing</h3>
+                        <div class="tool-cards-row">
+                            <div class="tool-card" onclick="testNotification()">
+                                <div class="tool-icon">
+                                    <i class="fas fa-bell"></i>
+                                </div>
+                                <h4>Test Notification</h4>
+                                <p>Send a test notification</p>
+                            </div>
+                            
+                            <div class="tool-card" onclick="testRealtimeNotification()">
+                                <div class="tool-icon">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <h4>Test Real-time</h4>
+                                <p>Test real-time notification system</p>
+                            </div>
+                            
+                            <div class="tool-card" onclick="testSimpleRealtime()">
+                                <div class="tool-icon">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <h4>Simple Test</h4>
+                                <p>Run a simple system test</p>
+                            </div>
+                            
+                            <div class="tool-card" onclick="testConnection()">
+                                <div class="tool-icon">
+                                    <i class="fas fa-wifi"></i>
+                                </div>
+                                <h4>Test Connection</h4>
+                                <p>Test Firebase connection</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Connection Management Section -->
+                    <div class="tool-section">
+                        <h3>Connection Management</h3>
+                        <div class="tool-cards-row">
+                            <div class="tool-card" onclick="retryConnection()">
+                                <div class="tool-icon">
+                                    <i class="fas fa-redo"></i>
+                                </div>
+                                <h4>Retry Connection</h4>
+                                <p>Retry Firebase connection</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Offer Letter Section -->
+        <div id="student-offer-letter-section" class="student-section">
+            <div class="section-header">
+                <h3><i class="fas fa-file-upload"></i> Offer Letter & Applications</h3>
+                <p>Upload your offer letter and apply for jobs</p>
+            </div>
+            
+            <!-- Current Status -->
+            <div class="status-card">
+                <h4>Current Status</h4>
+                <div id="student-current-status">
+                    <!-- Status will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Offer Letter Upload -->
+            <div class="upload-card">
+                <h4>Upload Offer Letter</h4>
+                <p>If you have received an offer letter, upload it here to update your placement status.</p>
+                <form id="student-offer-letter-form" onsubmit="uploadStudentOfferLetter(event)">
+                    <div class="form-group">
+                        <label for="student-offer-file">Offer Letter (PDF/Image)</label>
+                        <input type="file" id="student-offer-file" accept=".pdf,.jpg,.jpeg,.png" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-salary">Salary (LPA)</label>
+                        <input type="number" id="student-salary" min="0" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-salary-range">Salary Range</label>
+                        <select id="student-salary-range" required>
+                            <option value="">Select salary range...</option>
+                            <option value="below10">Below 10 LPA</option>
+                            <option value="below20">Below 20 LPA</option>
+                            <option value="above20">20 LPA+</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i>
+                        Upload Offer Letter
+                    </button>
+                </form>
+            </div>
+            
+                    <!-- Offer Letter Download -->
+                    <div class="download-card" id="offer-letter-download-section" style="display: none;">
+                        <h4>Download Offer Letter</h4>
+                        <div id="offer-letter-download-info">
+                            <!-- Download info will be loaded here -->
+                        </div>
+                    </div>
+                    
+        </div>
+
         <!-- Admin Dashboard -->
         <div id="admin-dashboard" class="page-content">
             <div class="admin-container">
@@ -319,6 +1078,104 @@
                             <i class="fas fa-sign-out-alt"></i>
                             Logout
                         </button>
+                    </div>
+                </div>
+
+                <!-- Admin Management Buttons -->
+                <div class="admin-management-grid">
+                    <div class="management-card" onclick="showJobManagement()">
+                        <div class="management-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="management-content">
+                            <h3>Job Management</h3>
+                            <p>Manage job postings, applications, and company details</p>
+                            <div class="management-stats">
+                                <span class="stat-item">
+                                    <i class="fas fa-building"></i>
+                                    <span id="total-jobs-count">0</span> Jobs
+                                </span>
+                            </div>
+                        </div>
+                        <div class="management-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="management-card" onclick="showNotificationsManagement()">
+                        <div class="management-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="management-content">
+                            <h3>Notifications Management</h3>
+                            <p>Create, edit, and manage system notifications</p>
+                            <div class="management-stats">
+                                <span class="stat-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span id="total-notifications-count">0</span> Notifications
+                                </span>
+                            </div>
+                        </div>
+                        <div class="management-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="management-card" onclick="showStudentDataManagement()">
+                        <div class="management-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="management-content">
+                            <h3>Student Data Management <span id="total-students-count">(0)</span></h3>
+                            <p>Manage student records, eligibility, and data export</p>
+                            <div class="management-stats">
+                                <span class="stat-item">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <span id="total-students-count-card">0</span> Students
+                                </span>
+                            </div>
+                        </div>
+                        <div class="management-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="management-card" onclick="showAdminManagement()">
+                        <div class="management-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="management-content">
+                            <h3>Admin Management</h3>
+                            <p>Manage admin accounts, permissions, and access control</p>
+                            <div class="management-stats">
+                                <span class="stat-item">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span id="total-admins-count">0</span> Admins
+                                </span>
+                            </div>
+                        </div>
+                        <div class="management-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="management-card" onclick="showAdminTools()">
+                        <div class="management-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="management-content">
+                            <h3>Admin Management Tools</h3>
+                            <p>System tools, analytics, and advanced management features</p>
+                            <div class="management-stats">
+                                <span class="stat-item">
+                                    <i class="fas fa-chart-line"></i>
+                                    Analytics
+                                </span>
+                            </div>
+                        </div>
+                        <div class="management-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
                     </div>
                 </div>
 
@@ -352,6 +1209,81 @@
                         <h3>Current Admins</h3>
                         <div id="admin-list" class="admin-list">
                             <!-- Admin list will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Data Management Section -->
+                <div class="management-section" style="margin-top: 2rem;">
+                    <div class="section-header">
+                        <h2>Student Data Management</h2>
+                        <div class="student-management-actions">
+                            <button onclick="showStudentUploadModal()" class="add-job-btn">
+                                <i class="fas fa-upload"></i>
+                                Upload Student Data
+                            </button>
+                            <button onclick="showAddStudentModal()" class="add-job-btn">
+                                <i class="fas fa-user-plus"></i>
+                                Add Student Manually
+                            </button>
+                            <button onclick="showEligibilityCriteriaModal()" class="add-job-btn">
+                                <i class="fas fa-cog"></i>
+                                Set Eligibility Criteria
+                            </button>
+                            <div class="export-dropdown">
+                                <button onclick="toggleExportDropdown()" class="export-btn">
+                                    <i class="fas fa-download"></i>
+                                    Export Data
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div id="export-dropdown-menu" class="export-dropdown-menu">
+                                    <button onclick="exportStudentData('csv')" class="export-option">
+                                        <i class="fas fa-file-csv"></i>
+                                        Export as CSV
+                                    </button>
+                                    <button onclick="exportStudentData('excel')" class="export-option">
+                                        <i class="fas fa-file-excel"></i>
+                                        Export as Excel
+                                    </button>
+                                    <button onclick="exportStudentData('pdf')" class="export-option">
+                                        <i class="fas fa-file-pdf"></i>
+                                        Export as PDF
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Student List -->
+                    <div class="student-list-section">
+                        <div class="student-stats">
+                            <div class="stat-item">
+                                <span class="stat-number" id="total-students">0</span>
+                                <span class="stat-label">Total Students</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="eligible-students">0</span>
+                                <span class="stat-label">Eligible Students</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="ineligible-students">0</span>
+                                <span class="stat-label">Ineligible Students</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="placed-students">0</span>
+                                <span class="stat-label">Placed Students</span>
+                            </div>
+                        </div>
+                        
+                        <div class="student-search-section">
+                            <div class="search-bar">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="student-search" placeholder="Search students by USN, email..." oninput="filterStudents()">
+                            </div>
+                        </div>
+                        
+                        <div id="student-list" class="student-list">
+                            <!-- Student list will be loaded here -->
                         </div>
                     </div>
                 </div>
@@ -426,6 +1358,14 @@
                                     <i class="fas fa-vial"></i>
                                     Test Notification
                                 </button>
+                                <button onclick="testRealtimeNotification()" class="test-realtime-btn">
+                                    <i class="fas fa-bolt"></i>
+                                    Test Real-time
+                                </button>
+                                <button onclick="testSimpleRealtime()" class="test-simple-btn">
+                                    <i class="fas fa-bell"></i>
+                                    Simple Test
+                                </button>
                                 <button onclick="testFirebaseConnection()" class="test-connection-btn">
                                     <i class="fas fa-network-wired"></i>
                                     Test Connection
@@ -496,6 +1436,33 @@
                         <label for="job-eligibility">Eligibility Criteria</label>
                         <textarea id="job-eligibility" rows="3" required></textarea>
                     </div>
+                    
+                    <div class="form-group">
+                        <label>Academic Requirements</label>
+                        <div class="eligibility-criteria-grid">
+                            <div class="criteria-item">
+                                <h4><i class="fas fa-certificate"></i> 10th Standard</h4>
+                                <div class="criteria-input-group">
+                                    <input type="number" id="job-10th-marks" min="0" max="100" step="0.1" class="criteria-input" placeholder="60">
+                                    <span class="criteria-unit">%</span>
+                                </div>
+                            </div>
+                            <div class="criteria-item">
+                                <h4><i class="fas fa-medal"></i> 12th/Diploma</h4>
+                                <div class="criteria-input-group">
+                                    <input type="number" id="job-12th-marks" min="0" max="100" step="0.1" class="criteria-input" placeholder="60">
+                                    <span class="criteria-unit">%</span>
+                                </div>
+                            </div>
+                            <div class="criteria-item">
+                                <h4><i class="fas fa-star"></i> Engineering CGPA</h4>
+                                <div class="criteria-input-group">
+                                    <input type="number" id="job-cgpa-marks" min="0" max="10" step="0.1" class="criteria-input" placeholder="6.0">
+                                    <span class="criteria-unit">CGPA</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="job-batches">Eligible Batches</label>
@@ -514,6 +1481,31 @@
                         <label for="job-form-link">Application Form Link</label>
                         <input type="url" id="job-form-link" placeholder="https://forms.google.com/..." required>
                     </div>
+                    
+                    <!-- Salary Range Eligibility -->
+                    <div class="form-group">
+                        <label>Eligible Salary Ranges (for placed students)</label>
+                        <div class="salary-range-eligibility">
+                            <div class="eligibility-option">
+                                <input type="checkbox" id="job-eligible-below10" value="below10">
+                                <label for="job-eligible-below10">Students placed below 10 LPA</label>
+                            </div>
+                            <div class="eligibility-option">
+                                <input type="checkbox" id="job-eligible-below20" value="below20">
+                                <label for="job-eligible-below20">Students placed below 20 LPA</label>
+                            </div>
+                            <div class="eligibility-option">
+                                <input type="checkbox" id="job-eligible-above20" value="above20">
+                                <label for="job-eligible-above20">Students placed 20 LPA+</label>
+                            </div>
+                            <div class="eligibility-option">
+                                <input type="checkbox" id="job-eligible-not-placed" value="not-placed" checked>
+                                <label for="job-eligible-not-placed">Students not placed</label>
+                            </div>
+                        </div>
+                        <small class="form-help">Select which salary ranges can apply to this job. Not placed students can always apply unless restricted.</small>
+                    </div>
+                    
                     <div class="form-actions">
                         <button type="button" onclick="closeJobForm()" class="cancel-btn">Cancel</button>
                         <button type="submit" class="submit-btn">Save Job</button>
@@ -871,6 +1863,107 @@
             </div>
         </div>
 
+        <!-- Eligibility Criteria Modal -->
+        <div id="eligibility-criteria-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeEligibilityCriteriaModal()">&times;</span>
+                <h2>Set Eligibility Criteria</h2>
+                <form id="eligibility-form" onsubmit="updateEligibilityCriteria(event)">
+                    <div class="form-group">
+                        <label for="min-10th-marks">Minimum 10th Standard Marks (%)</label>
+                        <input type="number" id="min-10th-marks" min="0" max="100" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="min-12th-marks">Minimum 12th/Diploma Marks (%)</label>
+                        <input type="number" id="min-12th-marks" min="0" max="100" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="min-cgpa-marks">Minimum Engineering CGPA</label>
+                        <input type="number" id="min-cgpa-marks" min="0" max="10" step="0.1" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" onclick="closeEligibilityCriteriaModal()" class="cancel-btn">Cancel</button>
+                        <button type="submit" class="submit-btn">Update Criteria</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Offer Letter Upload Modal -->
+        <div id="offer-letter-upload-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeOfferLetterUploadModal()">&times;</span>
+                <h2>Upload Offer Letter</h2>
+                <form id="offer-letter-form" onsubmit="uploadOfferLetter(event)">
+                    <div class="form-group">
+                        <label for="student-select">Select Student</label>
+                        <select id="student-select" required>
+                            <option value="">Choose a student...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="offer-letter-file">Offer Letter (PDF/Image)</label>
+                        <input type="file" id="offer-letter-file" accept=".pdf,.jpg,.jpeg,.png" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="placed-salary">Salary (LPA)</label>
+                        <input type="number" id="placed-salary" min="0" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="salary-range">Salary Range</label>
+                        <select id="salary-range" required>
+                            <option value="">Select salary range...</option>
+                            <option value="below10">Below 10 LPA</option>
+                            <option value="below20">Below 20 LPA</option>
+                            <option value="above20">20 LPA+</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" onclick="closeOfferLetterUploadModal()" class="cancel-btn">Cancel</button>
+                        <button type="submit" class="submit-btn">Upload Offer Letter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Add Student Manually Modal -->
+        <div id="add-student-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeAddStudentModal()">&times;</span>
+                <h2>Add Student Manually</h2>
+                <form id="add-student-form" onsubmit="handleAddStudent(event)">
+                    <div class="form-group">
+                        <label for="manual-usn">USN/User ID *</label>
+                        <input type="text" id="manual-usn" required placeholder="e.g., 1DS23IS400">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-name">Student Name *</label>
+                        <input type="text" id="manual-name" required placeholder="e.g., John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-email">Email Address *</label>
+                        <input type="email" id="manual-email" required placeholder="e.g., student@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-cgpa">Current CGPA *</label>
+                        <input type="number" id="manual-cgpa" min="0" max="10" step="0.01" required placeholder="e.g., 8.33">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-10th">10th Standard Marks (%) *</label>
+                        <input type="number" id="manual-10th" min="0" max="100" step="0.01" required placeholder="e.g., 72.72">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-12th">12th/Diploma Marks (%) *</label>
+                        <input type="number" id="manual-12th" min="0" max="100" step="0.01" required placeholder="e.g., 89.5">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" onclick="closeAddStudentModal()" class="cancel-btn">Cancel</button>
+                        <button type="submit" class="submit-btn">Add Student</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- File Upload Modal -->
         <div id="file-upload-modal" class="modal">
             <div class="modal-content">
@@ -903,6 +1996,157 @@
 
             </div>
         </div>
+
+        <!-- Student Data Upload Modal -->
+        <div id="student-upload-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeStudentUploadModal()">&times;</span>
+                <h2>Upload Student Data</h2>
+                <div class="upload-instructions">
+                    <h3>CSV/Excel Format Requirements:</h3>
+                    <p>Please ensure your file has the following columns in order:</p>
+                    <ul>
+                        <li><strong>Column 1:</strong> USN (University Seat Number)</li>
+                        <li><strong>Column 2:</strong> Name (Full Name)</li>
+                        <li><strong>Column 3:</strong> Email Address</li>
+                        <li><strong>Column 4:</strong> Current CGPA (0-10 scale)</li>
+                        <li><strong>Column 5:</strong> 10th Standard Marks (%)</li>
+                        <li><strong>Column 6:</strong> 12th/Diploma Marks (%)</li>
+                    </ul>
+                    <p><strong>Note:</strong> Passwords will be automatically generated for each student.</p>
+                </div>
+                <div class="upload-section">
+                    <div id="student-drop-zone" class="drop-zone" ondrop="handleStudentFileDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag and drop your XLSX/CSV file here</p>
+                        <span>or</span>
+                        <button type="button" onclick="document.getElementById('student-file-input').click()" class="upload-btn">Choose File</button>
+                        <input type="file" id="student-file-input" accept=".xlsx,.csv" onchange="handleStudentFileSelect(event)" style="display: none;">
+                    </div>
+                    <div id="student-upload-progress" class="upload-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div id="student-progress-fill" class="progress-fill"></div>
+                        </div>
+                        <span id="student-progress-text">Processing...</span>
+                    </div>
+                </div>
+                <div id="student-data-viewer" class="data-viewer" style="display: none;">
+                    <h3>Student Data Preview</h3>
+                    <div id="upload-errors" class="upload-errors" style="display: none;">
+                        <h4>Errors Found:</h4>
+                        <ul id="error-list"></ul>
+                    </div>
+                    <div class="table-container">
+                        <table id="student-preview-table">
+                            <thead id="student-preview-header"></thead>
+                            <tbody id="student-preview-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="modal-actions" style="margin-top: 1rem;">
+                        <button onclick="saveStudentData()" class="submit-btn" id="save-student-btn" disabled>
+                            <i class="fas fa-save"></i>
+                            Save Student Data
+                        </button>
+                        <button onclick="closeStudentUploadModal()" class="cancel-btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Edit Student Modal -->
+        <div id="edit-student-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeEditStudentModal()">&times;</span>
+                <h2>Edit Student Information</h2>
+                <form id="edit-student-form" onsubmit="handleEditStudentSubmit(event)">
+                    <input type="hidden" id="edit-student-id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-student-usn">USN</label>
+                            <input type="text" id="edit-student-usn" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-student-name">Name</label>
+                            <input type="text" id="edit-student-name" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-student-email">Email</label>
+                            <input type="email" id="edit-student-email" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-student-cgpa">Current CGPA</label>
+                            <input type="number" id="edit-student-cgpa" min="0" max="10" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-student-10th">10th Marks (%)</label>
+                            <input type="number" id="edit-student-10th" min="0" max="100" step="0.1" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-student-12th">12th/Diploma Marks (%)</label>
+                        <input type="number" id="edit-student-12th" min="0" max="100" step="0.1" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" onclick="closeEditStudentModal()" class="cancel-btn">Cancel</button>
+                        <button type="submit" class="submit-btn">Update Student</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA Install Banner -->
+    <div id="pwa-install-banner" class="pwa-install-banner">
+        <div class="app-icon">
+            <img src="DSi.png" alt="DSI Jobs App Icon">
+        </div>
+        <div class="banner-content">
+            <h3 class="banner-title">Install DSI Jobs</h3>
+            <p class="banner-description">Get quick access to job opportunities and stay updated with notifications</p>
+        </div>
+        <div class="banner-actions">
+            <button class="install-btn" onclick="installPWA()">Install</button>
+            <button class="dismiss-btn" onclick="dismissInstallBanner()">Not Now</button>
+        </div>
+    </div>
+
+    <!-- iOS Install Instructions Modal -->
+    <div id="ios-install-modal" class="ios-install-modal">
+        <div class="ios-install-content">
+            <div class="ios-icon">
+                <i class="fab fa-apple"></i>
+            </div>
+            <h3>Install DSI Jobs on iPhone/iPad</h3>
+            <p>Add this app to your home screen for easy access and notifications</p>
+            
+            <div class="ios-install-steps">
+                <div class="ios-install-step">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Tap the Share button <i class="fas fa-share"></i> at the bottom of your screen</div>
+                </div>
+                <div class="ios-install-step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Scroll down and tap "Add to Home Screen"</div>
+                </div>
+                <div class="ios-install-step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Tap "Add" to confirm installation</div>
+                </div>
+            </div>
+            
+            <button class="close-btn" onclick="closeIOSInstallModal()">Got it!</button>
+        </div>
+    </div>
+
+    <!-- PWA Status Indicator -->
+    <div id="pwa-status" class="pwa-status">
+        <i class="fas fa-wifi"></i>
+        <span>Online</span>
     </div>
 
     <script src="script.js"></script>

@@ -1,3 +1,482 @@
+// Device Detection and Download Functions
+function detectDevice() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+    const isTablet = /ipad|android(?!.*mobile)|tablet/i.test(userAgent);
+    const isIOS = /iphone|ipad|ipod/i.test(userAgent);
+    const isAndroid = /android/i.test(userAgent);
+    
+    let deviceType = 'Desktop';
+    if (isTablet) {
+        deviceType = 'Tablet';
+    } else if (isMobile) {
+        deviceType = 'Mobile';
+    }
+    
+    return {
+        type: deviceType,
+        isMobile,
+        isTablet,
+        isIOS,
+        isAndroid,
+        isDesktop: !isMobile && !isTablet
+    };
+}
+
+function updateDeviceInfo() {
+    const device = detectDevice();
+    const deviceTypeElement = document.getElementById('device-type');
+    const downloadBtn = document.getElementById('download-btn');
+    const installBtn = document.getElementById('install-btn');
+    
+    if (deviceTypeElement) {
+        deviceTypeElement.textContent = `Device: ${device.type}`;
+    }
+    
+    // Show appropriate download option based on device
+    if (device.isMobile || device.isTablet) {
+        // Show PWA install option for mobile/tablet
+        if (downloadBtn) downloadBtn.style.display = 'none';
+        if (installBtn) installBtn.style.display = 'flex';
+    } else {
+        // Show download option for desktop
+        if (downloadBtn) downloadBtn.style.display = 'flex';
+        if (installBtn) installBtn.style.display = 'none';
+    }
+}
+
+function downloadApp() {
+    const device = detectDevice();
+    
+    if (device.isIOS) {
+        // For iOS, try to trigger add to home screen
+        triggerIOSInstall();
+    } else if (device.isAndroid) {
+        // For Android, show install prompt
+        installPWA();
+    } else {
+        // For Windows/Desktop, try to install PWA
+        installPWA();
+    }
+}
+
+function triggerIOSInstall() {
+    // For iOS, we can't programmatically trigger "Add to Home Screen"
+    // But we can show a simple notification with instructions
+    showNotification('For iPhone: Tap the Share button (square with arrow) and select "Add to Home Screen"', 'info', 5000);
+    
+    // Try to trigger any available install prompt
+    if (window.deferredPrompt) {
+        window.deferredPrompt.prompt();
+        window.deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                showNotification('App installed successfully!', 'success');
+            }
+            window.deferredPrompt = null;
+        });
+    }
+}
+
+function showIOSInstallInstructions() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Add to Home Screen</h2>
+                <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="ios-install-guide">
+                    <div class="ios-icon">
+                        <i class="fab fa-apple"></i>
+                    </div>
+                    <h3>Install on iPhone/iPad</h3>
+                    <p>Add this app to your home screen for easy access:</p>
+                    
+                    <div class="install-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Tap the Share button</strong>
+                                <p>Look for the share icon (square with arrow up) at the bottom of Safari</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Scroll down and tap "Add to Home Screen"</strong>
+                                <p>You'll see this option in the share menu</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Tap "Add" to confirm</strong>
+                                <p>The app will appear on your home screen like a native app</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ios-benefits">
+                        <h4>Benefits:</h4>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Quick access from home screen</li>
+                            <li><i class="fas fa-check"></i> Works offline</li>
+                            <li><i class="fas fa-check"></i> No app store required</li>
+                            <li><i class="fas fa-check"></i> Native app experience</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="this.closest('.modal').remove()">Got it!</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+}
+
+function showDesktopInstallInstructions() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Install on Windows/Desktop</h2>
+                <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="desktop-install-guide">
+                    <div class="desktop-icon">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <h3>Install as Desktop App</h3>
+                    <p>Get the best experience by installing this as a desktop app:</p>
+                    
+                    <div class="browser-instructions">
+                        <div class="browser-item">
+                            <div class="browser-icon chrome">
+                                <i class="fab fa-chrome"></i>
+                            </div>
+                            <div class="browser-steps">
+                                <h4>Google Chrome</h4>
+                                <ol>
+                                    <li>Look for the install icon in the address bar</li>
+                                    <li>Click "Install" when prompted</li>
+                                    <li>Or go to Menu → "Install DSI Placement Portal"</li>
+                                </ol>
+                            </div>
+                        </div>
+                        
+                        <div class="browser-item">
+                            <div class="browser-icon edge">
+                                <i class="fab fa-edge"></i>
+                            </div>
+                            <div class="browser-steps">
+                                <h4>Microsoft Edge</h4>
+                                <ol>
+                                    <li>Click the install icon in the address bar</li>
+                                    <li>Click "Install" when prompted</li>
+                                    <li>Or go to Menu → "Apps" → "Install this site as an app"</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="desktop-benefits">
+                        <h4>Benefits:</h4>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Faster loading and better performance</li>
+                            <li><i class="fas fa-check"></i> Works offline</li>
+                            <li><i class="fas fa-check"></i> Native app-like experience</li>
+                            <li><i class="fas fa-check"></i> Easy access from desktop</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
+                <button class="btn btn-primary" onclick="triggerPWAInstall()">Try Install Now</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+}
+
+function showDetailedInstallInstructions(platform) {
+    const instructions = {
+        iOS: {
+            title: 'Install on iOS',
+            steps: [
+                '1. Tap the Share button (square with arrow up)',
+                '2. Scroll down and tap "Add to Home Screen"',
+                '3. Tap "Add" to confirm',
+                '4. The app will appear on your home screen'
+            ]
+        },
+        Android: {
+            title: 'Install on Android',
+            steps: [
+                '1. Tap the three-dot menu in your browser',
+                '2. Select "Add to Home screen" or "Install app"',
+                '3. Tap "Add" or "Install" to confirm',
+                '4. The app will appear on your home screen'
+            ]
+        }
+    };
+    
+    const instruction = instructions[platform];
+    let message = `${instruction.title}:\n\n${instruction.steps.join('\n')}`;
+    
+    // Show as a detailed notification
+    showNotification(message, 'info', 10000); // Show for 10 seconds
+}
+
+function showPWAInstallModal() {
+    // Create a modal with detailed PWA installation instructions
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>Install DSI Placement Portal</h2>
+                <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="install-instructions">
+                    <div class="install-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3>Install as a Progressive Web App (PWA)</h3>
+                    <p>Get the best experience by installing this app on your device:</p>
+                    
+                    <div class="browser-instructions">
+                        <div class="browser-item">
+                            <div class="browser-icon chrome">
+                                <i class="fab fa-chrome"></i>
+                            </div>
+                            <div class="browser-steps">
+                                <h4>Google Chrome</h4>
+                                <ol>
+                                    <li>Look for the install icon in the address bar</li>
+                                    <li>Click "Install" when prompted</li>
+                                    <li>Or go to Menu → "Install DSI Placement Portal"</li>
+                                </ol>
+                            </div>
+                        </div>
+                        
+                        <div class="browser-item">
+                            <div class="browser-icon edge">
+                                <i class="fab fa-edge"></i>
+                            </div>
+                            <div class="browser-steps">
+                                <h4>Microsoft Edge</h4>
+                                <ol>
+                                    <li>Click the install icon in the address bar</li>
+                                    <li>Click "Install" when prompted</li>
+                                    <li>Or go to Menu → "Apps" → "Install this site as an app"</li>
+                                </ol>
+                            </div>
+                        </div>
+                        
+                        <div class="browser-item">
+                            <div class="browser-icon firefox">
+                                <i class="fab fa-firefox"></i>
+                            </div>
+                            <div class="browser-steps">
+                                <h4>Firefox</h4>
+                                <ol>
+                                    <li>Go to Menu → "Install"</li>
+                                    <li>Click "Install" when prompted</li>
+                                    <li>The app will be added to your applications</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="install-benefits">
+                        <h4>Benefits of Installing:</h4>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Faster loading and better performance</li>
+                            <li><i class="fas fa-check"></i> Works offline</li>
+                            <li><i class="fas fa-check"></i> Native app-like experience</li>
+                            <li><i class="fas fa-check"></i> Easy access from your desktop</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
+                <button class="btn btn-primary" onclick="triggerPWAInstall()">Try Install Now</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+}
+
+function triggerPWAInstall() {
+    if (window.deferredPrompt) {
+        window.deferredPrompt.prompt();
+        window.deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                showNotification('App installed successfully!', 'success');
+            } else {
+                showNotification('Installation cancelled. You can try again later.', 'info');
+            }
+            window.deferredPrompt = null;
+        });
+    } else {
+        showNotification('Install prompt not available. Please use your browser\'s menu to install.', 'info');
+    }
+    
+    // Close the modal
+    const modal = document.querySelector('.modal');
+    if (modal) {
+        modal.remove();
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function installPWA() {
+    console.log('🔧 Attempting to install PWA...');
+    console.log('🔍 Deferred prompt available:', !!window.deferredPrompt);
+    
+    // Try to trigger the install prompt directly
+    if (window.deferredPrompt) {
+        console.log('✅ Triggering install prompt...');
+        window.deferredPrompt.prompt();
+        window.deferredPrompt.userChoice.then((choiceResult) => {
+            console.log('📱 User choice:', choiceResult.outcome);
+            if (choiceResult.outcome === 'accepted') {
+                showNotification('App installed successfully!', 'success');
+            } else {
+                showNotification('Installation cancelled', 'info');
+            }
+            window.deferredPrompt = null;
+        });
+    } else {
+        console.log('❌ No install prompt available');
+        // If no install prompt available, show browser-specific instructions
+        const device = detectDevice();
+        if (device.isAndroid) {
+            showNotification('Tap the menu button (⋮) and select "Add to Home screen" or "Install app"', 'info', 5000);
+        } else if (device.isIOS) {
+            showNotification('Tap the Share button (square with arrow) and select "Add to Home Screen"', 'info', 5000);
+        } else {
+            showNotification('Look for the install icon in your browser\'s address bar or try refreshing the page', 'info', 5000);
+        }
+    }
+}
+
+function setupPWAInstallPrompt() {
+    // Listen for the beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('💾 PWA install prompt available');
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later
+        window.deferredPrompt = e;
+        
+        // Show install button for all devices when prompt is available
+        const downloadBtn = document.getElementById('download-btn');
+        if (downloadBtn) {
+            downloadBtn.style.display = 'flex';
+            downloadBtn.innerHTML = '<i class="fas fa-download"></i><span class="download-text">Install App</span>';
+        }
+        
+        console.log('✅ Install prompt ready - button should be visible');
+    });
+    
+    // Listen for the appinstalled event
+    window.addEventListener('appinstalled', () => {
+        console.log('✅ PWA was installed');
+        showNotification('App installed successfully!', 'success');
+        window.deferredPrompt = null;
+        
+        // Hide install button after successful installation
+        const downloadBtn = document.getElementById('download-btn');
+        if (downloadBtn) {
+            downloadBtn.style.display = 'none';
+        }
+    });
+    
+    // Check if app is already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('✅ App is already installed');
+        const downloadBtn = document.getElementById('download-btn');
+        if (downloadBtn) {
+            downloadBtn.style.display = 'none';
+        }
+    }
+}
+
+function checkPWARequirements() {
+    console.log('🔍 Checking PWA requirements...');
+    
+    const requirements = {
+        https: location.protocol === 'https:' || location.hostname === 'localhost',
+        serviceWorker: 'serviceWorker' in navigator,
+        manifest: !!document.querySelector('link[rel="manifest"]'),
+        icons: document.querySelectorAll('link[rel="icon"]').length > 0
+    };
+    
+    console.log('📋 PWA Requirements:', requirements);
+    
+    if (!requirements.https) {
+        console.warn('⚠️ HTTPS required for PWA install prompt');
+        showNotification('PWA install requires HTTPS. Use localhost or deploy to HTTPS.', 'warning', 5000);
+    }
+    
+    if (!requirements.serviceWorker) {
+        console.warn('⚠️ Service Worker not supported');
+    }
+    
+    if (!requirements.manifest) {
+        console.warn('⚠️ Web App Manifest not found');
+    }
+    
+    if (!requirements.icons) {
+        console.warn('⚠️ App icons not found');
+    }
+    
+    const allRequirementsMet = Object.values(requirements).every(req => req);
+    console.log('✅ All PWA requirements met:', allRequirementsMet);
+    
+    if (allRequirementsMet) {
+        console.log('🎉 PWA is ready for installation!');
+    } else {
+        console.log('❌ PWA requirements not fully met');
+    }
+}
+
+// Test function for debugging login
+function testStudentLogin() {
+    console.log('🧪 Testing student login...');
+    console.log('📊 AppState.students:', AppState.students);
+    console.log('🔍 Looking for student 1DS20CS001...');
+    
+    const testStudent = AppState.students.find(s => s.usn === '1DS20CS001');
+    console.log('👤 Test student found:', testStudent);
+    
+    if (testStudent) {
+        console.log('✅ Test credentials: USN=1DS20CS001, Password=Stu@123');
+    } else {
+        console.log('❌ Test student not found in AppState.students');
+    }
+}
+
 // Theme Management
 let currentTheme = 'light'; // Default theme, no localStorage
 
@@ -6,9 +485,31 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTheme();
 });
 
+// Global error handler to catch and log errors
+window.addEventListener('error', function(event) {
+    console.error('Global error caught:', event.error);
+    console.error('Error details:', {
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno
+    });
+    
+    // Show user-friendly error message
+    if (event.error && event.error.message.includes('classList')) {
+        console.warn('DOM element not found - this is usually harmless');
+    }
+});
+
 function initializeTheme() {
     const body = document.body;
     const themeToggle = document.getElementById('theme-toggle');
+    
+    if (!themeToggle) {
+        console.warn('Theme toggle element not found');
+        return;
+    }
+    
     const themeIcon = themeToggle.querySelector('i');
     
     // Set initial theme
@@ -122,37 +623,55 @@ function waitForFirebase() {
 
 // Firebase Database Functions
 async function saveDataToFirebase(data) {
-    if (!isFirebaseReady) await waitForFirebase();
+    console.log('saveDataToFirebase called with data:', data);
+    if (!isFirebaseReady) {
+        console.log('Firebase not ready, waiting...');
+        await waitForFirebase();
+    }
+    
     
     try {
-            // Clean data for Firebase (remove functions and undefined values)
-            const cleanData = {
-                jobs: data.jobs || [],
-                shortlistedData: data.shortlistedData || [],
-                jobShortlisted: data.jobShortlisted || {},
-                notifications: (data.notifications || []).map(notification => ({
-                    id: notification.id || '',
-                    title: notification.title || '',
-                    message: notification.message || '',
-                    type: notification.type || 'info',
-                    timestamp: notification.timestamp || Date.now(),
-                    // Remove the action.callback function
-                    action: notification.action && notification.action.text ? {
-                        text: notification.action.text
-                    } : null
-                })).filter(notification => notification.id && notification.title), // Remove empty notifications
-                admins: data.admins || []
-            };
+        console.log('Firebase is ready, processing data...');
+        // Clean data for Firebase (remove functions and undefined values)
+        const cleanData = {
+            jobs: data.jobs || [],
+            shortlistedData: data.shortlistedData || [],
+            jobShortlisted: data.jobShortlisted || {},
+            notifications: (data.notifications || []).map(notification => ({
+                id: notification.id || '',
+                title: notification.title || '',
+                message: notification.message || '',
+                type: notification.type || 'info',
+                timestamp: notification.timestamp || Date.now(),
+                // Remove the action.callback function
+                action: notification.action && notification.action.text ? {
+                    text: notification.action.text
+                } : null
+            })).filter(notification => notification.id && notification.title), // Remove empty notifications
+            admins: data.admins || [],
+            students: data.students || [],
+            eligibilityCriteria: data.eligibilityCriteria || {
+                min10thMarks: 60,
+                min12thMarks: 60,
+                minCGPAMarks: 6.0
+            }
+        };
+        
+        console.log('Clean data prepared:', cleanData);
+        console.log('Students in clean data:', cleanData.students.length);
         
         const dataRef = window.firebaseRef(window.firebaseDatabase, 'placementPortalData');
+        console.log('Saving to Firebase...');
         await window.firebaseSet(dataRef, cleanData);
         console.log('✅ Data saved to Firebase successfully');
         showNotification('Data synced to cloud!', 'success');
     } catch (error) {
         console.error('❌ Error saving to Firebase:', error);
         console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
         // No localStorage fallback - cloud-only storage
         showNotification('Error syncing to cloud - please check connection', 'error');
+        throw error; // Re-throw to be caught by calling function
     }
 }
 
@@ -175,6 +694,12 @@ async function loadDataFromFirebase() {
             AppState.jobShortlisted = data.jobShortlisted || {};
             AppState.notifications = data.notifications || [];
             AppState.admins = data.admins || [];
+            AppState.students = data.students || [];
+            AppState.eligibilityCriteria = data.eligibilityCriteria || {
+                min10thMarks: 60,
+                min12thMarks: 60,
+                minCGPAMarks: 6.0
+            };
             
             AppState.filteredJobs = [...AppState.jobs];
             AppState.filteredShortlistedData = [...AppState.shortlistedData];
@@ -189,6 +714,12 @@ async function loadDataFromFirebase() {
             AppState.jobShortlisted = {};
             AppState.notifications = [];
             AppState.admins = [];
+            AppState.students = [];
+            AppState.eligibilityCriteria = {
+                min10thMarks: 60,
+                min12thMarks: 60,
+                minCGPAMarks: 6.0
+            };
             
             AppState.filteredJobs = [...AppState.jobs];
             AppState.filteredShortlistedData = [...AppState.shortlistedData];
@@ -202,6 +733,12 @@ async function loadDataFromFirebase() {
         AppState.jobShortlisted = {};
         AppState.notifications = [];
         AppState.admins = [];
+        AppState.students = [];
+        AppState.eligibilityCriteria = {
+            min10thMarks: 60,
+            min12thMarks: 60,
+            minCGPAMarks: 6.0
+        };
         
         AppState.filteredJobs = [...AppState.jobs];
         AppState.filteredShortlistedData = [...AppState.shortlistedData];
@@ -252,6 +789,9 @@ function setupFirebaseListeners() {
     try {
         const dataRef = window.firebaseRef(window.firebaseDatabase, 'placementPortalData');
         
+        // Store previous notification IDs for real-time detection
+        let previousNotificationIds = AppState.notifications.map(n => n.id);
+        
         // Listen for real-time updates
         const unsubscribe = window.firebaseOnValue(dataRef, (snapshot) => {
             if (snapshot.exists()) {
@@ -265,15 +805,47 @@ function setupFirebaseListeners() {
                     console.log('Notification timestamps:', data.notifications.map(n => n.timestamp));
                 }
                 
+                // Store old notifications for comparison
+                const oldNotifications = [...AppState.notifications];
+                
                 // Update app state
                 AppState.jobs = data.jobs || [];
                 AppState.shortlistedData = data.shortlistedData || [];
                 AppState.jobShortlisted = data.jobShortlisted || {};
                 AppState.notifications = data.notifications || [];
                 AppState.admins = data.admins || [];
+                AppState.students = data.students || [];
+                AppState.eligibilityCriteria = data.eligibilityCriteria || {
+                    min10thMarks: 60,
+                    min12thMarks: 60,
+                    minCGPAMarks: 6.0
+                };
                 
                 AppState.filteredJobs = [...AppState.jobs];
                 AppState.filteredShortlistedData = [...AppState.shortlistedData];
+                
+                // Check for new notifications by comparing IDs
+                const newNotificationIds = AppState.notifications.map(n => n.id);
+                const hasNewNotifications = newNotificationIds.length > previousNotificationIds.length || 
+                    newNotificationIds.some(id => !previousNotificationIds.includes(id));
+                
+                // Handle new notifications with real-time alerts
+                if (hasNewNotifications && AppState.notifications.length > 0) {
+                    // Find the newest notification that wasn't in the previous list
+                    const newNotifications = AppState.notifications.filter(n => 
+                        !previousNotificationIds.includes(n.id)
+                    );
+                    
+                    if (newNotifications.length > 0) {
+                        // Show the latest new notification
+                        const latestNewNotification = newNotifications[0];
+                        console.log('🔔 New notification detected:', latestNewNotification);
+                        handleRealtimeNotification(latestNewNotification);
+                    }
+                }
+                
+                // Update previous notification IDs
+                previousNotificationIds = newNotificationIds;
                 
                 // Update UI if needed
                 if (document.getElementById('admin-job-list')) {
@@ -297,6 +869,12 @@ function setupFirebaseListeners() {
                 if (document.getElementById('all-notifications-list')) {
                     loadAllNotifications();
                 }
+                if (document.getElementById('student-notifications-list')) {
+                    loadStudentNotifications();
+                }
+                
+                // Always update notification badge
+                updateNotificationBadge();
                 
                 updateConnectionStatus('connected');
                 console.log('Real-time update received from Firebase');
@@ -311,6 +889,7 @@ function setupFirebaseListeners() {
                 AppState.jobShortlisted = {};
                 AppState.notifications = [];
                 AppState.admins = [];
+                AppState.students = [];
                 
                 AppState.filteredJobs = [...AppState.jobs];
                 AppState.filteredShortlistedData = [...AppState.shortlistedData];
@@ -354,7 +933,19 @@ const AppState = {
     showShortlistedBanner: false,
     notifications: [],
     jobShortlisted: {}, // Store shortlisted data per job
-    admins: [] // Store admin users
+    admins: [], // Store admin users
+    students: [], // Store student data
+    currentStudent: null, // Currently logged in student
+    eligibilityCriteria: {
+        min10thMarks: 60, // Minimum 10th marks percentage
+        min12thMarks: 60, // Minimum 12th marks percentage
+        minCGPAMarks: 6.0 // Minimum CGPA
+    },
+    salaryRanges: {
+        below10: 'Below 10 LPA',
+        below20: 'Below 20 LPA', 
+        above20: '20 LPA+'
+    }
 };
 
 // Sample Data - Empty array for clean start (removed test data)
@@ -376,17 +967,49 @@ async function initializeApp() {
         // Load data from Firebase (cloud-only)
         await loadDataFromFirebase();
         
+        // Create default notifications if none exist
+        createDefaultNotifications();
+        
         // Set up real-time listeners
         setupFirebaseListeners();
         
         // Set up offline detection
         setupOfflineDetection();
         
-        // Show student dashboard by default
-        showStudentDashboard();
+        // Initialize navigation (with DOM ready check)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateNavigationForStudent);
+        } else {
+            updateNavigationForStudent();
+        }
+        
+        // Restore login state if exists
+        restoreLoginState();
+        
+        // Show homepage by default (will be overridden if user is logged in)
+        showHomepage();
         
         // Load jobs
         loadJobs();
+        
+        // Add sample data if none exists
+        if (AppState.students.length === 0) {
+            addSampleStudentData();
+        }
+        if (AppState.jobs.length === 0) {
+            addSampleJobData(false);
+        }
+        
+        // Test login functionality
+        setTimeout(() => {
+            testStudentLogin();
+        }, 1000);
+        
+        // Set up PWA install prompt
+        setupPWAInstallPrompt();
+        
+        // Check PWA requirements
+        checkPWARequirements();
         
         // Initialize animations
         animateElements();
@@ -439,13 +1062,19 @@ function setupOfflineDetection() {
 
 // Data persistence functions (Firebase cloud-only)
 async function saveDataToStorage() {
+    console.log('saveDataToStorage called');
     const dataToSave = {
         jobs: AppState.jobs,
         shortlistedData: AppState.shortlistedData,
         jobShortlisted: AppState.jobShortlisted,
         notifications: AppState.notifications,
-        admins: AppState.admins
+        admins: AppState.admins,
+        students: AppState.students,
+        eligibilityCriteria: AppState.eligibilityCriteria
     };
+    
+    console.log('Data to save:', dataToSave);
+    console.log('Students count:', dataToSave.students.length);
     
     // Save to Firebase (primary)
     await saveDataToFirebase(dataToSave);
@@ -462,6 +1091,12 @@ function loadDataFromStorage() {
     AppState.jobShortlisted = {};
     AppState.notifications = [];
     AppState.admins = [];
+    AppState.students = [];
+    AppState.eligibilityCriteria = {
+        min10thMarks: 60,
+        min12thMarks: 60,
+        minCGPAMarks: 6.0
+    };
     AppState.filteredJobs = [];
     AppState.filteredShortlistedData = [];
     
@@ -549,13 +1184,53 @@ function testNotification() {
     });
     
     // Show success message
-    showNotification('Test notification sent successfully! Firebase is working! ✅', 'success');
+    showNotification('Real-time test notification sent! Check for enhanced features like sound and browser notifications.', 'success');
     
     // Update the notifications display
     loadAdminNotifications();
     displayNotifications();
     
-    console.log('✅ Test notification created - Firebase is working!');
+    console.log('✅ Real-time test notification created - Enhanced system is working!');
+}
+
+// Test enhanced real-time notification system
+function testRealtimeNotification() {
+    console.log('🚀 Testing enhanced real-time notification system...');
+    
+    // Add a test notification that will trigger real-time updates
+    addNotification({
+        type: 'success',
+        title: '🚀 Real-time System Test',
+        message: 'This notification demonstrates the enhanced real-time features including sound, browser notifications, and animated display. It should appear automatically without any user action!',
+        action: {
+            text: 'Test Action',
+            callback: () => showNotification('Real-time action executed!', 'success')
+        }
+    });
+    
+    showNotification('Real-time notification test completed! Check for automatic display.', 'success');
+}
+
+// Simple test function to verify real-time notifications work
+function testSimpleRealtime() {
+    console.log('🔔 Testing simple real-time notification...');
+    
+    // Create a simple test notification
+    const testNotification = {
+        id: Date.now(),
+        type: 'info',
+        title: '🔔 Simple Real-time Test',
+        message: 'This is a simple test to verify real-time notifications are working automatically.',
+        timestamp: Date.now(),
+        time: new Date().toISOString(),
+        read: false,
+        realtime: true
+    };
+    
+    // Show it immediately
+    handleRealtimeNotification(testNotification);
+    
+    console.log('✅ Simple real-time test completed');
 }
 
 // Clear All Notifications Function (for debugging)
@@ -1149,15 +1824,3722 @@ window.clearShortlistedData = clearShortlistedData;
 
 // Test job creation function removed to prevent dummy data
 
+// Student Data Management Functions
+function generateRandomPassword(length = 8) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let password = '';
+    for (let i = 0; i < length; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+}
+
+function validateStudentData(studentData) {
+    console.log('Validating student data:', studentData);
+    
+    const requiredFields = ['usn', 'name', 'email', 'cgpa', 'marks10th', 'marks12th'];
+    for (const field of requiredFields) {
+        const value = studentData[field];
+        if (!value || value.toString().trim() === '' || value.toString().trim() === 'undefined') {
+            console.log(`Validation failed: Missing required field: ${field}, value:`, value);
+            return `Missing required field: ${field}`;
+        }
+    }
+    
+    // Validate email format - be more lenient
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(studentData.email)) {
+        console.log(`Validation failed: Invalid email format: ${studentData.email}`);
+        return `Invalid email format: ${studentData.email}`;
+    }
+    
+    // Validate numeric fields
+    const cgpa = parseFloat(studentData.cgpa);
+    const marks10th = parseFloat(studentData.marks10th);
+    const marks12th = parseFloat(studentData.marks12th);
+    
+    if (isNaN(cgpa) || cgpa < 0 || cgpa > 10) {
+        console.log(`Validation failed: Invalid CGPA: ${studentData.cgpa}`);
+        return `CGPA must be between 0 and 10, got: ${studentData.cgpa}`;
+    }
+    
+    if (isNaN(marks10th) || marks10th < 0 || marks10th > 100) {
+        console.log(`Validation failed: Invalid 10th marks: ${studentData.marks10th}`);
+        return `10th marks must be between 0 and 100, got: ${studentData.marks10th}`;
+    }
+    
+    if (isNaN(marks12th) || marks12th < 0 || marks12th > 100) {
+        console.log(`Validation failed: Invalid 12th marks: ${studentData.marks12th}`);
+        return `12th marks must be between 0 and 100, got: ${studentData.marks12th}`;
+    }
+    
+    console.log('Validation passed for student data');
+    return null; // No validation errors
+}
+
+function processStudentDataFromCSV(csvData) {
+    console.log('processStudentDataFromCSV called with data:', csvData);
+    const students = [];
+    const errors = [];
+    
+    console.log('Processing', csvData.length, 'rows of data');
+    
+    // Skip header row
+    for (let i = 1; i < csvData.length; i++) {
+        console.log(`Processing row ${i}:`, csvData[i]);
+        const row = csvData[i];
+        if (row.length < 6) {
+            errors.push(`Row ${i + 1}: Insufficient data columns (need at least 6 columns)`);
+            continue;
+        }
+        
+        const studentData = {
+            usn: (row[0] && row[0].toString().trim() !== '') ? row[0].toString().trim() : '',
+            name: (row[1] && row[1].toString().trim() !== '') ? row[1].toString().trim() : '',
+            email: (row[2] && row[2].toString().trim() !== '') ? row[2].toString().trim() : '',
+            cgpa: (row[3] && row[3].toString().trim() !== '') ? row[3].toString().trim() : '',
+            marks10th: (row[4] && row[4].toString().trim() !== '') ? row[4].toString().trim() : '',
+            marks12th: (row[5] && row[5].toString().trim() !== '') ? row[5].toString().trim() : ''
+        };
+        
+        console.log('Student data extracted:', studentData);
+        
+        // Skip rows with completely empty data
+        if (!studentData.usn && !studentData.name && !studentData.email && !studentData.cgpa && !studentData.marks10th && !studentData.marks12th) {
+            console.log(`Skipping empty row ${i + 1}`);
+            continue;
+        }
+        
+        const validationError = validateStudentData(studentData);
+        if (validationError) {
+            console.log(`Validation error for row ${i + 1}:`, validationError);
+            errors.push(`Row ${i + 1}: ${validationError}`);
+            continue;
+        }
+        console.log('Student data validated successfully');
+        
+        // Check for duplicate email and USN
+        if (AppState.students.some(s => s.email === studentData.email)) {
+            console.log(`Duplicate email found for row ${i + 1}:`, studentData.email);
+            errors.push(`Row ${i + 1}: Email already exists`);
+            continue;
+        }
+        
+        if (AppState.students.some(s => s.usn === studentData.usn)) {
+            console.log(`Duplicate USN found for row ${i + 1}:`, studentData.usn);
+            errors.push(`Row ${i + 1}: USN already exists`);
+            continue;
+        }
+        
+        // Generate password and add to student data
+        const student = {
+            id: `student_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+            usn: studentData.usn,
+            name: studentData.name,
+            email: studentData.email,
+            cgpa: parseFloat(studentData.cgpa),
+            marks10th: parseFloat(studentData.marks10th),
+            marks12th: parseFloat(studentData.marks12th),
+            password: generateRandomPassword(),
+            createdAt: new Date().toISOString(),
+            isEligible: checkStudentEligibility(studentData)
+        };
+        
+        console.log('Created student object:', student);
+        students.push(student);
+        console.log('Added student to array. Total students so far:', students.length);
+    }
+    
+    console.log('Final result - Students:', students.length, 'Errors:', errors.length);
+    console.log('Students array:', students);
+    console.log('Errors array:', errors);
+    
+    return { students, errors };
+}
+
+function checkStudentEligibility(studentData) {
+    const cgpa = parseFloat(studentData.cgpa);
+    const marks10th = parseFloat(studentData.marks10th);
+    const marks12th = parseFloat(studentData.marks12th);
+    
+    return cgpa >= AppState.eligibilityCriteria.minCGPAMarks &&
+           marks10th >= AppState.eligibilityCriteria.min10thMarks &&
+           marks12th >= AppState.eligibilityCriteria.min12thMarks;
+}
+
+function checkStudentEligibilityForJob(studentData, job) {
+    const cgpa = parseFloat(studentData.cgpa);
+    const marks10th = parseFloat(studentData.marks10th);
+    const marks12th = parseFloat(studentData.marks12th);
+    
+    // Use job-specific requirements if available, otherwise use global criteria
+    const minCgpa = job.academicRequirements?.minCGPAMarks || AppState.eligibilityCriteria.minCGPAMarks;
+    const min10th = job.academicRequirements?.min10thMarks || AppState.eligibilityCriteria.min10thMarks;
+    const min12th = job.academicRequirements?.min12thMarks || AppState.eligibilityCriteria.min12thMarks;
+    
+    // Check academic eligibility first
+    const academicEligible = cgpa >= minCgpa &&
+                           marks10th >= min10th &&
+                           marks12th >= min12th;
+    
+    if (!academicEligible) {
+        console.log('❌ Student not academically eligible for job:', job.id);
+        return false;
+    }
+    
+    // Check salary range eligibility using our new logic
+    const salaryEligible = canStudentApplyToJobSilent(studentData, job);
+    
+    console.log('🎯 Job eligibility check:', {
+        jobId: job.id,
+        jobTitle: job.title,
+        academicEligible,
+        salaryEligible,
+        finalEligible: academicEligible && salaryEligible
+    });
+    
+    return academicEligible && salaryEligible;
+}
+
+// Function to get detailed eligibility failure reasons
+function getEligibilityFailureReasons(studentData, job) {
+    const reasons = [];
+    
+    const cgpa = parseFloat(studentData.cgpa);
+    const marks10th = parseFloat(studentData.marks10th);
+    const marks12th = parseFloat(studentData.marks12th);
+    
+    // Use job-specific requirements if available, otherwise use global criteria
+    const minCgpa = job.academicRequirements?.minCGPAMarks || AppState.eligibilityCriteria.minCGPAMarks;
+    const min10th = job.academicRequirements?.min10thMarks || AppState.eligibilityCriteria.min10thMarks;
+    const min12th = job.academicRequirements?.min12thMarks || AppState.eligibilityCriteria.min12thMarks;
+    
+    // Check academic eligibility (percentage criteria)
+    if (cgpa < minCgpa) {
+        reasons.push(`CGPA requirement not met (${cgpa} < ${minCgpa})`);
+    }
+    if (marks10th < min10th) {
+        reasons.push(`10th marks requirement not met (${marks10th}% < ${min10th}%)`);
+    }
+    if (marks12th < min12th) {
+        reasons.push(`12th marks requirement not met (${marks12th}% < ${min12th}%)`);
+    }
+    
+    // Check placement policy eligibility
+    const salaryEligible = canStudentApplyToJobSilent(studentData, job);
+    if (!salaryEligible) {
+        const studentRange = getStudentSalaryRange(studentData);
+        const jobSalary = parseJobSalary(job.salary);
+        
+        if (studentData.isPlaced) {
+            if (studentData.canApplyToJobs === '10+') {
+                reasons.push(`Placement policy: You can only apply to jobs with 10+ LPA (Job salary: ${jobSalary} LPA)`);
+            } else if (studentData.canApplyToJobs === '20+') {
+                reasons.push(`Placement policy: You can only apply to jobs with 20+ LPA (Job salary: ${jobSalary} LPA)`);
+            } else if (studentData.canApplyToJobs === 'none') {
+                reasons.push(`Placement policy: You cannot apply to any jobs as you are already placed at the highest level`);
+            }
+        } else {
+            if (job.eligibleSalaryRanges && job.eligibleSalaryRanges.length > 0) {
+                reasons.push(`Placement policy: This job is only for students with specific placement status`);
+            }
+        }
+    }
+    
+    return reasons;
+}
+
+// Helper function to get student salary range
+function getStudentSalaryRange(student) {
+    if (!student.isPlaced) return 'not-placed';
+    
+    const salary = parseFloat(student.currentSalary) || 0;
+    if (salary < 10) return 'below10';
+    if (salary < 20) return 'below20';
+    return 'above20';
+}
+
+// Helper function to parse job salary
+function parseJobSalary(salaryString) {
+    if (!salaryString) return 0;
+    
+    // Extract numeric value from salary string - look for patterns like "Rs 25", "25 LPA", "25-30 LPA", etc.
+    const patterns = [
+        /(\d+(?:\.\d+)?)\s*-\s*\d+(?:\.\d+)?\s*LPA/i,  // Range like "25-30 LPA"
+        /(\d+(?:\.\d+)?)\s*LPA/i,                      // Single value like "25 LPA"
+        /Rs\s*(\d+(?:\.\d+)?)/i,                       // "Rs 25"
+        /(\d+(?:\.\d+)?)/                              // Just numbers
+    ];
+    
+    for (const pattern of patterns) {
+        const match = salaryString.match(pattern);
+        if (match) {
+            return parseFloat(match[1]);
+        }
+    }
+    
+    return 0;
+}
+
+async function addStudentsToDatabase(students) {
+    console.log('Adding students to database:', students);
+    AppState.students.push(...students);
+    console.log('Total students in AppState:', AppState.students.length);
+    
+    try {
+        await saveDataToStorage();
+        console.log('Data saved successfully');
+        showNotification(`Successfully added ${students.length} students`, 'success');
+    } catch (error) {
+        console.error('Error saving student data:', error);
+        showNotification('Error saving student data: ' + error.message, 'error');
+    }
+}
+
+// Admin Management Functions
+function showJobManagement() {
+    console.log('Showing Job Management Page');
+    hideAllPages();
+    document.getElementById('job-management-page').classList.add('active');
+    setActiveNav('admin-nav');
+    loadAdminJobList();
+    showNotification('Job Management page opened', 'info');
+}
+
+function showNotificationsManagement() {
+    console.log('Showing Notifications Management Page');
+    hideAllPages();
+    document.getElementById('notifications-management-page').classList.add('active');
+    setActiveNav('admin-nav');
+    loadAdminNotificationsManagement();
+    showNotification('Notifications Management page opened', 'info');
+    
+    // Add a test notification if none exist
+    if (AppState.notifications.length === 0) {
+        console.log('No notifications found, creating a test notification');
+        addNotification({
+            type: 'info',
+            title: 'Test Notification',
+            message: 'This is a test notification to verify edit/delete functionality works properly.'
+        });
+    }
+    
+    // Force reload the notifications management list
+    setTimeout(() => {
+        loadAdminNotificationsManagement();
+    }, 100);
+}
+
+function loadAdminNotificationsManagement() {
+    const adminNotificationsList = document.getElementById('notifications-management-list');
+    if (!adminNotificationsList) return;
+    
+    console.log('Loading admin notifications management list, total notifications:', AppState.notifications.length);
+    console.log('Notification details:', AppState.notifications.map(n => ({ id: n.id, title: n.title, idType: typeof n.id })));
+    
+    // Fix any notifications that might be missing timestamps
+    let needsSave = false;
+    AppState.notifications.forEach(notification => {
+        if (!notification.timestamp) {
+            console.log('Fixing notification missing timestamp:', notification.id);
+            notification.timestamp = notification.time ? new Date(notification.time).getTime() : Date.now();
+            needsSave = true;
+        }
+    });
+    
+    if (needsSave) {
+        saveDataToStorage();
+        console.log('Fixed notifications with missing timestamps');
+    }
+    
+    // Display notifications in admin management format
+    if (AppState.notifications.length === 0) {
+        adminNotificationsList.innerHTML = `
+            <div class="no-data-message">
+                <div class="no-data-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3>No Notifications Found</h3>
+                <p>No notifications have been created yet.</p>
+                <p>Use the "Add Notification" button to create new notifications.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    adminNotificationsList.innerHTML = AppState.notifications.map(notification => `
+        <div class="notification-card">
+            <div class="notification-header">
+                <h4 class="notification-title">${notification.title || 'Untitled Notification'}</h4>
+                <span class="notification-timestamp">${formatTimestamp(notification.timestamp)}</span>
+            </div>
+            <div class="notification-message">
+                ${notification.message || 'No message content'}
+            </div>
+            <div class="notification-actions">
+                <button onclick="console.log('Edit button clicked for ID:', '${notification.id}'); editNotification('${notification.id}')" class="edit-btn" title="Edit Notification">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="console.log('Delete button clicked for ID:', '${notification.id}'); deleteNotification('${notification.id}')" class="delete-btn" title="Delete Notification">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function formatTimestamp(timestamp) {
+    if (!timestamp) return 'Unknown';
+    
+    // Handle both timestamp (number) and time (ISO string) formats
+    let date;
+    if (typeof timestamp === 'number') {
+        date = new Date(timestamp);
+    } else if (typeof timestamp === 'string') {
+        date = new Date(timestamp);
+    } else {
+        return 'Invalid date';
+    }
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+        return 'Invalid date';
+    }
+    
+    const now = Date.now();
+    const diff = now - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    
+    return date.toLocaleDateString();
+}
+
+function editNotification(notificationId) {
+    console.log('=== EDIT NOTIFICATION FUNCTION START ===');
+    console.log('Editing notification:', notificationId, 'Type:', typeof notificationId);
+    console.log('AppState exists:', !!AppState);
+    console.log('AppState.notifications exists:', !!AppState.notifications);
+    console.log('AppState.notifications length:', AppState.notifications ? AppState.notifications.length : 'N/A');
+    console.log('Available notifications:', AppState.notifications ? AppState.notifications.map(n => ({ id: n.id, title: n.title, idType: typeof n.id })) : 'N/A');
+    
+    // Check if AppState or notifications array is missing
+    if (!AppState) {
+        console.error('AppState is not defined!');
+        showNotification('Application state not available', 'error');
+        return;
+    }
+    
+    if (!AppState.notifications) {
+        console.error('AppState.notifications is not defined!');
+        showNotification('Notifications data not available', 'error');
+        return;
+    }
+    
+    if (!Array.isArray(AppState.notifications)) {
+        console.error('AppState.notifications is not an array!', typeof AppState.notifications);
+        showNotification('Notifications data is corrupted', 'error');
+        return;
+    }
+    
+    // Find the notification - try both string and number comparison
+    console.log('Searching for notification with ID:', notificationId);
+    let notification = AppState.notifications.find(n => n.id == notificationId);
+    console.log('First search result (==):', notification);
+    
+    if (!notification) {
+        // Try with parsed integer
+        const parsedId = parseInt(notificationId);
+        console.log('Trying with parsed integer:', parsedId);
+        notification = AppState.notifications.find(n => n.id === parsedId);
+        console.log('Second search result (=== parsed):', notification);
+    }
+    if (!notification) {
+        // Try with string comparison
+        console.log('Trying with string comparison');
+        notification = AppState.notifications.find(n => String(n.id) === String(notificationId));
+        console.log('Third search result (string):', notification);
+    }
+    
+    if (!notification) {
+        console.error('Notification not found after all search attempts!');
+        console.error('Searched for:', notificationId, 'Type:', typeof notificationId);
+        console.error('Available IDs:', AppState.notifications.map(n => ({ id: n.id, type: typeof n.id })));
+        showNotification('Notification not found', 'error');
+        return;
+    }
+    
+    console.log('Notification found:', notification);
+    
+    // Populate the edit form with existing data
+    try {
+        const idField = document.getElementById('edit-notification-id');
+        const typeField = document.getElementById('edit-notification-type');
+        const titleField = document.getElementById('edit-notification-title');
+        const messageField = document.getElementById('edit-notification-message');
+        
+        if (!idField || !typeField || !titleField || !messageField) {
+            console.error('Edit form elements not found');
+            showNotification('Edit form not available', 'error');
+            return;
+        }
+        
+        idField.value = notification.id;
+        typeField.value = notification.type || 'info';
+        titleField.value = notification.title || '';
+        messageField.value = notification.message || '';
+    } catch (error) {
+        console.error('Error populating edit form:', error);
+        showNotification('Error loading edit form', 'error');
+        return;
+    }
+    
+    // Handle action data
+    const actionEnabled = notification.action && notification.action.text;
+    document.getElementById('edit-notification-action-enabled').checked = actionEnabled;
+    
+    if (actionEnabled) {
+        document.getElementById('edit-notification-action-text').value = notification.action.text || '';
+        document.getElementById('edit-notification-action-link').value = notification.action.link || '';
+        document.getElementById('edit-notification-action-section').style.display = 'block';
+    } else {
+        document.getElementById('edit-notification-action-text').value = '';
+        document.getElementById('edit-notification-action-link').value = '';
+        document.getElementById('edit-notification-action-section').style.display = 'none';
+    }
+    
+    // Show the edit modal
+    try {
+        const modal = document.getElementById('edit-notification-modal');
+        if (!modal) {
+            console.error('Edit notification modal not found');
+            showNotification('Edit modal not available', 'error');
+            return;
+        }
+        
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        showEditNotificationModal();
+        console.log('Edit modal opened successfully');
+    } catch (error) {
+        console.error('Error opening edit modal:', error);
+        showNotification('Error opening edit form', 'error');
+    }
+}
+
+function deleteNotification(notificationId) {
+    console.log('=== DELETE NOTIFICATION FUNCTION START ===');
+    console.log('Deleting notification:', notificationId, 'Type:', typeof notificationId);
+    console.log('AppState exists:', !!AppState);
+    console.log('AppState.notifications exists:', !!AppState.notifications);
+    console.log('AppState.notifications length:', AppState.notifications ? AppState.notifications.length : 'N/A');
+    console.log('Available notifications:', AppState.notifications ? AppState.notifications.map(n => ({ id: n.id, title: n.title, idType: typeof n.id })) : 'N/A');
+    
+    // Check if AppState or notifications array is missing
+    if (!AppState) {
+        console.error('AppState is not defined!');
+        showNotification('Application state not available', 'error');
+        return;
+    }
+    
+    if (!AppState.notifications) {
+        console.error('AppState.notifications is not defined!');
+        showNotification('Notifications data not available', 'error');
+        return;
+    }
+    
+    if (!Array.isArray(AppState.notifications)) {
+        console.error('AppState.notifications is not an array!', typeof AppState.notifications);
+        showNotification('Notifications data is corrupted', 'error');
+        return;
+    }
+    
+    if (confirm('Are you sure you want to delete this notification?')) {
+        console.log('User confirmed deletion');
+        
+        // Find the notification with robust ID comparison
+        console.log('Searching for notification with ID:', notificationId);
+        let notification = AppState.notifications.find(n => n.id == notificationId);
+        console.log('First search result (==):', notification);
+        
+        if (!notification) {
+            // Try with parsed integer
+            const parsedId = parseInt(notificationId);
+            console.log('Trying with parsed integer:', parsedId);
+            notification = AppState.notifications.find(n => n.id === parsedId);
+            console.log('Second search result (=== parsed):', notification);
+        }
+        if (!notification) {
+            // Try with string comparison
+            console.log('Trying with string comparison');
+            notification = AppState.notifications.find(n => String(n.id) === String(notificationId));
+            console.log('Third search result (string):', notification);
+        }
+        
+        if (!notification) {
+            console.error('Notification not found for deletion after all search attempts!');
+            console.error('Searched for:', notificationId, 'Type:', typeof notificationId);
+            console.error('Available IDs:', AppState.notifications.map(n => ({ id: n.id, type: typeof n.id })));
+            showNotification('Notification not found', 'error');
+            return;
+        }
+        
+        console.log('Notification found for deletion:', notification);
+        
+        const notificationTitle = notification.title || 'Unknown';
+        
+        // Remove the notification using the found notification's ID
+        AppState.notifications = AppState.notifications.filter(n => n.id !== notification.id);
+        
+        // Save to storage
+        saveDataToStorage();
+        
+        // Update all notification displays
+        loadAdminNotificationsManagement();
+        loadAdminNotifications();
+        loadAllNotifications();
+        displayNotifications();
+        
+        showNotification(`Notification "${notificationTitle}" deleted successfully!`, 'success');
+        console.log('Notification deleted successfully');
+    }
+}
+
+function showStudentDataManagement() {
+    console.log('Showing Student Data Management Page');
+    hideAllPages();
+    document.getElementById('student-management-page').classList.add('active');
+    setActiveNav('admin-nav');
+    loadStudentList();
+    showNotification('Student Data Management page opened', 'info');
+}
+
+function showAdminManagement() {
+    console.log('Showing Admin Management Page');
+    hideAllPages();
+    document.getElementById('admin-management-page').classList.add('active');
+    setActiveNav('admin-nav');
+    loadAdminManagementList();
+    showNotification('Admin Management page opened', 'info');
+}
+
+function loadAdminManagementList() {
+    const adminList = document.getElementById('admin-list');
+    if (!adminList) return;
+    
+    console.log('Loading admin management list, total admins:', AppState.admins.length);
+    
+    // Display admins in admin management format
+    if (AppState.admins.length === 0) {
+        adminList.innerHTML = `
+            <div class="no-data-message">
+                <div class="no-data-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3>No Admins Found</h3>
+                <p>No admin accounts have been created yet.</p>
+                <p>Use the "Add Admin" button to create new admin accounts.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    adminList.innerHTML = AppState.admins.map(admin => `
+        <div class="admin-card">
+            <div class="admin-header">
+                <div class="admin-identity">
+                    <h4 class="admin-name">${admin.username || admin.name || 'Admin'}</h4>
+                    <p class="admin-email">${admin.email || 'admin@dsi.com'}</p>
+                </div>
+                <div class="admin-badges">
+                    <span class="admin-role-badge default">Default Admin</span>
+                    <span class="admin-status-badge active">Active</span>
+                </div>
+            </div>
+            <div class="admin-created">
+                Created: ${admin.createdAt ? new Date(admin.createdAt).toLocaleDateString() : 'Unknown'}
+            </div>
+        </div>
+    `).join('');
+}
+
+function showAdminTools() {
+    console.log('Showing Admin Tools Page');
+    hideAllPages();
+    document.getElementById('admin-tools-page').classList.add('active');
+    setActiveNav('admin-nav');
+    showNotification('Admin Tools page opened', 'info');
+}
+
+function showAdminToolsModal() {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('admin-tools-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'admin-tools-modal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content admin-tools-modal">
+                <span class="close" onclick="closeAdminToolsModal()">&times;</span>
+                <h2>Admin Management Tools</h2>
+                
+                <div class="admin-tools-grid">
+                    <div class="tool-card" onclick="showSystemAnalytics()">
+                        <div class="tool-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>System Analytics</h3>
+                        <p>View system statistics and performance metrics</p>
+                    </div>
+                    
+                    <div class="tool-card" onclick="showDataBackup()">
+                        <div class="tool-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3>Data Backup</h3>
+                        <p>Backup and restore system data</p>
+                    </div>
+                    
+                    <div class="tool-card" onclick="showSystemLogs()">
+                        <div class="tool-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h3>System Logs</h3>
+                        <p>View system activity and error logs</p>
+                    </div>
+                    
+                    <div class="tool-card" onclick="showSystemSettings()">
+                        <div class="tool-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <h3>System Settings</h3>
+                        <p>Configure system preferences and options</p>
+                    </div>
+                    
+                    <div class="tool-card" onclick="showUserActivity()">
+                        <div class="tool-icon">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <h3>User Activity</h3>
+                        <p>Monitor user login and activity logs</p>
+                    </div>
+                    
+                    <div class="tool-card" onclick="showSystemHealth()">
+                        <div class="tool-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h3>System Health</h3>
+                        <p>Check system status and performance</p>
+                    </div>
+                    
+                    <div class="tool-card" onclick="clearAllStudentData()">
+                        <div class="tool-icon">
+                            <i class="fas fa-user-times"></i>
+                        </div>
+                        <h3>Clear All Student Data</h3>
+                        <p>Remove all student records and data</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAdminToolsModal() {
+    const modal = document.getElementById('admin-tools-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Admin Tools Functions
+function showSystemAnalytics() {
+    showNotification('System Analytics feature coming soon!', 'info');
+    closeAdminToolsModal();
+}
+
+function showDataBackup() {
+    showNotification('Data Backup feature coming soon!', 'info');
+    closeAdminToolsModal();
+}
+
+function showSystemLogs() {
+    showNotification('System Logs feature coming soon!', 'info');
+    closeAdminToolsModal();
+}
+
+function showSystemSettings() {
+    showNotification('System Settings feature coming soon!', 'info');
+    closeAdminToolsModal();
+}
+
+function showUserActivity() {
+    showNotification('User Activity feature coming soon!', 'info');
+    closeAdminToolsModal();
+}
+
+function showSystemHealth() {
+    showNotification('System Health feature coming soon!', 'info');
+    closeAdminToolsModal();
+}
+
+// Admin Tools Functions
+function downloadWebsiteAsPDF() {
+    try {
+        // Create a new window with the current page content
+        const newWindow = window.open('', '_blank');
+        newWindow.document.write(`
+            <html>
+                <head>
+                    <title>DSI Placement Portal - Export</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1 { color: #333; text-align: center; }
+                        .section { margin: 20px 0; }
+                        .card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; }
+                        .stats { display: flex; gap: 20px; margin: 20px 0; }
+                        .stat-item { background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: center; }
+                    </style>
+                </head>
+                <body>
+                    <h1>DSI Placement Portal - System Report</h1>
+                    <div class="section">
+                        <h2>System Statistics</h2>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <h3>${AppState.jobs.length}</h3>
+                                <p>Total Jobs</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>${AppState.students.length}</h3>
+                                <p>Total Students</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>${AppState.notifications.length}</h3>
+                                <p>Total Notifications</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <h2>Export Information</h2>
+                        <p><strong>Export Date:</strong> ${new Date().toLocaleString()}</p>
+                        <p><strong>System Version:</strong> DSI Placement Portal v1.0</p>
+                    </div>
+                </body>
+            </html>
+        `);
+        newWindow.document.close();
+        
+        setTimeout(() => {
+            newWindow.print();
+        }, 500);
+        
+        showNotification('PDF export opened in new window. Use browser print to save as PDF.', 'info');
+    } catch (error) {
+        console.error('Error creating PDF:', error);
+        showNotification('Error creating PDF export', 'error');
+    }
+}
+
+function refreshData() {
+    showNotification('Refreshing data from Firebase...', 'info');
+    loadDataFromFirebase().then(() => {
+        showNotification('Data refreshed successfully!', 'success');
+        // Update all relevant displays
+        if (document.getElementById('admin-dashboard').classList.contains('active')) {
+            loadAdminDashboard();
+        }
+    }).catch(error => {
+        console.error('Error refreshing data:', error);
+        showNotification('Error refreshing data: ' + error.message, 'error');
+    });
+}
+
+function clearAllNotifications() {
+    // Default admin password
+    const defaultAdminPassword = 'admin123';
+    
+    // Prompt for admin password
+    const enteredPassword = prompt('Enter admin password to clear all notifications:');
+    
+    if (enteredPassword === null) {
+        // User cancelled
+        return;
+    }
+    
+    if (enteredPassword !== defaultAdminPassword) {
+        showNotification('Invalid admin password! Access denied.', 'error');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to clear ALL notifications? This action cannot be undone.')) {
+        return;
+    }
+    
+    AppState.notifications = [];
+    saveDataToStorage();
+    showNotification('All notifications cleared successfully!', 'success');
+    
+    // Update displays
+    if (document.getElementById('admin-dashboard').classList.contains('active')) {
+        loadAdminNotifications();
+    }
+    if (document.getElementById('notifications-management-page').classList.contains('active')) {
+        loadAdminNotifications();
+    }
+}
+
+function clearAllJobs() {
+    // Default admin password
+    const defaultAdminPassword = 'admin123';
+    
+    // Prompt for admin password
+    const enteredPassword = prompt('Enter admin password to clear all jobs:');
+    
+    if (enteredPassword === null) {
+        // User cancelled
+        return;
+    }
+    
+    if (enteredPassword !== defaultAdminPassword) {
+        showNotification('Invalid admin password! Access denied.', 'error');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to clear ALL jobs? This action cannot be undone.')) {
+        return;
+    }
+    
+    AppState.jobs = [];
+    AppState.filteredJobs = [];
+    saveDataToStorage();
+    showNotification('All jobs cleared successfully!', 'success');
+    
+    // Update displays
+    if (document.getElementById('admin-dashboard').classList.contains('active')) {
+        loadAdminJobList();
+    }
+    if (document.getElementById('job-management-page').classList.contains('active')) {
+        loadAdminJobList();
+    }
+}
+
+function clearAllShortlistedData() {
+    // Default admin password
+    const defaultAdminPassword = 'admin123';
+    
+    // Prompt for admin password
+    const enteredPassword = prompt('Enter admin password to clear all shortlisted data:');
+    
+    if (enteredPassword === null) {
+        // User cancelled
+        return;
+    }
+    
+    if (enteredPassword !== defaultAdminPassword) {
+        showNotification('Invalid admin password! Access denied.', 'error');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to clear ALL shortlisted data? This action cannot be undone.')) {
+        return;
+    }
+    
+    AppState.shortlistedData = [];
+    AppState.filteredShortlistedData = [];
+    AppState.jobShortlisted = {};
+    saveDataToStorage();
+    showNotification('All shortlisted data cleared successfully!', 'success');
+    
+    // Update displays
+    if (document.getElementById('admin-dashboard').classList.contains('active')) {
+        loadAdminDashboard();
+    }
+}
+
+function clearAllStudentData() {
+    // Default admin password
+    const defaultAdminPassword = 'admin123';
+    
+    // Prompt for admin password
+    const enteredPassword = prompt('Enter admin password to clear all student data:');
+    
+    if (enteredPassword === null) {
+        // User cancelled
+        return;
+    }
+    
+    if (enteredPassword !== defaultAdminPassword) {
+        showNotification('Invalid admin password! Access denied.', 'error');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to clear ALL student data? This action cannot be undone.')) {
+        return;
+    }
+    
+    AppState.students = [];
+    AppState.currentStudent = null;
+    saveDataToStorage();
+    showNotification('All student data cleared successfully!', 'success');
+    
+    // Update displays
+    if (document.getElementById('admin-dashboard').classList.contains('active')) {
+        loadStudentList();
+    }
+    if (document.getElementById('student-management-page').classList.contains('active')) {
+        loadStudentList();
+    }
+    if (document.getElementById('admin-student-list').classList.contains('active')) {
+        loadStudentList();
+    }
+}
+
+function testConnection() {
+    showNotification('Testing Firebase connection...', 'info');
+    
+    if (isFirebaseReady) {
+        // Test Firebase connection
+        const testRef = window.firebaseRef(window.firebaseDatabase, 'test');
+        window.firebaseSet(testRef, { timestamp: Date.now() }).then(() => {
+            showNotification('Firebase connection test successful!', 'success');
+        }).catch(error => {
+            console.error('Firebase connection test failed:', error);
+            showNotification('Firebase connection test failed: ' + error.message, 'error');
+        });
+    } else {
+        showNotification('Firebase is not ready. Please wait and try again.', 'warning');
+    }
+}
+
+function retryConnection() {
+    showNotification('Retrying Firebase connection...', 'info');
+    
+    // Reset Firebase state
+    isFirebaseReady = false;
+    
+    // Reinitialize Firebase
+    initializeFirebase().then(() => {
+        showNotification('Firebase connection retry successful!', 'success');
+    }).catch(error => {
+        console.error('Firebase connection retry failed:', error);
+        showNotification('Firebase connection retry failed: ' + error.message, 'error');
+    });
+}
+
+// Additional modal functions for new pages
+function showAddNotificationModal() {
+    // Check if the add notification modal exists in the original admin dashboard
+    const existingModal = document.getElementById('add-notification-modal');
+    if (existingModal) {
+        existingModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } else {
+        showNotification('Add notification modal not found. Please use the original admin dashboard.', 'warning');
+    }
+}
+
+function showAddAdminModal() {
+    showNotification('Add Admin modal coming soon!', 'info');
+}
+
+// Student Management Modal Functions
+function showStudentUploadModal() {
+    // Check if the student upload modal exists in the original admin dashboard
+    const existingModal = document.getElementById('student-upload-modal');
+    if (existingModal) {
+        existingModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } else {
+        showNotification('Student upload modal not found. Please use the original admin dashboard.', 'warning');
+    }
+}
+
+function showAddStudentModal() {
+    // Check if the add student modal exists in the original admin dashboard
+    const existingModal = document.getElementById('add-student-modal');
+    if (existingModal) {
+        existingModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } else {
+        showNotification('Add student modal not found. Please use the original admin dashboard.', 'warning');
+    }
+}
+
+function showEligibilityCriteriaModal() {
+    // Check if the eligibility criteria modal exists in the original admin dashboard
+    const existingModal = document.getElementById('eligibility-criteria-modal');
+    if (existingModal) {
+        existingModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } else {
+        showNotification('Eligibility criteria modal not found. Please use the original admin dashboard.', 'warning');
+    }
+}
+
+// Copy to clipboard function
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showNotification('Password copied to clipboard!', 'success');
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showNotification('Password copied to clipboard!', 'success');
+        } catch (err) {
+            showNotification('Failed to copy password', 'error');
+        }
+        document.body.removeChild(textArea);
+    });
+}
+
+// Add sample student data for testing
+function addSampleStudentData() {
+    if (AppState.students.length > 0) {
+        showNotification('Sample data already exists. Clear existing data first.', 'warning');
+        return;
+    }
+    
+    const sampleStudents = [
+        {
+            id: 'student_sample_1',
+            usn: '1DS20CS001',
+            email: 'john.doe@dsi.com',
+            cgpa: 8.5,
+            marks10th: 85,
+            marks12th: 78,
+            name: 'John Doe',
+            password: 'Stu@123',
+            isEligible: true,
+            isPlaced: true,
+            offerLetter: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+            placedSalary: 8,
+            salaryRange: 'below10',
+            placedDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago
+            canApplyToJobs: '10+',
+            createdAt: new Date().toISOString()
+        },
+        {
+            id: 'student_sample_2',
+            usn: '1DS20CS002',
+            email: 'jane.smith@dsi.com',
+            cgpa: 7.8,
+            marks10th: 92,
+            marks12th: 88,
+            name: 'Jane Smith',
+            password: 'Stu@456',
+            isEligible: true,
+            isPlaced: false,
+            offerLetter: null,
+            placedSalary: null,
+            salaryRange: null,
+            createdAt: new Date().toISOString()
+        },
+        {
+            id: 'student_sample_3',
+            usn: '1DS20CS003',
+            email: 'mike.johnson@dsi.com',
+            cgpa: 6.2,
+            marks10th: 65,
+            marks12th: 70,
+            name: 'Mike Johnson',
+            password: 'Stu@789',
+            isEligible: false,
+            isPlaced: false,
+            offerLetter: null,
+            placedSalary: null,
+            salaryRange: null,
+            createdAt: new Date().toISOString()
+        },
+        {
+            id: 'student_sample_4',
+            usn: '1DS20CS004',
+            email: 'sarah.wilson@dsi.com',
+            cgpa: 9.1,
+            marks10th: 95,
+            marks12th: 92,
+            name: 'Sarah Wilson',
+            password: 'Stu@101',
+            isEligible: true,
+            isPlaced: false,
+            offerLetter: null,
+            placedSalary: null,
+            salaryRange: null,
+            createdAt: new Date().toISOString()
+        },
+        {
+            id: 'student_sample_5',
+            usn: '1DS20CS005',
+            email: 'alex.brown@dsi.com',
+            cgpa: 5.8,
+            marks10th: 58,
+            marks12th: 62,
+            name: 'Alex Brown',
+            password: 'Stu@202',
+            isEligible: false,
+            isPlaced: false,
+            offerLetter: null,
+            placedSalary: null,
+            salaryRange: null,
+            createdAt: new Date().toISOString()
+        }
+    ];
+    
+    AppState.students = sampleStudents;
+    saveDataToStorage();
+    loadStudentList();
+    updateManagementStats();
+    showNotification('Sample student data added successfully!', 'success');
+}
+
+// Add sample job data for testing
+function addSampleJobData(showNotification = true) {
+    if (AppState.jobs.length > 0) {
+        if (showNotification) {
+            showNotification('Sample jobs already exist. Clear existing data first.', 'warning');
+        }
+        return;
+    }
+    
+    const sampleJobs = [
+        {
+            id: 1,
+            company: 'TechCorp',
+            title: 'Software Engineer',
+            deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+            status: 'Open',
+            description: 'Full-stack development role with modern technologies.',
+            salary: '8-12 LPA',
+            location: 'Bangalore',
+            eligibility: 'Computer Science, Information Technology',
+            batches: '2024, 2023',
+            branches: 'CSE, IT',
+            selectionProcess: 'Online Test, Technical Interview, HR Interview',
+            formLink: 'https://forms.google.com/techcorp',
+            academicRequirements: {
+                min10thMarks: 60,
+                min12thMarks: 60,
+                minCGPAMarks: 6.0
+            },
+            eligibleSalaryRanges: ['below10', 'not-placed'], // Only allows below 10 LPA and not placed students
+            applicants: []
+        },
+        {
+            id: 2,
+            company: 'DataSoft',
+            title: 'Data Scientist',
+            deadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(), // 45 days from now
+            status: 'Open',
+            description: 'Machine learning and data analysis role.',
+            salary: '15-20 LPA',
+            location: 'Mumbai',
+            eligibility: 'Computer Science, Mathematics, Statistics',
+            batches: '2024, 2023',
+            branches: 'CSE, IT, Mathematics',
+            selectionProcess: 'Online Test, Technical Interview, Case Study, HR Interview',
+            formLink: 'https://forms.google.com/datasoft',
+            academicRequirements: {
+                min10thMarks: 70,
+                min12thMarks: 70,
+                minCGPAMarks: 7.0
+            },
+            eligibleSalaryRanges: ['below20', 'not-placed'], // Only allows below 20 LPA and not placed students
+            applicants: []
+        },
+        {
+            id: 3,
+            company: 'CloudTech',
+            title: 'Senior Developer',
+            deadline: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString(), // 20 days from now
+            status: 'Open',
+            description: 'Senior full-stack developer with cloud experience.',
+            salary: '25-30 LPA',
+            location: 'Hyderabad',
+            eligibility: 'Computer Science, Information Technology',
+            batches: '2024, 2023, 2022',
+            branches: 'CSE, IT',
+            selectionProcess: 'Online Test, Technical Interview, System Design, HR Interview',
+            formLink: 'https://forms.google.com/cloudtech',
+            academicRequirements: {
+                min10thMarks: 75,
+                min12thMarks: 75,
+                minCGPAMarks: 7.5
+            },
+            eligibleSalaryRanges: ['above20', 'not-placed'], // Only allows 20+ LPA and not placed students
+            applicants: []
+        },
+        {
+            id: 4,
+            company: 'StartupXYZ',
+            title: 'Full Stack Developer',
+            deadline: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days from now
+            status: 'Open',
+            description: 'Full-stack development in a fast-paced startup environment.',
+            salary: '6-8 LPA',
+            location: 'Pune',
+            eligibility: 'Computer Science, Information Technology',
+            batches: '2024, 2023',
+            branches: 'CSE, IT',
+            selectionProcess: 'Online Test, Technical Interview, HR Interview',
+            formLink: 'https://forms.google.com/startupxyz',
+            academicRequirements: {
+                min10thMarks: 60,
+                min12thMarks: 60,
+                minCGPAMarks: 6.0
+            },
+            eligibleSalaryRanges: ['not-placed'], // Only allows not placed students
+            applicants: []
+        }
+    ];
+    
+    AppState.jobs = sampleJobs;
+    saveDataToStorage();
+    
+    if (showNotification) {
+        showNotification('Sample job data added successfully!', 'success');
+    }
+}
+
+// Add sample admin data for testing
+function addSampleAdminData() {
+    if (AppState.admins.length > 0) {
+        showNotification('Admin data already exists. Clear existing data first.', 'warning');
+        return;
+    }
+    
+    const sampleAdmins = [
+        {
+            id: '1',
+            username: 'himu',
+            email: 'admin@dsi.com',
+            name: 'Himu Admin',
+            role: 'Default Admin',
+            status: 'Active',
+            createdAt: new Date().toISOString()
+        },
+        {
+            id: '2',
+            username: 'admin2',
+            email: 'admin2@dsi.com',
+            name: 'Secondary Admin',
+            role: 'Admin',
+            status: 'Active',
+            createdAt: new Date().toISOString()
+        }
+    ];
+    
+    AppState.admins = sampleAdmins;
+    saveDataToStorage();
+    loadAdminManagementList();
+    updateManagementStats();
+    showNotification('Sample admin data added successfully!', 'success');
+}
+
+// Update management card statistics
+function updateManagementStats() {
+    console.log('Updating management stats:', {
+        jobs: AppState.jobs?.length || 0,
+        notifications: AppState.notifications?.length || 0,
+        students: AppState.students?.length || 0,
+        admins: AppState.admins?.length || 0
+    });
+    
+    // Update job count
+    const jobCount = document.getElementById('total-jobs-count');
+    if (jobCount) {
+        jobCount.textContent = AppState.jobs ? AppState.jobs.length : 0;
+    }
+    
+    // Update notification count
+    const notificationCount = document.getElementById('total-notifications-count');
+    if (notificationCount) {
+        notificationCount.textContent = AppState.notifications ? AppState.notifications.length : 0;
+    }
+    
+    // Update student count (both in management cards and student stats)
+    const studentCount = document.getElementById('total-students-count');
+    if (studentCount) {
+        studentCount.textContent = `(${AppState.students ? AppState.students.length : 0})`;
+    }
+    
+    // Update student count in management card stats
+    const studentCountCard = document.getElementById('total-students-count-card');
+    if (studentCountCard) {
+        studentCountCard.textContent = AppState.students ? AppState.students.length : 0;
+    }
+    
+    // Update student statistics in student management page
+    updateStudentStatistics();
+    
+    // Update admin count
+    const adminCount = document.getElementById('total-admins-count');
+    if (adminCount) {
+        adminCount.textContent = AppState.admins ? AppState.admins.length : 0;
+    }
+}
+
+// Export Functions
+function toggleExportDropdown() {
+    const dropdown = document.querySelector('.export-dropdown');
+    dropdown.classList.toggle('active');
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function closeDropdown(e) {
+        if (!dropdown.contains(e.target)) {
+            dropdown.classList.remove('active');
+            document.removeEventListener('click', closeDropdown);
+        }
+    });
+}
+
+function exportStudentData(format) {
+    console.log(`Exporting student data as ${format}`);
+    
+    if (AppState.students.length === 0) {
+        showNotification('No student data to export', 'warning');
+        return;
+    }
+    
+    // Close dropdown
+    document.querySelector('.export-dropdown').classList.remove('active');
+    
+    switch (format) {
+        case 'csv':
+            exportToCSV();
+            break;
+        case 'excel':
+            exportToExcel();
+            break;
+        case 'pdf':
+            exportToPDF();
+            break;
+        default:
+            showNotification('Invalid export format', 'error');
+    }
+}
+
+function exportToCSV() {
+    try {
+        const headers = ['USN', 'Name', 'Email', 'CGPA', '10th Marks (%)', '12th Marks (%)', 'Password', 'Eligible', 'Created Date'];
+        const csvContent = [
+            headers.join(','),
+            ...AppState.students.map(student => [
+                student.usn,
+                `"${student.name || 'N/A'}"`,
+                student.email,
+                student.cgpa,
+                student.marks10th,
+                student.marks12th,
+                student.password,
+                student.isEligible ? 'Yes' : 'No',
+                new Date(student.createdAt).toLocaleDateString()
+            ].map(field => `"${field}"`).join(','))
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `student_data_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showNotification('Student data exported as CSV successfully!', 'success');
+    } catch (error) {
+        console.error('Error exporting CSV:', error);
+        showNotification('Error exporting CSV file', 'error');
+    }
+}
+
+function exportToExcel() {
+    try {
+        // Check if XLSX library is available
+        if (typeof XLSX === 'undefined') {
+            showNotification('Excel export requires XLSX library. Please use CSV export instead.', 'warning');
+            return;
+        }
+        
+        const worksheetData = [
+            ['USN', 'Name', 'Email', 'CGPA', '10th Marks (%)', '12th Marks (%)', 'Password', 'Eligible', 'Created Date'],
+            ...AppState.students.map(student => [
+                student.usn,
+                student.name || 'N/A',
+                student.email,
+                student.cgpa,
+                student.marks10th,
+                student.marks12th,
+                student.password,
+                student.isEligible ? 'Yes' : 'No',
+                new Date(student.createdAt).toLocaleDateString()
+            ])
+        ];
+        
+        const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Student Data');
+        
+        XLSX.writeFile(workbook, `student_data_${new Date().toISOString().split('T')[0]}.xlsx`);
+        
+        showNotification('Student data exported as Excel successfully!', 'success');
+    } catch (error) {
+        console.error('Error exporting Excel:', error);
+        showNotification('Error exporting Excel file', 'error');
+    }
+}
+
+function exportToPDF() {
+    try {
+        // Create a simple HTML table for PDF generation
+        const tableHTML = `
+            <html>
+                <head>
+                    <title>Student Data Export</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1 { color: #333; text-align: center; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; font-weight: bold; }
+                        tr:nth-child(even) { background-color: #f9f9f9; }
+                        .footer { margin-top: 30px; text-align: center; color: #666; font-size: 12px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Student Data Export</h1>
+                    <p><strong>Export Date:</strong> ${new Date().toLocaleDateString()}</p>
+                    <p><strong>Total Students:</strong> ${AppState.students.length}</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>USN</th>
+                                <th>Email</th>
+                                <th>CGPA</th>
+                                <th>10th Marks (%)</th>
+                                <th>12th Marks (%)</th>
+                                <th>Password</th>
+                                <th>Eligible</th>
+                                <th>Created Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${AppState.students.map(student => `
+                                <tr>
+                                    <td>${student.usn}</td>
+                                    <td>${student.email}</td>
+                                    <td>${student.cgpa}</td>
+                                    <td>${student.marks10th}</td>
+                                    <td>${student.marks12th}</td>
+                                    <td>${student.password}</td>
+                                    <td>${student.isEligible ? 'Yes' : 'No'}</td>
+                                    <td>${new Date(student.createdAt).toLocaleDateString()}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="footer">
+                        Generated by DSI Placement Portal on ${new Date().toLocaleString()}
+                    </div>
+                </body>
+            </html>
+        `;
+        
+        // Open in new window for printing/saving as PDF
+        const newWindow = window.open('', '_blank');
+        newWindow.document.write(tableHTML);
+        newWindow.document.close();
+        
+        // Trigger print dialog
+        setTimeout(() => {
+            newWindow.print();
+        }, 500);
+        
+        showNotification('PDF export opened in new window. Use browser print to save as PDF.', 'info');
+    } catch (error) {
+        console.error('Error exporting PDF:', error);
+        showNotification('Error exporting PDF file', 'error');
+    }
+}
+
+// Student Authentication Functions
+function handleStudentLogin(event) {
+    event.preventDefault();
+    
+    const usn = document.getElementById('student-usn').value;
+    const password = document.getElementById('student-password').value;
+    
+    console.log('🔐 Attempting student login:', { usn, passwordLength: password.length });
+    console.log('📊 Available students:', AppState.students.length);
+    
+    const student = AppState.students.find(s => s.usn === usn && s.password === password);
+    
+    if (student) {
+        console.log('✅ Student found:', student.usn);
+        AppState.currentStudent = student;
+        
+        // Save login state to localStorage
+        localStorage.setItem('currentStudent', JSON.stringify(student));
+        localStorage.setItem('loginType', 'student');
+        
+        // Ensure notifications exist before showing portal
+        ensureNotificationsExist();
+        
+        updateNavigationForStudent();
+        showNotification('Login successful!', 'success');
+        
+        console.log('🚀 Navigating to student portal...');
+        showStudentPortal();
+    } else {
+        console.log('❌ Student not found or invalid credentials');
+        showNotification('Invalid USN or password', 'error');
+    }
+}
+
+function showStudentPortal() {
+    console.log('🎓 showStudentPortal called');
+    hideAllPages();
+    const studentPortal = document.getElementById('student-portal');
+    console.log('📄 Student portal element:', studentPortal);
+    
+    if (studentPortal) {
+        studentPortal.classList.add('active');
+        console.log('✅ Student portal activated');
+    } else {
+        console.error('❌ Student portal element not found!');
+    }
+    
+    setActiveNav('student-nav');
+    console.log('🧭 Navigation updated');
+    
+    // Wait for DOM to be fully ready before loading dashboard
+    setTimeout(() => {
+        console.log('⏰ Loading student dashboard...');
+        loadStudentDashboard();
+    }, 200);
+    
+    closeMobileMenu();
+}
+
+function loadStudentDashboard() {
+    console.log('🎓 Loading student dashboard...');
+    
+    if (!AppState.currentStudent) {
+        showNotification('Please login first', 'error');
+        showStudentLogin();
+        return;
+    }
+    
+    const student = AppState.currentStudent;
+    console.log('Student logged in:', student.usn);
+    
+    // Update student info display immediately
+    loadStudentInfo();
+    
+    // Ensure notifications section is active by default and load its content
+    const notificationsSection = document.getElementById('student-notifications-section');
+    const availableJobsSection = document.getElementById('student-available-jobs-section');
+    const myPortalSection = document.getElementById('student-my-portal-section');
+    
+    console.log('Sections found:', {
+        notifications: !!notificationsSection,
+        availableJobs: !!availableJobsSection,
+        myPortal: !!myPortalSection
+    });
+    
+    // Hide all sections first
+    [notificationsSection, availableJobsSection, myPortalSection].forEach(section => {
+        if (section) section.classList.remove('active');
+    });
+    
+    // Remove active class from all nav buttons
+    document.querySelectorAll('.portal-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show notifications section as default
+    if (notificationsSection) {
+        notificationsSection.classList.add('active');
+        const navBtn = document.getElementById('nav-notifications');
+        if (navBtn) navBtn.classList.add('active');
+        console.log('✅ Notifications section activated');
+    }
+    
+    // SIMPLE APPROACH - Just use the working method directly
+    console.log('🔄 Using the working section switch method...');
+    showStudentSection('notifications');
+}
+
+function loadStudentInfo() {
+    if (!AppState.currentStudent) {
+        return;
+    }
+    
+    const student = AppState.currentStudent;
+    
+    // Update student info display immediately
+    document.getElementById('student-info-usn').textContent = student.usn || '-';
+    document.getElementById('student-info-email').textContent = student.email || '-';
+    document.getElementById('student-info-cgpa').textContent = student.cgpa || '-';
+    document.getElementById('student-info-10th').textContent = student.marks10th ? student.marks10th + '%' : '-';
+    document.getElementById('student-info-12th').textContent = student.marks12th ? student.marks12th + '%' : '-';
+    document.getElementById('student-info-eligible').textContent = student.isEligible ? 'Yes' : 'No';
+    document.getElementById('student-info-eligible').className = student.isEligible ? 'eligible-yes' : 'eligible-no';
+}
+
+function handleStudentLogout() {
+    AppState.currentStudent = null;
+    updateNavigationForStudent();
+    showNotification('Logged out successfully', 'success');
+    showStudentLogin();
+}
+
+function loadEligibleJobs() {
+    if (!AppState.currentStudent) {
+        document.getElementById('eligible-jobs-list').innerHTML = 
+            '<div class="no-eligible-jobs"><p>Please login to view available jobs.</p></div>';
+        return;
+    }
+    
+    // Only load jobs if the available jobs section is currently active
+    const jobsSection = document.getElementById('student-available-jobs-section');
+    if (!jobsSection || !jobsSection.classList.contains('active')) {
+        return;
+    }
+    
+    const jobsList = document.getElementById('eligible-jobs-list');
+    
+    // Load all open jobs (not filtering by eligibility)
+    const openJobs = AppState.jobs.filter(job => {
+        // Check if job is still open
+        const now = new Date();
+        const deadline = new Date(job.deadline);
+        return deadline > now && job.status === 'Open';
+    });
+    
+    jobsList.innerHTML = '';
+    
+    if (openJobs.length === 0) {
+        jobsList.innerHTML = '<div class="no-eligible-jobs"><p>No jobs available at the moment.</p></div>';
+        return;
+    }
+    
+    // Use document fragment for better performance
+    const fragment = document.createDocumentFragment();
+    
+    openJobs.forEach(job => {
+        const jobCard = createEligibleJobCard(job);
+        fragment.appendChild(jobCard);
+    });
+    
+    jobsList.appendChild(fragment);
+}
+
+function loadStudentNotifications() {
+    console.log('🔔 Loading student notifications...');
+    console.log('Current student:', AppState.currentStudent ? 'Logged in' : 'Not logged in');
+    console.log('Notifications count:', AppState.notifications.length);
+    
+    if (!AppState.currentStudent) {
+        const notificationsList = document.getElementById('student-notifications-list');
+        if (notificationsList) {
+            notificationsList.innerHTML = 
+                '<div class="no-notifications"><p>Please login to view notifications.</p></div>';
+        }
+        return;
+    }
+    
+    const notificationsList = document.getElementById('student-notifications-list');
+    
+    // Check if the notifications list element exists and is visible
+    if (!notificationsList) {
+        console.error('❌ Notifications list element not found!');
+        return;
+    }
+    
+    // Check if the notifications section is active
+    const notificationsSection = document.getElementById('student-notifications-section');
+    if (!notificationsSection || !notificationsSection.classList.contains('active')) {
+        console.log('⚠️ Notifications section not active, skipping load');
+        return;
+    }
+    
+    console.log('✅ Notifications list element found and section is active');
+    
+    // Load notifications immediately without any delays
+    notificationsList.innerHTML = '';
+    
+    if (AppState.notifications.length === 0) {
+        console.log('⚠️ No notifications available, creating default ones...');
+        
+        // Create default notifications immediately
+        const defaultNotifications = [
+            {
+                id: Date.now() + 1,
+                title: 'Welcome to DSI Placement Portal',
+                message: 'Check this section regularly for important updates about placements and shortlisted candidates.',
+                type: 'info',
+                timestamp: new Date().toISOString(),
+                read: false
+            },
+            {
+                id: Date.now() + 2,
+                title: 'Test Notification - Firebase Working!',
+                message: `This test notification was created at ${new Date().toLocaleTimeString()}. If you can see this, Firebase is working correctly!`,
+                type: 'success',
+                timestamp: new Date().toISOString(),
+                read: false
+            }
+        ];
+        
+        AppState.notifications = defaultNotifications;
+        
+        // Save to Firebase
+        saveDataToStorage().then(() => {
+            console.log('✅ Default notifications created and saved');
+        }).catch(error => {
+            console.error('❌ Error saving default notifications:', error);
+        });
+    }
+    
+    console.log('✅ Found notifications:', AppState.notifications.length);
+    
+    // Show recent notifications (first 10 - newest first due to unshift)
+    const recentNotifications = AppState.notifications.slice(0, 10);
+    
+    // Use document fragment for better performance
+    const fragment = document.createDocumentFragment();
+    
+    recentNotifications.forEach(notification => {
+        const notificationElement = document.createElement('div');
+        notificationElement.className = `notification-item ${notification.read ? 'read' : 'unread'}`;
+        
+        const timeAgo = getTimeAgo(new Date(notification.timestamp));
+        
+        notificationElement.innerHTML = `
+            <div class="notification-icon">
+                <i class="fas fa-${getNotificationIcon(notification.type)}"></i>
+            </div>
+            <div class="notification-content">
+                <h4>${notification.title}</h4>
+                <p>${notification.message}</p>
+                <span class="notification-time">${timeAgo}</span>
+            </div>
+        `;
+        
+        fragment.appendChild(notificationElement);
+    });
+    
+    notificationsList.appendChild(fragment);
+    console.log('✅ Notifications loaded successfully');
+}
+
+function createEligibleJobCard(job) {
+    const card = document.createElement('div');
+    card.className = 'eligible-job-card';
+    
+    const formattedDeadline = new Date(job.deadline).toLocaleString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    });
+    
+    // Check if student is eligible for this job
+    const isEligible = AppState.currentStudent ? checkStudentEligibilityForJob(AppState.currentStudent, job) : false;
+    const eligibilityReasons = AppState.currentStudent ? getEligibilityFailureReasons(AppState.currentStudent, job) : [];
+    
+    card.innerHTML = `
+        <div class="job-header">
+            <div>
+                <div class="company-name">${job.company}</div>
+                <div class="job-title">${job.title}</div>
+            </div>
+            <div class="status-badge open">Open</div>
+        </div>
+        <div class="job-details">
+            <div class="job-detail-item">
+                <i class="fas fa-calendar"></i>
+                <span>Deadline: ${formattedDeadline}</span>
+            </div>
+            <div class="job-detail-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>${job.location}</span>
+            </div>
+            <div class="job-detail-item">
+                <i class="fas fa-rupee-sign"></i>
+                <span>${job.salary || 'Not specified'}</span>
+            </div>
+        </div>
+        <div class="job-actions">
+            <button class="view-details-btn" data-job-id="${job.id}">
+                <i class="fas fa-eye"></i>
+                View Details
+            </button>
+        </div>
+    `;
+    
+    // Add click event listener to the view details button
+    const viewDetailsBtn = card.querySelector('.view-details-btn');
+    viewDetailsBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent card click event
+        console.log('View Details button clicked for job:', job);
+        showJobDetail(job.id);
+    });
+    
+    
+    return card;
+}
+
+function studentLogout() {
+    AppState.currentStudent = null;
+    
+    // Clear login state from localStorage
+    localStorage.removeItem('currentStudent');
+    localStorage.removeItem('loginType');
+    
+    showNotification('Logged out successfully', 'info');
+    showStudentLogin();
+}
+
+
+// Admin Student Management Functions
+function showStudentUploadModal() {
+    document.getElementById('student-upload-modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeStudentUploadModal() {
+    document.getElementById('student-upload-modal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+    
+    // Reset form
+    document.getElementById('student-file-input').value = '';
+    document.getElementById('student-data-viewer').style.display = 'none';
+    document.getElementById('student-upload-progress').style.display = 'none';
+    document.getElementById('upload-errors').style.display = 'none';
+}
+
+// Eligibility Criteria Functions
+function showEligibilityCriteriaModal() {
+    document.getElementById('eligibility-criteria-modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Populate current criteria
+    document.getElementById('min-10th-marks').value = AppState.eligibilityCriteria.min10thMarks;
+    document.getElementById('min-12th-marks').value = AppState.eligibilityCriteria.min12thMarks;
+    document.getElementById('min-cgpa-marks').value = AppState.eligibilityCriteria.minCGPAMarks;
+}
+
+function closeEligibilityCriteriaModal() {
+    document.getElementById('eligibility-criteria-modal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+function showOfferLetterUploadModal() {
+    console.log('Showing offer letter upload modal');
+    const modal = document.getElementById('offer-letter-upload-modal');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Populate student dropdown
+        const studentSelect = document.getElementById('student-select');
+        studentSelect.innerHTML = '<option value="">Choose a student...</option>';
+        
+        console.log('Populating student dropdown with students:', AppState.students.length);
+        AppState.students.forEach(student => {
+            console.log('Adding student to dropdown:', { id: student.id, usn: student.usn, name: student.name });
+            const option = document.createElement('option');
+            option.value = student.id;
+            option.textContent = `${student.usn} - ${student.name || student.email}`;
+            studentSelect.appendChild(option);
+        });
+        
+        showNotification('Offer letter upload modal opened', 'info');
+    } else {
+        showNotification('Offer letter upload modal not found', 'error');
+    }
+}
+
+function closeOfferLetterUploadModal() {
+    const modal = document.getElementById('offer-letter-upload-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        document.getElementById('offer-letter-form').reset();
+    }
+}
+
+function updateEligibilityCriteria(event) {
+    event.preventDefault();
+    
+    const min10th = parseFloat(document.getElementById('min-10th-marks').value);
+    const min12th = parseFloat(document.getElementById('min-12th-marks').value);
+    const minCgpa = parseFloat(document.getElementById('min-cgpa-marks').value);
+    
+    if (isNaN(min10th) || isNaN(min12th) || isNaN(minCgpa)) {
+        showNotification('Please enter valid numbers for all criteria', 'error');
+        return;
+    }
+    
+    if (min10th < 0 || min10th > 100 || min12th < 0 || min12th > 100 || minCgpa < 0 || minCgpa > 10) {
+        showNotification('Please enter valid ranges: 10th/12th (0-100%), CGPA (0-10)', 'error');
+        return;
+    }
+    
+    AppState.eligibilityCriteria = {
+        min10thMarks: min10th,
+        min12thMarks: min12th,
+        minCGPAMarks: minCgpa
+    };
+    
+    // Update eligibility for all students
+    AppState.students.forEach(student => {
+        student.isEligible = checkStudentEligibility(student);
+    });
+    
+    saveDataToStorage();
+    closeEligibilityCriteriaModal();
+    loadStudentList();
+    
+    // Update eligibility criteria inputs in Add Job modal if it's open
+    if (document.getElementById('job-form-modal').classList.contains('active')) {
+        document.getElementById('job-10th-marks').value = AppState.eligibilityCriteria.min10thMarks;
+        document.getElementById('job-12th-marks').value = AppState.eligibilityCriteria.min12thMarks;
+        document.getElementById('job-cgpa-marks').value = AppState.eligibilityCriteria.minCGPAMarks;
+        
+        // Reset salary range checkboxes to default if it's a new job
+        if (!AppState.editingJobId) {
+            populateSalaryRangeCheckboxes(['not-placed']);
+        }
+    }
+    
+    showNotification('Eligibility criteria updated successfully', 'success');
+}
+
+function uploadOfferLetter(event) {
+    event.preventDefault();
+    
+    const studentId = document.getElementById('student-select').value;
+    const fileInput = document.getElementById('offer-letter-file');
+    const salary = parseFloat(document.getElementById('placed-salary').value);
+    const salaryRange = document.getElementById('salary-range').value;
+    
+    console.log('Upload offer letter - studentId:', studentId);
+    console.log('Available students:', AppState.students.map(s => ({ id: s.id, usn: s.usn })));
+    
+    if (!studentId || !fileInput.files[0] || !salary || !salaryRange) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+    }
+    
+    const student = AppState.students.find(s => s.id === studentId);
+    if (!student) {
+        console.error('Student not found with ID:', studentId);
+        console.error('Available student IDs:', AppState.students.map(s => s.id));
+        showNotification('Student not found', 'error');
+        return;
+    }
+    
+    // Convert file to base64 for storage
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        // Update student with offer letter information
+        student.isPlaced = true;
+        student.placedSalary = salary;
+        student.salaryRange = salaryRange;
+        student.offerLetter = e.target.result; // Base64 encoded file
+        student.placedDate = new Date().toISOString();
+        
+        // Update eligibility based on salary
+        updateStudentJobEligibility(student);
+        
+        // Save to storage
+        saveDataToStorage();
+        
+        // Update UI
+        loadStudentList();
+        updateStudentStatistics();
+        closeOfferLetterUploadModal();
+        
+        showNotification(`Offer letter uploaded for ${student.usn} (${salary} LPA)`, 'success');
+    };
+    
+    reader.onerror = function() {
+        showNotification('Error reading file', 'error');
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+function updateStudentJobEligibility(student) {
+    console.log('🔄 Updating student job eligibility:', {
+        id: student.id,
+        usn: student.usn,
+        isPlaced: student.isPlaced,
+        salaryRange: student.salaryRange,
+        placedSalary: student.placedSalary
+    });
+    
+    // Update job eligibility based on placement status and salary
+    if (student.isPlaced) {
+        switch (student.salaryRange) {
+            case 'below10':
+                // Can only apply to jobs with 10+ LPA
+                student.canApplyToJobs = '10+';
+                console.log('✅ Set canApplyToJobs to 10+ (below 10 LPA)');
+                break;
+            case 'below20':
+                // Can only apply to jobs with 20+ LPA
+                student.canApplyToJobs = '20+';
+                console.log('✅ Set canApplyToJobs to 20+ (below 20 LPA)');
+                break;
+            case 'above20':
+                // Cannot apply to any jobs (already placed at highest level)
+                student.canApplyToJobs = 'none';
+                console.log('✅ Set canApplyToJobs to none (20+ LPA)');
+                break;
+            default:
+                console.log('⚠️ Unknown salary range:', student.salaryRange);
+                student.canApplyToJobs = 'all';
+        }
+    } else {
+        // Not placed, can apply to all jobs
+        student.canApplyToJobs = 'all';
+        console.log('✅ Set canApplyToJobs to all (not placed)');
+    }
+    
+    console.log('🎯 Final canApplyToJobs:', student.canApplyToJobs);
+}
+
+// Debug function to test eligibility manually
+function debugEligibility() {
+    console.log('🔧 DEBUGGING ELIGIBILITY:');
+    console.log('Current Student:', AppState.currentStudent);
+    console.log('All Jobs:', AppState.jobs);
+    
+    if (AppState.currentStudent && AppState.jobs.length > 0) {
+        AppState.jobs.forEach((job, index) => {
+            console.log(`\n--- Job ${index + 1}: ${job.company} - ${job.title} ---`);
+            console.log('Job eligibleSalaryRanges:', job.eligibleSalaryRanges);
+            console.log('Student salaryRange:', AppState.currentStudent.salaryRange);
+            console.log('Student isPlaced:', AppState.currentStudent.isPlaced);
+            
+            const canApply = canStudentApplyToJobSilent(AppState.currentStudent, job);
+            console.log('Can Apply:', canApply);
+        });
+    }
+}
+
+// Function to add name field to existing students without names
+function migrateStudentNames() {
+    let updatedCount = 0;
+    
+    AppState.students.forEach(student => {
+        if (!student.name || student.name === 'N/A') {
+            // Prompt for name or set a default
+            const newName = prompt(`Enter name for student ${student.usn} (${student.email}):`);
+            if (newName && newName.trim() !== '') {
+                student.name = newName.trim();
+                updatedCount++;
+            }
+        }
+    });
+    
+    if (updatedCount > 0) {
+        saveDataToStorage();
+        loadStudentList();
+        showNotification(`Updated names for ${updatedCount} students`, 'success');
+    } else {
+        showNotification('No students needed name updates', 'info');
+    }
+}
+
+// Debug function to check specific job eligibility
+function debugJobEligibility(jobTitle) {
+    if (!AppState.currentStudent) {
+        console.log('❌ No student logged in');
+        return;
+    }
+    
+    const job = AppState.jobs.find(j => j.title.toLowerCase().includes(jobTitle.toLowerCase()) || 
+                                      j.company.toLowerCase().includes(jobTitle.toLowerCase()));
+    
+    if (!job) {
+        console.log(`❌ Job not found: ${jobTitle}`);
+        console.log('Available jobs:', AppState.jobs.map(j => `${j.company} - ${j.title}`));
+        return;
+    }
+    
+    console.log(`🔍 Debugging eligibility for: ${job.company} - ${job.title}`);
+    console.log('Job data:', job);
+    console.log('Student data:', AppState.currentStudent);
+    
+    // Check academic eligibility
+    const cgpa = parseFloat(AppState.currentStudent.cgpa);
+    const marks10th = parseFloat(AppState.currentStudent.marks10th);
+    const marks12th = parseFloat(AppState.currentStudent.marks12th);
+    
+    const minCgpa = job.academicRequirements?.minCGPAMarks || AppState.eligibilityCriteria.minCGPAMarks;
+    const min10th = job.academicRequirements?.min10thMarks || AppState.eligibilityCriteria.min10thMarks;
+    const min12th = job.academicRequirements?.min12thMarks || AppState.eligibilityCriteria.min12thMarks;
+    
+    console.log('Academic check:', {
+        cgpa: `${cgpa} >= ${minCgpa} = ${cgpa >= minCgpa}`,
+        marks10th: `${marks10th} >= ${min10th} = ${marks10th >= min10th}`,
+        marks12th: `${marks12th} >= ${min12th} = ${marks12th >= min12th}`
+    });
+    
+    const academicEligible = cgpa >= minCgpa && marks10th >= min10th && marks12th >= min12th;
+    console.log('Academic eligible:', academicEligible);
+    
+    // Check salary eligibility
+    const salaryEligible = canStudentApplyToJobSilent(AppState.currentStudent, job);
+    console.log('Salary eligible:', salaryEligible);
+    
+    // Final result
+    const finalEligible = academicEligible && salaryEligible;
+    console.log('Final eligible:', finalEligible);
+    
+    // Get failure reasons
+    const reasons = getEligibilityFailureReasons(AppState.currentStudent, job);
+    console.log('Failure reasons:', reasons);
+}
+
+// Student Offer Letter Upload Function
+function uploadStudentOfferLetter(event) {
+    event.preventDefault();
+    
+    if (!AppState.currentStudent) {
+        showNotification('Please login as a student first', 'error');
+        return;
+    }
+    
+    const fileInput = document.getElementById('student-offer-file');
+    const salary = parseFloat(document.getElementById('student-salary').value);
+    const salaryRange = document.getElementById('student-salary-range').value;
+    
+    if (!fileInput.files[0] || !salary || !salaryRange) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+    }
+    
+    // Convert file to base64 for storage
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        // Update current student with offer letter information
+        AppState.currentStudent.isPlaced = true;
+        AppState.currentStudent.placedSalary = salary;
+        AppState.currentStudent.salaryRange = salaryRange;
+        AppState.currentStudent.offerLetter = e.target.result; // Base64 encoded file
+        AppState.currentStudent.placedDate = new Date().toISOString();
+        
+        // Update the student in AppState.students array
+        let studentIndex = AppState.students.findIndex(s => s.id === AppState.currentStudent.id);
+        if (studentIndex !== -1) {
+            AppState.students[studentIndex] = { ...AppState.currentStudent };
+        }
+        
+        // Update eligibility based on salary
+        updateStudentJobEligibility(AppState.currentStudent);
+        
+        // Update the student in AppState.students array again with updated eligibility
+        studentIndex = AppState.students.findIndex(s => s.id === AppState.currentStudent.id);
+        if (studentIndex !== -1) {
+            AppState.students[studentIndex] = { ...AppState.currentStudent };
+        }
+        
+        // Save to storage
+        saveDataToStorage();
+        
+        console.log('💾 Student data after upload:', {
+            id: AppState.currentStudent.id,
+            usn: AppState.currentStudent.usn,
+            isPlaced: AppState.currentStudent.isPlaced,
+            placedSalary: AppState.currentStudent.placedSalary,
+            salaryRange: AppState.currentStudent.salaryRange,
+            canApplyToJobs: AppState.currentStudent.canApplyToJobs
+        });
+        
+        // Update UI
+        loadStudentInfo();
+        loadStudentOfferLetterSection();
+        
+        // Reset form
+        document.getElementById('student-offer-letter-form').reset();
+        
+        showNotification(`Offer letter uploaded successfully! (${salary} LPA)`, 'success');
+    };
+    
+    reader.onerror = function() {
+        showNotification('Error reading file', 'error');
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+// Load student offer letter section
+function loadStudentOfferLetterSection() {
+    if (!AppState.currentStudent) return;
+    
+    const student = AppState.currentStudent;
+    console.log('📊 Loading student offer letter section:', {
+        id: student.id,
+        usn: student.usn,
+        isPlaced: student.isPlaced,
+        placedSalary: student.placedSalary,
+        salaryRange: student.salaryRange,
+        canApplyToJobs: student.canApplyToJobs
+    });
+    
+    // Ensure eligibility is up-to-date
+    updateStudentJobEligibility(student);
+    
+    // Update current status
+    const statusDiv = document.getElementById('student-current-status');
+    if (statusDiv) {
+        statusDiv.innerHTML = `
+            <div class="status-info">
+                <div class="status-item">
+                    <strong>Placement Status:</strong>
+                    <span class="status-badge ${student.isPlaced ? 'placed' : 'not-placed'}">
+                        ${student.isPlaced ? 'Placed' : 'Not Placed'}
+                    </span>
+                </div>
+                ${student.isPlaced ? `
+                    <div class="status-item">
+                        <strong>Salary:</strong>
+                        <span>${student.placedSalary} LPA (${AppState.salaryRanges[student.salaryRange]})</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Placed Date:</strong>
+                        <span>${new Date(student.placedDate).toLocaleDateString()}</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Can Apply To:</strong>
+                        <span class="eligibility-info">${getEligibilityText(student.canApplyToJobs)}</span>
+                    </div>
+                ` : `
+                    <div class="status-item">
+                        <strong>Can Apply To:</strong>
+                        <span class="eligibility-info">All jobs</span>
+                    </div>
+                `}
+            </div>
+        `;
+    }
+    
+    // Show/hide download section based on placement status
+    const downloadSection = document.getElementById('offer-letter-download-section');
+    const downloadInfo = document.getElementById('offer-letter-download-info');
+    
+    if (student.isPlaced && student.offerLetter) {
+        downloadSection.style.display = 'block';
+        downloadInfo.innerHTML = `
+            <div class="download-info">
+                <p><strong>You have an offer letter available for download.</strong></p>
+                <div class="offer-details">
+                    <p><strong>Salary:</strong> ${student.placedSalary} LPA (${AppState.salaryRanges[student.salaryRange]})</p>
+                    <p><strong>Placed Date:</strong> ${new Date(student.placedDate).toLocaleDateString()}</p>
+                </div>
+                <div class="download-actions">
+                    <button onclick="viewStudentOfferLetter()" class="btn btn-secondary">
+                        <i class="fas fa-eye"></i>
+                        View Offer Letter
+                    </button>
+                    <button onclick="downloadStudentOfferLetter()" class="btn btn-primary">
+                        <i class="fas fa-download"></i>
+                        Download Offer Letter
+                    </button>
+                </div>
+            </div>
+        `;
+    } else {
+        downloadSection.style.display = 'none';
+    }
+    
+    // Load job applications
+    loadStudentApplications();
+}
+
+// Get eligibility text for display
+function getEligibilityText(canApplyTo) {
+    console.log('📝 Getting eligibility text for:', canApplyTo);
+    let text;
+    switch (canApplyTo) {
+        case 'all': 
+            text = 'All jobs';
+            break;
+        case '10+': 
+            text = 'Jobs with 10+ LPA only';
+            break;
+        case '20+': 
+            text = 'Jobs with 20+ LPA only';
+            break;
+        case 'none': 
+            text = 'Cannot apply to any jobs';
+            break;
+        default: 
+            text = 'All jobs';
+            console.log('⚠️ Unknown canApplyTo value:', canApplyTo);
+    }
+    console.log('📝 Returning eligibility text:', text);
+    return text;
+}
+
+// Load student job applications
+function loadStudentApplications() {
+    // Job Applications section has been removed from UI
+    return;
+    
+    const student = AppState.currentStudent;
+    
+    console.log('🎯 Loading student applications for:', {
+        student: {
+            id: student.id,
+            usn: student.usn,
+            isPlaced: student.isPlaced,
+            placedSalary: student.placedSalary,
+            salaryRange: student.salaryRange,
+            canApplyToJobs: student.canApplyToJobs
+        },
+        totalJobs: AppState.jobs.length
+    });
+    
+    // Get eligible jobs based on student's placement status and job's salary range eligibility
+    const eligibleJobs = AppState.jobs.filter(job => {
+        const canApply = canStudentApplyToJobSilent(student, job);
+        console.log(`🔍 Job ${job.id} (${job.company} - ${job.title}): ${canApply ? 'ELIGIBLE' : 'NOT ELIGIBLE'}`);
+        return canApply;
+    });
+    
+    console.log(`📊 Filtered ${AppState.jobs.length} jobs down to ${eligibleJobs.length} eligible jobs`);
+    
+    // Debug: Run manual eligibility check
+    debugEligibility();
+    
+    if (eligibleJobs.length === 0) {
+        applicationsDiv.innerHTML = `
+            <div class="no-applications">
+                <p>${student.isPlaced ? 'You cannot apply to any jobs based on your current placement status.' : 'No jobs available for application.'}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    applicationsDiv.innerHTML = eligibleJobs.map(job => `
+        <div class="application-card">
+            <div class="job-info">
+                <h5>${job.title}</h5>
+                <p><strong>Company:</strong> ${job.company}</p>
+                <p><strong>Salary:</strong> ${job.salary} LPA</p>
+                <p><strong>Location:</strong> ${job.location}</p>
+                <p><strong>Deadline:</strong> ${new Date(job.deadline).toLocaleDateString()}</p>
+            </div>
+            <div class="application-actions">
+                <button onclick="applyForJob('${job.id}')" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i>
+                    Apply Now
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Helper function to extract numeric salary from salary string
+function extractSalaryValue(salaryString) {
+    if (!salaryString) return 0;
+    
+    // Use the same improved parsing logic as parseJobSalary
+    return parseJobSalary(salaryString);
+}
+
+// Check if student can apply to a job based on salary range eligibility (silent check for filtering)
+function canStudentApplyToJobSilent(student, job) {
+    console.log('🔍 Checking eligibility:', {
+        student: {
+            id: student.id,
+            usn: student.usn,
+            isPlaced: student.isPlaced,
+            salaryRange: student.salaryRange,
+            canApplyToJobs: student.canApplyToJobs
+        },
+        job: {
+            id: job.id,
+            title: job.title,
+            company: job.company,
+            salary: job.salary,
+            eligibleSalaryRanges: job.eligibleSalaryRanges
+        }
+    });
+    
+    // Debug: Check if job has eligibleSalaryRanges
+    if (!job.eligibleSalaryRanges) {
+        console.log('⚠️ Job has no eligibleSalaryRanges field:', job);
+    }
+    
+    // If job doesn't have salary range eligibility defined, use old logic
+    if (!job.eligibleSalaryRanges || job.eligibleSalaryRanges.length === 0) {
+        console.log('📝 Job has no salary range eligibility, using old logic');
+        if (student.isPlaced) {
+            const jobSalary = extractSalaryValue(job.salary);
+            console.log('💰 Job salary extracted:', jobSalary);
+            switch (student.canApplyToJobs) {
+                case '10+':
+                    if (jobSalary < 10) {
+                        console.log('❌ Student can only apply to 10+ LPA jobs, job salary is', jobSalary);
+                        return false;
+                    }
+                    break;
+                case '20+':
+                    if (jobSalary < 20) {
+                        console.log('❌ Student can only apply to 20+ LPA jobs, job salary is', jobSalary);
+                        return false;
+                    }
+                    break;
+                case 'none':
+                    console.log('❌ Student cannot apply to any jobs');
+                    return false;
+            }
+        }
+        console.log('✅ Student can apply (old logic)');
+        return true;
+    }
+    
+    // Check based on job's salary range eligibility settings
+    let studentRange = 'not-placed';
+    if (student.isPlaced) {
+        studentRange = student.salaryRange;
+    }
+    
+    console.log('🎯 Student range:', studentRange, 'Job allows:', job.eligibleSalaryRanges);
+    
+    // Check if the job allows this student's salary range
+    if (!job.eligibleSalaryRanges.includes(studentRange)) {
+        console.log('❌ Student range not in job eligibility');
+        return false;
+    }
+    
+    // Additional check: If student is placed, also check if they can apply based on job salary
+    if (student.isPlaced && student.canApplyToJobs !== 'all') {
+        const jobSalary = extractSalaryValue(job.salary);
+        console.log('💰 Job salary:', jobSalary, 'Student can apply to:', student.canApplyToJobs);
+        
+        switch (student.canApplyToJobs) {
+            case '10+':
+                if (jobSalary < 10) {
+                    console.log('❌ Student can only apply to 10+ LPA jobs, job salary is', jobSalary);
+                    return false;
+                }
+                break;
+            case '20+':
+                if (jobSalary < 20) {
+                    console.log('❌ Student can only apply to 20+ LPA jobs, job salary is', jobSalary);
+                    return false;
+                }
+                break;
+            case 'none':
+                console.log('❌ Student cannot apply to any jobs');
+                return false;
+        }
+    }
+    
+    console.log('✅ Student can apply (new logic)');
+    return true;
+}
+
+// Check if student can apply to a job based on salary range eligibility (with notifications)
+function canStudentApplyToJob(student, job) {
+    // If job doesn't have salary range eligibility defined, use old logic
+    if (!job.eligibleSalaryRanges || job.eligibleSalaryRanges.length === 0) {
+        if (student.isPlaced) {
+            const jobSalary = extractSalaryValue(job.salary);
+            switch (student.canApplyToJobs) {
+                case '10+':
+                    if (jobSalary < 10) {
+                        showNotification('You can only apply to jobs with 10+ LPA', 'warning');
+                        return false;
+                    }
+                    break;
+                case '20+':
+                    if (jobSalary < 20) {
+                        showNotification('You can only apply to jobs with 20+ LPA', 'warning');
+                        return false;
+                    }
+                    break;
+                case 'none':
+                    showNotification('You cannot apply to any jobs as you are already placed at the highest level', 'warning');
+                    return false;
+            }
+        }
+        return true;
+    }
+    
+    // Check based on job's salary range eligibility settings
+    let studentRange = 'not-placed';
+    if (student.isPlaced) {
+        studentRange = student.salaryRange;
+    }
+    
+    if (!job.eligibleSalaryRanges.includes(studentRange)) {
+        const rangeText = AppState.salaryRanges[studentRange] || 'not placed';
+        showNotification(`This job is not available for students ${rangeText.toLowerCase()}`, 'warning');
+        return false;
+    }
+    
+    // Additional check: If student is placed, also check if they can apply based on job salary
+    if (student.isPlaced && student.canApplyToJobs !== 'all') {
+        const jobSalary = extractSalaryValue(job.salary);
+        
+        switch (student.canApplyToJobs) {
+            case '10+':
+                if (jobSalary < 10) {
+                    showNotification('You can only apply to jobs with 10+ LPA', 'warning');
+                    return false;
+                }
+                break;
+            case '20+':
+                if (jobSalary < 20) {
+                    showNotification('You can only apply to jobs with 20+ LPA', 'warning');
+                    return false;
+                }
+                break;
+            case 'none':
+                showNotification('You cannot apply to any jobs as you are already placed at the highest level', 'warning');
+                return false;
+        }
+    }
+    
+    return true;
+}
+
+// Apply for a job
+function applyForJob(jobId) {
+    if (!AppState.currentStudent) {
+        showNotification('Please login as a student first', 'error');
+        return;
+    }
+    
+    const job = AppState.jobs.find(j => j.id === jobId);
+    if (!job) {
+        showNotification('Job not found', 'error');
+        return;
+    }
+    
+    const student = AppState.currentStudent;
+    
+    // Check if student can apply to this job based on salary range eligibility
+    if (!canStudentApplyToJob(student, job)) {
+        return;
+    }
+    
+    // Check if already applied
+    if (!job.applications) job.applications = [];
+    if (job.applications.some(app => app.studentId === student.id)) {
+        showNotification('You have already applied for this job', 'warning');
+        return;
+    }
+    
+    // Add application
+    job.applications.push({
+        studentId: student.id,
+        studentUSN: student.usn,
+        studentEmail: student.email,
+        appliedDate: new Date().toISOString(),
+        status: 'pending'
+    });
+    
+    // Save to storage
+    saveDataToStorage();
+    
+    // Update UI
+    loadStudentApplications();
+    
+    showNotification(`Successfully applied for ${job.title} at ${job.company}`, 'success');
+}
+
+// View offer letter with student details
+function viewOfferLetter(studentId) {
+    const student = AppState.students.find(s => s.id === studentId);
+    if (!student || !student.offerLetter) {
+        showNotification('Offer letter not found', 'error');
+        return;
+    }
+    
+    // Create modal to display offer letter
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+            <h2>Offer Letter - ${student.usn}</h2>
+            
+            <div class="student-details">
+                <div class="detail-row">
+                    <span class="detail-label">Student Name:</span>
+                    <span class="detail-value">${student.name || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">USN:</span>
+                    <span class="detail-value">${student.usn}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">${student.email}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Salary:</span>
+                    <span class="detail-value">${student.placedSalary} LPA (${AppState.salaryRanges[student.salaryRange]})</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Placed Date:</span>
+                    <span class="detail-value">${new Date(student.placedDate).toLocaleDateString()}</span>
+                </div>
+            </div>
+            
+            <div class="offer-letter-preview">
+                <h3>Offer Letter Preview</h3>
+                ${student.offerLetter.startsWith('data:image/') ? 
+                    `<img src="${student.offerLetter}" alt="Offer Letter" style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px;">` :
+                    `<iframe src="${student.offerLetter}" style="width: 100%; height: 500px; border: 1px solid #ddd; border-radius: 8px;"></iframe>`
+                }
+            </div>
+            
+            <div class="modal-actions">
+                <button onclick="downloadOfferLetter('${student.id}')" class="btn btn-primary">
+                    <i class="fas fa-download"></i>
+                    Download Offer Letter
+                </button>
+                <button onclick="this.closest('.modal').remove()" class="btn btn-secondary">
+                    Close
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+}
+
+// Download offer letter
+function downloadOfferLetter(studentId) {
+    const student = AppState.students.find(s => s.id === studentId);
+    if (!student || !student.offerLetter) {
+        showNotification('Offer letter not found', 'error');
+        return;
+    }
+    
+    try {
+        // Create filename
+        const filename = `OfferLetter_${student.usn}_${student.placedSalary}LPA.pdf`;
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = student.offerLetter;
+        link.download = filename;
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showNotification(`Offer letter downloaded: ${filename}`, 'success');
+    } catch (error) {
+        console.error('Error downloading offer letter:', error);
+        showNotification('Error downloading offer letter', 'error');
+    }
+}
+
+// Student offer letter view and download functions
+function viewStudentOfferLetter() {
+    if (!AppState.currentStudent || !AppState.currentStudent.offerLetter) {
+        showNotification('No offer letter found', 'error');
+        return;
+    }
+    
+    const student = AppState.currentStudent;
+    
+    // Create modal to display offer letter
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+            <h2>Your Offer Letter</h2>
+            
+            <div class="student-details">
+                <div class="detail-row">
+                    <span class="detail-label">Student Name:</span>
+                    <span class="detail-value">${student.name || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">USN:</span>
+                    <span class="detail-value">${student.usn}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">${student.email}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Salary:</span>
+                    <span class="detail-value">${student.placedSalary} LPA (${AppState.salaryRanges[student.salaryRange]})</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Placed Date:</span>
+                    <span class="detail-value">${new Date(student.placedDate).toLocaleDateString()}</span>
+                </div>
+            </div>
+            
+            <div class="offer-letter-preview">
+                <h3>Offer Letter</h3>
+                ${student.offerLetter.startsWith('data:image/') ? 
+                    `<img src="${student.offerLetter}" alt="Offer Letter" style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px;">` :
+                    `<iframe src="${student.offerLetter}" style="width: 100%; height: 500px; border: 1px solid #ddd; border-radius: 8px;"></iframe>`
+                }
+            </div>
+            
+            <div class="modal-actions">
+                <button onclick="downloadStudentOfferLetter()" class="btn btn-primary">
+                    <i class="fas fa-download"></i>
+                    Download Offer Letter
+                </button>
+                <button onclick="this.closest('.modal').remove()" class="btn btn-secondary">
+                    Close
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+}
+
+function downloadStudentOfferLetter() {
+    if (!AppState.currentStudent || !AppState.currentStudent.offerLetter) {
+        showNotification('No offer letter found', 'error');
+        return;
+    }
+    
+    const student = AppState.currentStudent;
+    
+    try {
+        // Create filename
+        const filename = `MyOfferLetter_${student.usn}_${student.placedSalary}LPA.pdf`;
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = student.offerLetter;
+        link.download = filename;
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showNotification(`Offer letter downloaded: ${filename}`, 'success');
+    } catch (error) {
+        console.error('Error downloading offer letter:', error);
+        showNotification('Error downloading offer letter', 'error');
+    }
+}
+
+// Manual Student Entry Functions
+function showAddStudentModal() {
+    document.getElementById('add-student-modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Clear form
+    document.getElementById('add-student-form').reset();
+}
+
+function closeAddStudentModal() {
+    document.getElementById('add-student-modal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+    
+    // Clear form
+    document.getElementById('add-student-form').reset();
+}
+
+async function handleAddStudent(event) {
+    event.preventDefault();
+    
+    const studentData = {
+        usn: document.getElementById('manual-usn').value.trim(),
+        name: document.getElementById('manual-name').value.trim(),
+        email: document.getElementById('manual-email').value.trim(),
+        cgpa: document.getElementById('manual-cgpa').value.trim(),
+        marks10th: document.getElementById('manual-10th').value.trim(),
+        marks12th: document.getElementById('manual-12th').value.trim()
+    };
+    
+    // Validate the data
+    const validationError = validateStudentData(studentData);
+    if (validationError) {
+        showNotification(validationError, 'error');
+        return;
+    }
+    
+    // Check for duplicate email and USN
+    if (AppState.students.some(s => s.email === studentData.email)) {
+        showNotification('Email already exists', 'error');
+        return;
+    }
+    
+    if (AppState.students.some(s => s.usn === studentData.usn)) {
+        showNotification('USN already exists', 'error');
+        return;
+    }
+    
+    try {
+        // Create student object
+        const student = {
+            id: `student_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+            usn: studentData.usn,
+            email: studentData.email,
+            cgpa: parseFloat(studentData.cgpa),
+            marks10th: parseFloat(studentData.marks10th),
+            marks12th: parseFloat(studentData.marks12th),
+            name: studentData.name,
+            password: generateRandomPassword(),
+            createdAt: new Date().toISOString(),
+            isEligible: checkStudentEligibility(studentData)
+        };
+        
+        // Add to database
+        await addStudentsToDatabase([student]);
+        
+        // Close modal and refresh list
+        closeAddStudentModal();
+        loadStudentList();
+        
+        showNotification(`Student ${student.usn} added successfully! Password: ${student.password}`, 'success');
+        
+    } catch (error) {
+        console.error('Error adding student:', error);
+        showNotification('Error adding student: ' + error.message, 'error');
+    }
+}
+
+
+
+function handleStudentFileDrop(event) {
+    event.preventDefault();
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+        processStudentFile(files[0]);
+    }
+}
+
+function handleStudentFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) {
+        processStudentFile(file);
+    }
+}
+
+function processStudentFile(file) {
+    console.log('Processing student file:', file.name, file.type, file.size);
+    
+    const progressDiv = document.getElementById('student-upload-progress');
+    const progressFill = document.getElementById('student-progress-fill');
+    const progressText = document.getElementById('student-progress-text');
+    
+    if (!progressDiv || !progressFill || !progressText) {
+        console.error('Required elements not found for student upload progress');
+        showNotification('Error: Upload interface not properly initialized', 'error');
+        return;
+    }
+    
+    progressDiv.style.display = 'block';
+    progressFill.style.width = '0%';
+    progressText.textContent = 'Reading file...';
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = e.target.result;
+            let csvData;
+            
+            console.log('File read successfully, processing...');
+            
+            if (file.name.endsWith('.csv')) {
+                console.log('Processing CSV file');
+                csvData = parseCSV(data);
+                console.log('CSV data parsed:', csvData.length, 'rows');
+                console.log('CSV data content:', csvData);
+            } else if (file.name.endsWith('.xlsx')) {
+                console.log('Processing XLSX file');
+                const workbook = XLSX.read(data, { type: 'binary' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                csvData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                console.log('XLSX data parsed:', csvData.length, 'rows');
+            } else {
+                throw new Error('Unsupported file format. Please use .csv or .xlsx files.');
+            }
+            
+            if (!csvData || csvData.length === 0) {
+                throw new Error('No data found in file');
+            }
+            
+            progressFill.style.width = '50%';
+            progressText.textContent = 'Processing data...';
+            
+            setTimeout(() => {
+                const result = processStudentDataFromCSV(csvData);
+                console.log('Student data processed:', result);
+                displayStudentPreview(result);
+                
+                progressFill.style.width = '100%';
+                progressText.textContent = 'Complete!';
+                
+                setTimeout(() => {
+                    progressDiv.style.display = 'none';
+                }, 1000);
+            }, 500);
+            
+        } catch (error) {
+            console.error('Error processing file:', error);
+            showNotification('Error processing file: ' + error.message, 'error');
+            progressDiv.style.display = 'none';
+        }
+    };
+    
+    reader.onerror = function() {
+        console.error('Error reading file');
+        showNotification('Error reading file. Please try again.', 'error');
+        progressDiv.style.display = 'none';
+    };
+    
+    if (file.name.endsWith('.csv')) {
+        reader.readAsText(file, 'UTF-8');
+    } else {
+        reader.readAsBinaryString(file);
+    }
+}
+
+function parseCSV(csvText) {
+    const lines = csvText.split('\n').filter(line => line.trim() !== '');
+    return lines.map(line => {
+        // Handle CSV with quoted fields and commas inside quotes
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current.trim());
+        
+        return result.map(cell => cell.replace(/^"|"$/g, '').trim());
+    });
+}
+
+function displayStudentPreview(result) {
+    console.log('displayStudentPreview called with result:', result);
+    const { students, errors } = result;
+    
+    console.log('Students to display:', students);
+    console.log('Errors found:', errors);
+    
+    // Show errors if any
+    const errorsDiv = document.getElementById('upload-errors');
+    const errorList = document.getElementById('error-list');
+    
+    if (errors.length > 0) {
+        console.log('Showing errors:', errors);
+        errorsDiv.style.display = 'block';
+        errorList.innerHTML = errors.map(error => `<li>${error}</li>`).join('');
+    } else {
+        errorsDiv.style.display = 'none';
+    }
+    
+    // Display preview table
+    const table = document.getElementById('student-preview-table');
+    const header = document.getElementById('student-preview-header');
+    const body = document.getElementById('student-preview-body');
+    
+    if (!table || !header || !body) {
+        console.error('Required table elements not found');
+        showNotification('Error: Preview table not found', 'error');
+        return;
+    }
+    
+    header.innerHTML = `
+        <tr>
+            <th>USN</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>CGPA</th>
+            <th>10th Marks</th>
+            <th>12th Marks</th>
+            <th>Password</th>
+            <th>Eligible</th>
+        </tr>
+    `;
+    
+    body.innerHTML = students.map(student => `
+        <tr>
+            <td>${student.usn}</td>
+            <td>${student.name}</td>
+            <td>${student.email}</td>
+            <td>${student.cgpa}</td>
+            <td>${student.marks10th}%</td>
+            <td>${student.marks12th}%</td>
+            <td>${student.password}</td>
+            <td><span class="${student.isEligible ? 'eligible-yes' : 'eligible-no'}">${student.isEligible ? 'Yes' : 'No'}</span></td>
+        </tr>
+    `).join('');
+    
+    // Store students for saving
+    window.pendingStudents = students;
+    console.log('Stored pending students:', window.pendingStudents);
+    console.log('Number of pending students:', window.pendingStudents ? window.pendingStudents.length : 0);
+    
+    // Enable save button if there are valid students (even if there are some errors)
+    const saveBtn = document.getElementById('save-student-btn');
+    if (saveBtn) {
+        saveBtn.disabled = students.length === 0;
+        console.log('Save button disabled:', saveBtn.disabled, 'Students count:', students.length);
+    } else {
+        console.error('Save button not found');
+    }
+    
+    const dataViewer = document.getElementById('student-data-viewer');
+    if (dataViewer) {
+        dataViewer.style.display = 'block';
+        console.log('Data viewer displayed');
+    } else {
+        console.error('Data viewer not found');
+    }
+}
+
+async function saveStudentData() {
+    console.log('saveStudentData called');
+    console.log('Pending students:', window.pendingStudents);
+    
+    if (window.pendingStudents && window.pendingStudents.length > 0) {
+        try {
+            console.log('Saving', window.pendingStudents.length, 'students to database');
+            await addStudentsToDatabase(window.pendingStudents);
+            closeStudentUploadModal();
+            loadStudentList();
+            window.pendingStudents = null;
+            showNotification(`Successfully saved ${window.pendingStudents.length} students!`, 'success');
+        } catch (error) {
+            console.error('Error in saveStudentData:', error);
+            showNotification('Error saving student data: ' + error.message, 'error');
+        }
+    } else {
+        console.warn('No pending students to save');
+        showNotification('No student data to save. Please upload a file first.', 'warning');
+    }
+}
+
+function loadStudentList() {
+    // Check if we're in the admin student management page
+    const adminStudentList = document.getElementById('admin-student-list');
+    if (adminStudentList) {
+        loadAdminStudentList();
+        return;
+    }
+    
+    // Original function for regular student list
+    const studentList = document.getElementById('student-list');
+    const totalStudents = document.getElementById('total-students');
+    const eligibleStudents = document.getElementById('eligible-students');
+    const ineligibleStudents = document.getElementById('ineligible-students');
+    
+    if (!studentList) return; // Exit if not on student page
+    
+    // Update stats
+    const total = AppState.students.length;
+    const eligible = AppState.students.filter(s => s.isEligible).length;
+    const ineligible = total - eligible;
+    
+    if (totalStudents) totalStudents.textContent = total;
+    if (eligibleStudents) eligibleStudents.textContent = eligible;
+    if (ineligibleStudents) ineligibleStudents.textContent = ineligible;
+    
+    // Display students
+    if (AppState.students.length === 0) {
+        studentList.innerHTML = '<div class="no-data-message"><p>No students added yet. Upload student data to get started.</p></div>';
+        return;
+    }
+    
+    studentList.innerHTML = AppState.students.map(student => `
+        <div class="student-card">
+            <div class="student-info">
+                <h4>${student.name || 'N/A'} (${student.usn})</h4>
+                <p><strong>Email:</strong> ${student.email}</p>
+                <p><strong>CGPA:</strong> ${student.cgpa} | <strong>10th:</strong> ${student.marks10th}% | <strong>12th:</strong> ${student.marks12th}%</p>
+                <p><strong>Password:</strong> ${student.password}</p>
+                ${student.isPlaced ? `
+                    <div class="placement-info">
+                        <p><strong>Status:</strong> <span class="placed-status">Placed</span></p>
+                        <p><strong>Salary:</strong> ${student.placedSalary} LPA (${AppState.salaryRanges[student.salaryRange]})</p>
+                        <p><strong>Placed Date:</strong> ${new Date(student.placedDate).toLocaleDateString()}</p>
+                    </div>
+                ` : `
+                    <div class="placement-info">
+                        <p><strong>Status:</strong> <span class="not-placed-status">Not Placed</span></p>
+                    </div>
+                `}
+            </div>
+            <div class="student-actions">
+                <span class="student-eligible-badge ${student.isEligible ? 'eligible' : 'ineligible'}">
+                    ${student.isEligible ? 'Eligible' : 'Ineligible'}
+                </span>
+                <button onclick="editStudent('${student.id}')" class="edit-btn">
+                    <i class="fas fa-edit"></i>
+                    Edit
+                </button>
+                ${student.isPlaced && student.offerLetter ? `
+                    <button onclick="viewOfferLetter('${student.id}')" class="view-btn">
+                        <i class="fas fa-eye"></i>
+                        View Offer
+                    </button>
+                    <button onclick="downloadOfferLetter('${student.id}')" class="download-btn">
+                        <i class="fas fa-download"></i>
+                        Download
+                    </button>
+                ` : ''}
+                <button onclick="deleteStudent('${student.id}')" class="delete-btn">
+                    <i class="fas fa-trash"></i>
+                    Delete
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadAdminStudentList() {
+    const adminStudentList = document.getElementById('admin-student-list');
+    if (!adminStudentList) return;
+    
+    console.log('Loading admin student list, total students:', AppState.students.length);
+    
+    // Update statistics
+    updateStudentStatistics();
+    
+    // Get filtered students
+    const filteredStudents = getFilteredStudents();
+    
+    // Display students in admin format
+    if (filteredStudents.length === 0) {
+        if (AppState.students.length === 0) {
+            adminStudentList.innerHTML = `
+                <div class="no-data-message">
+                    <div class="no-data-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>No Students Found</h3>
+                    <p>No students have been added to the system yet.</p>
+                    <p>Use the upload feature or add students manually to get started.</p>
+                </div>
+            `;
+        } else {
+            adminStudentList.innerHTML = `
+                <div class="no-data-message">
+                    <div class="no-data-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>No Matching Students</h3>
+                    <p>No students match your current search or filter criteria.</p>
+                    <p>Try adjusting your search terms or filter options.</p>
+                </div>
+            `;
+        }
+        return;
+    }
+    
+    adminStudentList.innerHTML = filteredStudents.map(student => `
+        <div class="admin-student-card" data-usn="${student.usn}" data-email="${student.email}" data-name="${student.name || ''}" data-eligible="${student.isEligible}">
+            <div class="student-header">
+                <div class="student-identity">
+                    <h4>${student.usn}</h4>
+                    <span class="student-eligible-badge ${student.isEligible ? 'eligible' : 'ineligible'}">
+                        <i class="fas fa-${student.isEligible ? 'check-circle' : 'times-circle'}"></i>
+                        ${student.isEligible ? 'Eligible' : 'Ineligible'}
+                    </span>
+                </div>
+                <div class="student-actions">
+                    <button onclick="editStudent('${student.id}')" class="edit-btn" title="Edit Student">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteStudent('${student.id}')" class="delete-btn" title="Delete Student">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="student-details">
+                <div class="detail-row">
+                    <span class="detail-label">Name:</span>
+                    <span class="detail-value">${student.name || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">${student.email}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">CGPA:</span>
+                    <span class="detail-value">${student.cgpa}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">10th Marks:</span>
+                    <span class="detail-value">${student.marks10th}%</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">12th Marks:</span>
+                    <span class="detail-value">${student.marks12th}%</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Password:</span>
+                    <span class="detail-value password-field">
+                        <span class="password-text">${student.password}</span>
+                        <button onclick="copyToClipboard('${student.password}')" class="copy-btn" title="Copy Password">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Created:</span>
+                    <span class="detail-value">${new Date(student.createdAt).toLocaleDateString()}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Update student statistics
+function updateStudentStatistics() {
+    const totalStudents = AppState.students.length;
+    const eligibleStudents = AppState.students.filter(s => s.isEligible).length;
+    const ineligibleStudents = totalStudents - eligibleStudents;
+    const placedStudents = AppState.students.filter(s => s.isPlaced).length;
+    
+    // Update the count in the management card title
+    const totalCount = document.getElementById('total-students-count');
+    if (totalCount) {
+        totalCount.textContent = `(${totalStudents})`;
+    }
+    
+    // Update the count in the student statistics page
+    const totalCountStats = document.getElementById('total-students-count-stats');
+    if (totalCountStats) {
+        totalCountStats.textContent = totalStudents;
+    }
+    
+    const eligibleCount = document.getElementById('eligible-students-count');
+    const ineligibleCount = document.getElementById('ineligible-students-count');
+    const placedCount = document.getElementById('placed-students-count');
+    
+    if (eligibleCount) eligibleCount.textContent = eligibleStudents;
+    if (ineligibleCount) ineligibleCount.textContent = ineligibleStudents;
+    if (placedCount) placedCount.textContent = placedStudents;
+    
+    // Also update the placed students count in the student statistics page
+    const placedCountStats = document.getElementById('placed-students');
+    if (placedCountStats) placedCountStats.textContent = placedStudents;
+}
+
+// Format date for display
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    try {
+        return new Date(dateString).toLocaleDateString();
+    } catch (error) {
+        console.error('Error formatting date:', dateString, error);
+        return 'Invalid Date';
+    }
+}
+
+// Show placed students page
+function showPlacedStudentsPage() {
+    hideAllPages();
+    document.getElementById('placed-students-page').classList.add('active');
+    loadPlacedStudentsPage();
+}
+
+// Load placed students page data
+function loadPlacedStudentsPage() {
+    updatePlacedStudentsStats();
+    loadPlacedStudentsList();
+}
+
+// Update placed students statistics
+function updatePlacedStudentsStats() {
+    const placedStudents = AppState.students.filter(s => s.isPlaced);
+    const totalPlaced = placedStudents.length;
+    
+    // Calculate average salary
+    const totalSalary = placedStudents.reduce((sum, student) => sum + (student.placedSalary || 0), 0);
+    const avgSalary = totalPlaced > 0 ? (totalSalary / totalPlaced).toFixed(1) : 0;
+    
+    // Calculate recent placements (last 30 days)
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const recentPlacements = placedStudents.filter(student => {
+        const placedDate = new Date(student.placedDate);
+        return placedDate >= thirtyDaysAgo;
+    }).length;
+    
+    // Update UI
+    const totalPlacedCount = document.getElementById('total-placed-count');
+    const avgSalaryElement = document.getElementById('avg-salary');
+    const recentPlacementsElement = document.getElementById('recent-placements');
+    
+    if (totalPlacedCount) totalPlacedCount.textContent = totalPlaced;
+    if (avgSalaryElement) avgSalaryElement.textContent = avgSalary;
+    if (recentPlacementsElement) recentPlacementsElement.textContent = recentPlacements;
+}
+
+// Load placed students list
+function loadPlacedStudentsList() {
+    const placedStudents = AppState.students.filter(s => s.isPlaced);
+    const container = document.getElementById('placed-students-list');
+    
+    if (!container) return;
+    
+    if (placedStudents.length === 0) {
+        container.innerHTML = `
+            <div class="no-placed-students">
+                <i class="fas fa-briefcase"></i>
+                <h3>No Placed Students</h3>
+                <p>No students have been placed yet. Upload offer letters to mark students as placed.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = placedStudents.map(student => `
+        <div class="placed-student-card">
+            <div class="placed-student-header">
+                <div class="placed-student-info">
+                    <h3>${student.name}</h3>
+                    <p>${student.usn}</p>
+                </div>
+                <div class="placed-badge">
+                    <i class="fas fa-briefcase"></i>
+                    Placed
+                </div>
+            </div>
+            
+            <div class="placed-student-details">
+                <div class="detail-item">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">${student.email}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">CGPA</div>
+                    <div class="detail-value">${student.cgpa}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Placed Salary</div>
+                    <div class="detail-value salary-highlight">${student.placedSalary} LPA</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Placed Date</div>
+                    <div class="detail-value">${formatDate(student.placedDate)}</div>
+                </div>
+            </div>
+            
+            <div class="placed-student-actions">
+                <button class="btn view-offer-btn" onclick="viewOfferLetter('${student.id}')">
+                    <i class="fas fa-eye"></i>
+                    View Offer
+                </button>
+                <button class="btn download-offer-btn" onclick="downloadOfferLetter('${student.id}')">
+                    <i class="fas fa-download"></i>
+                    Download
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Filter placed students
+function filterPlacedStudents() {
+    const searchTerm = document.getElementById('placed-student-search')?.value.toLowerCase() || '';
+    const salaryFilter = document.getElementById('salary-filter')?.value || 'all';
+    
+    const placedStudents = AppState.students.filter(s => s.isPlaced);
+    let filtered = placedStudents;
+    
+    // Apply search filter
+    if (searchTerm) {
+        filtered = filtered.filter(student => 
+            student.name.toLowerCase().includes(searchTerm) ||
+            student.usn.toLowerCase().includes(searchTerm) ||
+            student.email.toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    // Apply salary filter
+    if (salaryFilter !== 'all') {
+        filtered = filtered.filter(student => {
+            const salary = student.placedSalary || 0;
+            switch (salaryFilter) {
+                case 'below10':
+                    return salary < 10;
+                case 'below20':
+                    return salary >= 10 && salary < 20;
+                case 'above20':
+                    return salary >= 20;
+                default:
+                    return true;
+            }
+        });
+    }
+    
+    // Update the display
+    const container = document.getElementById('placed-students-list');
+    if (!container) return;
+    
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="no-placed-students">
+                <i class="fas fa-search"></i>
+                <h3>No Students Found</h3>
+                <p>No placed students match your search criteria.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = filtered.map(student => `
+        <div class="placed-student-card">
+            <div class="placed-student-header">
+                <div class="placed-student-info">
+                    <h3>${student.name}</h3>
+                    <p>${student.usn}</p>
+                </div>
+                <div class="placed-badge">
+                    <i class="fas fa-briefcase"></i>
+                    Placed
+                </div>
+            </div>
+            
+            <div class="placed-student-details">
+                <div class="detail-item">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">${student.email}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">CGPA</div>
+                    <div class="detail-value">${student.cgpa}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Placed Salary</div>
+                    <div class="detail-value salary-highlight">${student.placedSalary} LPA</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Placed Date</div>
+                    <div class="detail-value">${formatDate(student.placedDate)}</div>
+                </div>
+            </div>
+            
+            <div class="placed-student-actions">
+                <button class="btn view-offer-btn" onclick="viewOfferLetter('${student.id}')">
+                    <i class="fas fa-eye"></i>
+                    View Offer
+                </button>
+                <button class="btn download-offer-btn" onclick="downloadOfferLetter('${student.id}')">
+                    <i class="fas fa-download"></i>
+                    Download
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Export placed students data
+function exportPlacedStudentsData() {
+    const placedStudents = AppState.students.filter(s => s.isPlaced);
+    
+    if (placedStudents.length === 0) {
+        showNotification('No placed students to export', 'warning');
+        return;
+    }
+    
+    // Create CSV content
+    const headers = ['USN', 'Name', 'Email', 'CGPA', 'Placed Salary (LPA)', 'Placed Date', 'Salary Range'];
+    const csvContent = [
+        headers.join(','),
+        ...placedStudents.map(student => [
+            student.usn,
+            `"${student.name}"`,
+            student.email,
+            student.cgpa,
+            student.placedSalary || 0,
+            formatDate(student.placedDate),
+            student.salaryRange || 'N/A'
+        ].join(','))
+    ].join('\n');
+    
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `placed_students_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showNotification(`Exported ${placedStudents.length} placed students data`, 'success');
+}
+
+// Get filtered students based on search and filter criteria
+function getFilteredStudents() {
+    const searchTerm = document.getElementById('student-search')?.value.toLowerCase() || '';
+    const eligibilityFilter = document.getElementById('eligibility-filter')?.value || 'all';
+    
+    let filtered = AppState.students;
+    
+    // Apply search filter
+    if (searchTerm) {
+        filtered = filtered.filter(student => 
+            student.usn.toLowerCase().includes(searchTerm) ||
+            student.email.toLowerCase().includes(searchTerm) ||
+            (student.name && student.name.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    // Apply eligibility filter
+    if (eligibilityFilter === 'eligible') {
+        filtered = filtered.filter(student => student.isEligible);
+    } else if (eligibilityFilter === 'ineligible') {
+        filtered = filtered.filter(student => !student.isEligible);
+    }
+    
+    return filtered;
+}
+
+function filterStudents() {
+    // Check if we're in the admin student management page
+    const adminStudentList = document.getElementById('admin-student-list');
+    if (adminStudentList) {
+        // Reload the admin student list with current filters
+        loadAdminStudentList();
+        return;
+    }
+    
+    // Original function for regular student list
+    const searchTerm = document.getElementById('student-search')?.value.toLowerCase() || '';
+    const studentCards = document.querySelectorAll('.student-card');
+    
+    studentCards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function editStudent(studentId) {
+    const student = AppState.students.find(s => s.id == studentId);
+    if (!student) return;
+    
+    document.getElementById('edit-student-id').value = student.id;
+    document.getElementById('edit-student-usn').value = student.usn;
+    document.getElementById('edit-student-name').value = student.name || '';
+    document.getElementById('edit-student-email').value = student.email;
+    document.getElementById('edit-student-cgpa').value = student.cgpa;
+    document.getElementById('edit-student-10th').value = student.marks10th;
+    document.getElementById('edit-student-12th').value = student.marks12th;
+    
+    document.getElementById('edit-student-modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeEditStudentModal() {
+    document.getElementById('edit-student-modal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+function handleEditStudentSubmit(event) {
+    event.preventDefault();
+    
+    const studentId = document.getElementById('edit-student-id').value;
+    const student = AppState.students.find(s => s.id == studentId);
+    
+    if (!student) return;
+    
+    // Update student data
+    student.usn = document.getElementById('edit-student-usn').value;
+    student.name = document.getElementById('edit-student-name').value;
+    student.email = document.getElementById('edit-student-email').value;
+    student.cgpa = parseFloat(document.getElementById('edit-student-cgpa').value);
+    student.marks10th = parseFloat(document.getElementById('edit-student-10th').value);
+    student.marks12th = parseFloat(document.getElementById('edit-student-12th').value);
+    
+    // Recalculate eligibility
+    student.isEligible = checkStudentEligibility(student);
+    
+    saveDataToStorage();
+    closeEditStudentModal();
+    loadStudentList();
+    showNotification('Student updated successfully', 'success');
+}
+
+function deleteStudent(studentId) {
+    if (confirm('Are you sure you want to delete this student?')) {
+        AppState.students = AppState.students.filter(s => s.id != studentId);
+        saveDataToStorage();
+        loadStudentList();
+        showNotification('Student deleted successfully', 'success');
+    }
+}
+
 // Navigation Functions
 function showStudentDashboard() {
+    // Check if student is logged in
+    if (!AppState.currentStudent) {
+        showNotification('Please login to access student portal', 'error');
+        showStudentLogin();
+        return;
+    }
+    
     hideAllPages();
-    document.getElementById('student-dashboard').classList.add('active');
+    document.getElementById('student-portal').classList.add('active');
     setActiveNav('student-nav');
-    loadJobs();
-    checkShortlistedBanner();
+    loadStudentDashboard();
     closeMobileMenu();
-    loadNotifications();
 }
 
 function showAdminLogin() {
@@ -1171,6 +5553,60 @@ function showAdminLogin() {
     closeMobileMenu();
 }
 
+function showHomepage() {
+    hideAllPages();
+    document.getElementById('homepage').classList.add('active');
+    updateNavigationForStudent();
+    
+    // Initialize device detection and download options
+    setTimeout(() => {
+        updateDeviceInfo();
+    }, 100);
+}
+
+function showStudentLogin() {
+    hideAllPages();
+    document.getElementById('student-login').classList.add('active');
+    updateNavigationForStudent();
+}
+
+// Student Portal Section Navigation
+function showStudentSection(section) {
+    console.log('🔄 Switching to section:', section);
+    
+    // Handle shortlisted section specially
+    if (section === 'shortlisted') {
+        showShortlistedView();
+        return;
+    }
+    
+    // Hide all sections
+    document.querySelectorAll('.student-section').forEach(sec => {
+        sec.classList.remove('active');
+    });
+    
+    // Remove active class from all nav buttons
+    document.querySelectorAll('.portal-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected section
+    document.getElementById(`student-${section}-section`).classList.add('active');
+    document.getElementById(`nav-${section}`).classList.add('active');
+    
+    // Load content based on section
+    if (section === 'notifications') {
+        console.log('🔔 Loading notifications section...');
+        createAndDisplayNotificationsDirectly();
+    } else if (section === 'available-jobs') {
+        loadEligibleJobs();
+    } else if (section === 'my-portal') {
+        loadStudentInfo();
+    } else if (section === 'offer-letter') {
+        loadStudentOfferLetterSection();
+    }
+}
+
 function showAdminDashboard() {
     hideAllPages();
     document.getElementById('admin-dashboard').classList.add('active');
@@ -1178,7 +5614,21 @@ function showAdminDashboard() {
     loadAdminDashboard();
 }
 
+function showStudentManagementPage() {
+    hideAllPages();
+    document.getElementById('student-management-page').classList.add('active');
+    setActiveNav('admin-nav');
+    loadStudentManagementPage();
+}
+
 function showShortlistedView() {
+    // Check if student is logged in
+    if (!AppState.currentStudent) {
+        showNotification('Please login to view shortlisted data', 'error');
+        showStudentLogin();
+        return;
+    }
+    
     hideAllPages();
     document.getElementById('shortlisted-view').classList.add('active');
     setActiveNav('shortlisted-nav');
@@ -1206,7 +5656,50 @@ function hideAllPages() {
 function setActiveNav(activeId) {
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => link.classList.remove('active'));
-    document.getElementById(activeId).classList.add('active');
+    
+    const activeElement = document.getElementById(activeId);
+    if (activeElement) {
+        activeElement.classList.add('active');
+    } else {
+        console.warn('Navigation element not found:', activeId);
+    }
+}
+
+function updateNavigationForStudent() {
+    // Hide/show navigation items based on login status
+    const homepageNav = document.getElementById('homepage-nav');
+    const studentLoginNav = document.getElementById('student-login-nav');
+    const adminNav = document.getElementById('admin-nav');
+    const studentNav = document.getElementById('student-nav');
+    // Check if elements exist before accessing their style
+    if (homepageNav && studentLoginNav && adminNav && studentNav) {
+        if (AppState.currentStudent) {
+            // Student is logged in
+            homepageNav.style.display = 'none';
+            studentLoginNav.style.display = 'none';
+            adminNav.style.display = 'none';
+            studentNav.style.display = 'block';
+        } else if (AppState.currentUser) {
+            // Admin is logged in
+            homepageNav.style.display = 'none';
+            studentLoginNav.style.display = 'none';
+            adminNav.style.display = 'block';
+            studentNav.style.display = 'none';
+        } else {
+            // No one is logged in
+            homepageNav.style.display = 'block';
+            studentLoginNav.style.display = 'block';
+            adminNav.style.display = 'block';
+            studentNav.style.display = 'none';
+        }
+    } else {
+        console.warn('⚠️ Some navigation elements not found:', {
+            homepageNav: !!homepageNav,
+            studentLoginNav: !!studentLoginNav,
+            adminNav: !!adminNav,
+            studentNav: !!studentNav
+        });
+    }
 }
 
 // Student Dashboard Functions
@@ -1230,7 +5723,10 @@ function createJobCard(job, index) {
     const card = document.createElement('div');
     card.className = 'job-card';
     card.style.animationDelay = `${index * 0.1}s`;
-    card.onclick = () => showJobDetail(job.id);
+    card.onclick = () => {
+        console.log('Job card clicked for job:', job);
+        showJobDetail(job.id);
+    };
     
     const statusClass = job.status.toLowerCase().replace(' ', '-');
     const formattedDeadline = new Date(job.deadline).toLocaleString('en-IN', {
@@ -1302,8 +5798,13 @@ function filterJobs() {
 
 // Job Detail Functions
 function showJobDetail(jobId) {
+    console.log('showJobDetail called with jobId:', jobId);
     const job = AppState.jobs.find(j => j.id === jobId);
-    if (!job) return;
+    console.log('Found job:', job);
+    if (!job) {
+        console.log('Job not found with id:', jobId);
+        return;
+    }
     
     const modal = document.getElementById('job-detail-modal');
     const content = document.getElementById('job-detail-content');
@@ -1366,6 +5867,26 @@ function showJobDetail(jobId) {
             <p>${job.eligibility}</p>
         </div>
         
+        <div class="job-detail-section">
+            <h3><i class="fas fa-graduation-cap"></i> Academic Requirements</h3>
+            <div class="eligibility-criteria-grid">
+                <div class="criteria-item">
+                    <h4><i class="fas fa-certificate"></i> 10th Standard</h4>
+                    <p>Minimum: <span class="criteria-value">${job.academicRequirements?.min10thMarks || AppState.eligibilityCriteria.min10thMarks}%</span></p>
+                </div>
+                <div class="criteria-item">
+                    <h4><i class="fas fa-medal"></i> 12th/Diploma</h4>
+                    <p>Minimum: <span class="criteria-value">${job.academicRequirements?.min12thMarks || AppState.eligibilityCriteria.min12thMarks}%</span></p>
+                </div>
+                <div class="criteria-item">
+                    <h4><i class="fas fa-star"></i> Engineering CGPA</h4>
+                    <p>Minimum: <span class="criteria-value">${job.academicRequirements?.minCGPAMarks || AppState.eligibilityCriteria.minCGPAMarks}</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="job-detail-section">
+        
         ${job.selectionProcess ? `
             <div class="job-detail-section">
                 <h3><i class="fas fa-tasks"></i> Selection Process</h3>
@@ -1390,11 +5911,28 @@ function showJobDetail(jobId) {
                     <h3><i class="fas fa-paper-plane"></i> Ready to Apply?</h3>
                     <p>Click the button below to access the application form</p>
                 </div>
-                <a href="${job.formLink}" target="_blank" class="apply-btn">
-                    <i class="fas fa-external-link-alt"></i>
-                    <span>Apply Now</span>
-                </a>
-                <p class="apply-note">You will be redirected to the company's application form</p>
+                ${AppState.currentStudent && checkStudentEligibilityForJob(AppState.currentStudent, job) ? `
+                    <a href="${job.formLink}" target="_blank" class="apply-btn">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>Apply Now</span>
+                    </a>
+                    <p class="apply-note">You will be redirected to the company's application form</p>
+                ` : `
+                    <div class="apply-btn disabled">
+                        <i class="fas fa-lock"></i>
+                        <span>Not Eligible</span>
+                    </div>
+                    ${AppState.currentStudent ? `
+                        <div class="eligibility-reasons">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Eligibility Issues:</h4>
+                            <ul>
+                                ${getEligibilityFailureReasons(AppState.currentStudent, job).map(reason => `<li>${reason}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : `
+                        <p class="apply-note">Please login to check your eligibility</p>
+                    `}
+                `}
             </div>
         ` : `
             <div class="apply-section">
@@ -1410,8 +5948,10 @@ function showJobDetail(jobId) {
         `}
     `;
     
+    console.log('Showing modal:', modal);
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+    console.log('Modal should now be visible');
 }
 
 function closeJobDetail() {
@@ -1443,6 +5983,11 @@ function handleAdminLogin(event) {
     
     if (isValidAdmin) {
         AppState.currentUser = { username: username, role: 'admin' };
+        
+        // Save login state to localStorage
+        localStorage.setItem('currentUser', JSON.stringify(AppState.currentUser));
+        localStorage.setItem('loginType', 'admin');
+        
         showNotification('Login successful!', 'success');
         showAdminDashboard();
     } else {
@@ -1452,8 +5997,13 @@ function handleAdminLogin(event) {
 
 function logout() {
     AppState.currentUser = null;
+    
+    // Clear login state from localStorage
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('loginType');
+    
     showNotification('Logged out successfully', 'info');
-    showStudentDashboard();
+    showHomepage();
 }
 
 // Admin Dashboard Functions
@@ -1461,6 +6011,8 @@ function loadAdminDashboard() {
     loadAdminJobList();
     loadAdminNotifications();
     loadAdminList();
+    loadStudentList();
+    updateManagementStats(); // Update the management card statistics
 }
 
 
@@ -1555,6 +6107,14 @@ function showAddJobModal() {
     document.getElementById('job-form').reset();
     document.getElementById('job-form-modal').classList.add('active');
     document.body.style.overflow = 'hidden';
+    
+    // Populate eligibility criteria inputs with current values
+    document.getElementById('job-10th-marks').value = AppState.eligibilityCriteria.min10thMarks;
+    document.getElementById('job-12th-marks').value = AppState.eligibilityCriteria.min12thMarks;
+    document.getElementById('job-cgpa-marks').value = AppState.eligibilityCriteria.minCGPAMarks;
+    
+    // Initialize salary range checkboxes to default (only "not-placed" checked)
+    populateSalaryRangeCheckboxes(['not-placed']);
 }
 
 function editJob(jobId) {
@@ -1583,6 +6143,50 @@ function editJob(jobId) {
     
     document.getElementById('job-form-modal').classList.add('active');
     document.body.style.overflow = 'hidden';
+    
+    // Populate eligibility criteria inputs with job-specific values or default values
+    document.getElementById('job-10th-marks').value = job.academicRequirements?.min10thMarks || AppState.eligibilityCriteria.min10thMarks;
+    document.getElementById('job-12th-marks').value = job.academicRequirements?.min12thMarks || AppState.eligibilityCriteria.min12thMarks;
+    document.getElementById('job-cgpa-marks').value = job.academicRequirements?.minCGPAMarks || AppState.eligibilityCriteria.minCGPAMarks;
+    
+    // Populate salary range eligibility checkboxes
+    populateSalaryRangeCheckboxes(job.eligibleSalaryRanges || []);
+}
+
+// Helper function to populate salary range checkboxes
+function populateSalaryRangeCheckboxes(selectedRanges) {
+    const checkboxes = [
+        { id: 'job-eligible-below10', value: 'below10' },
+        { id: 'job-eligible-below20', value: 'below20' },
+        { id: 'job-eligible-above20', value: 'above20' },
+        { id: 'job-eligible-not-placed', value: 'not-placed' }
+    ];
+    
+    checkboxes.forEach(checkbox => {
+        const element = document.getElementById(checkbox.id);
+        if (element) {
+            element.checked = selectedRanges.includes(checkbox.value);
+        }
+    });
+}
+
+// Helper function to get selected salary ranges
+function getSelectedSalaryRanges() {
+    const ranges = [];
+    const checkboxes = [
+        { id: 'job-eligible-below10', value: 'below10' },
+        { id: 'job-eligible-below20', value: 'below20' },
+        { id: 'job-eligible-above20', value: 'above20' },
+        { id: 'job-eligible-not-placed', value: 'not-placed' }
+    ];
+    
+    checkboxes.forEach(checkbox => {
+        if (document.getElementById(checkbox.id).checked) {
+            ranges.push(checkbox.value);
+        }
+    });
+    
+    return ranges;
 }
 
 function handleJobSubmit(event) {
@@ -1600,7 +6204,15 @@ function handleJobSubmit(event) {
         batches: document.getElementById('job-batches').value,
         branches: document.getElementById('job-branches').value,
         selectionProcess: document.getElementById('job-selection-process').value,
-        formLink: document.getElementById('job-form-link').value
+        formLink: document.getElementById('job-form-link').value,
+        // Academic requirements for this specific job
+        academicRequirements: {
+            min10thMarks: parseFloat(document.getElementById('job-10th-marks').value) || AppState.eligibilityCriteria.min10thMarks,
+            min12thMarks: parseFloat(document.getElementById('job-12th-marks').value) || AppState.eligibilityCriteria.min12thMarks,
+            minCGPAMarks: parseFloat(document.getElementById('job-cgpa-marks').value) || AppState.eligibilityCriteria.minCGPAMarks
+        },
+        // Salary range eligibility for placed students
+        eligibleSalaryRanges: getSelectedSalaryRanges()
     };
     
     if (AppState.editingJobId) {
@@ -1699,6 +6311,9 @@ function closeJobForm() {
     // Reset form and clear all fields
     document.getElementById('job-form').reset();
     document.getElementById('job-form-title').textContent = 'Add New Job';
+    
+    // Reset salary range checkboxes to default (only "not-placed" checked)
+    populateSalaryRangeCheckboxes(['not-placed']);
 }
 
 // File Upload Functions
@@ -1719,23 +6334,40 @@ function closeFileUpload() {
 function handleDragOver(event) {
     event.preventDefault();
     event.stopPropagation();
-    document.getElementById('drop-zone').classList.add('drag-over');
+    // Handle both regular drop-zone and student-drop-zone
+    const dropZone = event.currentTarget;
+    if (dropZone) {
+        dropZone.classList.add('drag-over');
+    }
 }
 
 function handleDragLeave(event) {
     event.preventDefault();
     event.stopPropagation();
-    document.getElementById('drop-zone').classList.remove('drag-over');
+    // Handle both regular drop-zone and student-drop-zone
+    const dropZone = event.currentTarget;
+    if (dropZone) {
+        dropZone.classList.remove('drag-over');
+    }
 }
 
 function handleFileDrop(event) {
     event.preventDefault();
     event.stopPropagation();
-    document.getElementById('drop-zone').classList.remove('drag-over');
+    // Handle both regular drop-zone and student-drop-zone
+    const dropZone = event.currentTarget;
+    if (dropZone) {
+        dropZone.classList.remove('drag-over');
+    }
     
     const files = event.dataTransfer.files;
     if (files.length > 0) {
-        processFile(files[0]);
+        // Check which drop zone this is and call appropriate function
+        if (dropZone && dropZone.id === 'student-drop-zone') {
+            processStudentFile(files[0]);
+        } else {
+            processFile(files[0]);
+        }
     }
 }
 
@@ -1885,9 +6517,23 @@ function showNotification(message, type = 'info') {
         </div>
     `;
     
+    // Calculate position for stacking from top - new notifications go to the top
+    const existingNotifications = document.querySelectorAll('.notification');
+    
+    // Move existing notifications down first with smooth transition
+    existingNotifications.forEach((existing, index) => {
+        const newTopOffset = 20 + ((index + 1) * 60); // Push existing ones down
+        existing.style.transition = 'top 0.3s ease';
+        existing.style.top = `${newTopOffset}px`;
+    });
+    
+    // New notification goes to the top
+    notification.style.top = '20px';
+    notification.style.transition = 'transform 0.3s ease';
+    
     document.body.appendChild(notification);
     
-    // Show notification
+    // Show notification from top
     setTimeout(() => {
         notification.classList.add('show');
     }, 100);
@@ -1896,9 +6542,23 @@ function showNotification(message, type = 'info') {
     setTimeout(() => {
         notification.classList.remove('show');
         setTimeout(() => {
-            document.body.removeChild(notification);
+            if (notification.parentElement) {
+                document.body.removeChild(notification);
+                // Reposition remaining notifications
+                repositionBasicNotifications();
+            }
         }, 300);
     }, 3000);
+}
+
+// Reposition basic notifications after one is removed
+function repositionBasicNotifications() {
+    const notifications = document.querySelectorAll('.notification');
+    notifications.forEach((notification, index) => {
+        const topOffset = 20 + (index * 60);
+        notification.style.transition = 'top 0.3s ease';
+        notification.style.top = `${topOffset}px`;
+    });
 }
 
 function animateElements() {
@@ -2904,26 +7564,294 @@ async function addNotification(notification) {
         timestamp: Date.now(), // Use timestamp for Firebase compatibility
         time: new Date().toISOString(), // Keep time for display
         read: false,
-        action: notification.action || null
+        action: notification.action || null,
+        realtime: true // Mark as real-time notification
     };
     
     console.log('Adding new notification:', newNotification.id, newNotification.title);
     
     AppState.notifications.unshift(newNotification);
     
-    // Keep only last 10 notifications
-    if (AppState.notifications.length > 10) {
-        AppState.notifications = AppState.notifications.slice(0, 10);
+    // Keep only newest 20 notifications (increased for better history)
+    if (AppState.notifications.length > 20) {
+        AppState.notifications = AppState.notifications.slice(0, 20);
     }
     
     try {
         // Save to cloud (this will trigger real-time updates)
         await saveDataToStorage();
+        
+        // Send push notification if supported
+        await sendPushNotification(newNotification);
+        
+        // Also show the notification immediately for the current user
+        handleRealtimeNotification(newNotification);
+        
     } catch (error) {
         console.error('Error saving notification:', error);
     }
     
     displayNotifications();
+}
+
+// Handle real-time notifications with enhanced alerts
+function handleRealtimeNotification(notification) {
+    console.log('🔔 Real-time notification received:', notification);
+    
+    // Show enhanced toast notification
+    showRealtimeNotification(notification);
+    
+    // Update notification badge/counter
+    updateNotificationBadge();
+    
+    // Play notification sound if enabled
+    playNotificationSound();
+    
+    // Show browser notification if permission granted
+    showBrowserNotification(notification);
+    
+    // Update notification displays
+    if (document.getElementById('notifications-list')) {
+        displayNotifications();
+    }
+    if (document.getElementById('admin-notifications-list')) {
+        loadAdminNotifications();
+    }
+    if (document.getElementById('student-notifications-list')) {
+        loadStudentNotifications();
+    }
+}
+
+// Enhanced real-time notification display
+function showRealtimeNotification(notification) {
+    const notificationElement = document.createElement('div');
+    notificationElement.className = `realtime-notification ${notification.type}`;
+    notificationElement.innerHTML = `
+        <div class="realtime-notification-content">
+            <div class="notification-header">
+                <div class="notification-icon ${notification.type}">
+                    <i class="fas fa-${getNotificationIcon(notification.type)}"></i>
+                </div>
+                <div class="notification-info">
+                    <h4>${notification.title}</h4>
+                    <p>${notification.message}</p>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.parentElement.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="notification-time">
+                <i class="fas fa-clock"></i>
+                <span>Just now</span>
+            </div>
+            ${notification.action ? `
+                <div class="notification-action">
+                    <button onclick="executeNotificationAction(${notification.id})" class="action-btn">
+                        <i class="fas fa-arrow-right"></i>
+                        ${notification.action.text}
+                    </button>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    // Calculate position for stacking from top - new notifications go to the top
+    const existingNotifications = document.querySelectorAll('.realtime-notification');
+    
+    // Move existing notifications down first with smooth transition
+    existingNotifications.forEach((existing, index) => {
+        const newTopOffset = 20 + ((index + 1) * 10); // Push existing ones down
+        existing.style.transition = 'top 0.3s ease';
+        existing.style.top = `${newTopOffset}px`;
+    });
+    
+    // New notification goes to the top
+    notificationElement.style.top = '20px';
+    notificationElement.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    
+    // Add to page
+    document.body.appendChild(notificationElement);
+    
+    // Animate in from top
+    setTimeout(() => {
+        notificationElement.classList.add('show');
+    }, 100);
+    
+    // Auto-remove after 8 seconds
+    setTimeout(() => {
+        notificationElement.classList.remove('show');
+        setTimeout(() => {
+            if (notificationElement.parentElement) {
+                notificationElement.remove();
+                // Reposition remaining notifications
+                repositionNotifications();
+            }
+        }, 300);
+    }, 8000);
+}
+
+// Reposition notifications after one is removed
+function repositionNotifications() {
+    const notifications = document.querySelectorAll('.realtime-notification');
+    notifications.forEach((notification, index) => {
+        const topOffset = 20 + (index * 10);
+        notification.style.transition = 'top 0.3s ease';
+        notification.style.top = `${topOffset}px`;
+    });
+}
+
+// Update notification badge/counter
+function updateNotificationBadge() {
+    const unreadCount = AppState.notifications.filter(n => !n.read).length;
+    
+    // Update notification badge in navigation
+    const badge = document.getElementById('nav-notification-badge');
+    if (badge) {
+        badge.textContent = unreadCount;
+        badge.style.display = unreadCount > 0 ? 'block' : 'none';
+    }
+    
+    // Update page title with notification count
+    if (unreadCount > 0) {
+        document.title = `(${unreadCount}) DSI Placement Portal`;
+    } else {
+        document.title = 'DSI Placement Portal';
+    }
+}
+
+// Toggle notification settings
+function toggleNotificationSettings() {
+    if ('Notification' in window) {
+        if (Notification.permission === 'granted') {
+            showNotification('Notifications are already enabled!', 'success');
+        } else if (Notification.permission === 'denied') {
+            showNotification('Notifications are blocked. Please enable them in browser settings.', 'warning');
+        } else {
+            requestNotificationPermission();
+        }
+    } else {
+        showNotification('Notifications are not supported in this browser.', 'warning');
+    }
+}
+
+// Request notification permission
+async function requestNotificationPermission() {
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            showNotification('✅ Notifications enabled! You will receive real-time updates.', 'success');
+            setupPushNotifications();
+        } else {
+            showNotification('❌ Notifications blocked. You can enable them later in browser settings.', 'warning');
+        }
+    } catch (error) {
+        console.error('Error requesting notification permission:', error);
+        showNotification('Error enabling notifications. Please try again.', 'error');
+    }
+}
+
+// Setup push notifications
+async function setupPushNotifications() {
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            console.log('Service Worker ready for push notifications');
+        } catch (error) {
+            console.error('Error setting up push notifications:', error);
+        }
+    }
+}
+
+// Play notification sound
+function playNotificationSound() {
+    try {
+        // Create audio context for notification sound
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (error) {
+        console.log('Could not play notification sound:', error);
+    }
+}
+
+// Show browser notification
+async function showBrowserNotification(notification) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+            const browserNotification = new Notification(notification.title, {
+                body: notification.message,
+                icon: './DSi.png',
+                badge: './DSi.png',
+                tag: 'dsi-notification',
+                requireInteraction: true,
+                silent: false,
+                vibrate: [200, 100, 200],
+                data: {
+                    notificationId: notification.id,
+                    url: window.location.href
+                }
+            });
+            
+            // Handle notification click
+            browserNotification.onclick = function() {
+                window.focus();
+                browserNotification.close();
+                
+                // Execute action if available
+                if (notification.action) {
+                    executeNotificationAction(notification.id);
+                }
+            };
+            
+            // Auto-close after 10 seconds
+            setTimeout(() => {
+                browserNotification.close();
+            }, 10000);
+            
+        } catch (error) {
+            console.log('Could not show browser notification:', error);
+        }
+    }
+}
+
+// Send push notification via service worker
+async function sendPushNotification(notification) {
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            
+            if (registration.active) {
+                registration.active.postMessage({
+                    type: 'PUSH_NOTIFICATION',
+                    notification: {
+                        title: notification.title,
+                        body: notification.message,
+                        icon: './DSi.png',
+                        badge: './DSi.png',
+                        tag: 'dsi-realtime',
+                        data: {
+                            notificationId: notification.id,
+                            type: notification.type
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.log('Could not send push notification:', error);
+        }
+    }
 }
 
 function displayNotifications() {
@@ -2945,13 +7873,14 @@ function displayNotifications() {
         return;
     }
     
+    // Display notifications (newest first - already in correct order due to unshift)
     AppState.notifications.forEach((notification, index) => {
         const item = document.createElement('div');
         item.className = `notification-item ${!notification.read ? 'unread' : ''}`;
         item.style.opacity = '0';
         item.style.transform = 'translateY(10px)';
         
-        const timeAgo = getTimeAgo(notification.time);
+        const timeAgo = getTimeAgo(notification.timestamp || notification.time);
         
         item.innerHTML = `
             <div class="notification-icon ${notification.type}">
@@ -3612,7 +8541,7 @@ function loadAdminNotifications() {
         return;
     }
     
-    // Show recent 5 notifications
+    // Show recent 5 notifications (newest first - already in correct order due to unshift)
     const recentNotifications = AppState.notifications.slice(0, 5);
     adminNotificationsList.innerHTML = '';
     
@@ -3725,6 +8654,7 @@ function loadAllNotifications() {
     
     allNotificationsList.innerHTML = '';
     
+    // Display notifications (newest first - already in correct order due to unshift)
     AppState.notifications.forEach(notification => {
         const item = document.createElement('div');
         item.className = 'admin-notification-item-full';
@@ -3743,10 +8673,10 @@ function loadAllNotifications() {
                 <div class="admin-notification-time-full">${timeAgo}</div>
             </div>
             <div class="admin-notification-actions">
-                <button class="notification-action-btn edit-notification-btn" onclick="editNotification(${notification.id})" title="Edit Notification">
+                <button class="notification-action-btn edit-notification-btn" onclick="editNotification('${notification.id}')" title="Edit Notification">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="notification-action-btn delete-notification-btn" onclick="deleteNotification(${notification.id})" title="Delete Notification">
+                <button class="notification-action-btn delete-notification-btn" onclick="deleteNotification('${notification.id}')" title="Delete Notification">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -3765,34 +8695,6 @@ function getNotificationTypeBadge(type) {
     }
 }
 
-function editNotification(notificationId) {
-    const notification = AppState.notifications.find(n => n.id === notificationId);
-    if (!notification) return;
-    
-    // Populate edit form
-    document.getElementById('edit-notification-id').value = notificationId;
-    document.getElementById('edit-notification-type').value = notification.type;
-    document.getElementById('edit-notification-title').value = notification.title;
-    document.getElementById('edit-notification-message').value = notification.message;
-    
-    // Handle action button
-    if (notification.action && notification.action.text) {
-        document.getElementById('edit-notification-action-enabled').checked = true;
-        document.getElementById('edit-notification-action-text').value = notification.action.text;
-        document.getElementById('edit-notification-action-link').value = notification.action.link || '';
-        document.getElementById('edit-notification-action-section').style.display = 'block';
-    } else {
-        document.getElementById('edit-notification-action-enabled').checked = false;
-        document.getElementById('edit-notification-action-text').value = '';
-        document.getElementById('edit-notification-action-link').value = '';
-        document.getElementById('edit-notification-action-section').style.display = 'none';
-    }
-    
-    // Show edit modal
-    document.getElementById('edit-notification-modal').classList.add('active');
-    document.body.style.overflow = 'hidden';
-    showEditNotificationModal();
-}
 
 function closeEditNotificationModal() {
     document.getElementById('edit-notification-modal').classList.remove('active');
@@ -3849,34 +8751,6 @@ function handleEditNotificationSubmit(event) {
     displayNotifications(); // Update student view
 }
 
-async function deleteNotification(notificationId) {
-    if (!confirm('Are you sure you want to delete this notification? This action cannot be undone.')) {
-        return;
-    }
-    
-    const notificationIndex = AppState.notifications.findIndex(n => n.id === notificationId);
-    if (notificationIndex === -1) {
-        showNotification('Notification not found', 'error');
-        return;
-    }
-    
-    AppState.notifications.splice(notificationIndex, 1);
-    
-    try {
-        // Save to Firebase (which will trigger real-time updates)
-        await saveDataToStorage();
-        
-        showNotification('Notification deleted successfully!', 'success');
-        
-    } catch (error) {
-        console.error('Error saving notification deletion:', error);
-        showNotification('Error saving deletion. Please try again.', 'error');
-    }
-    
-    loadAdminNotifications();
-    loadAllNotifications();
-    displayNotifications(); // Update student view
-}
 
 
 // Check and update job statuses based on deadlines
@@ -4293,71 +9167,154 @@ function setupInstallPrompt() {
         console.log('Install prompt triggered');
         e.preventDefault();
         PWAState.deferredPrompt = e;
-        showInstallPrompt();
+        
+        // Check if user has previously dismissed the banner
+        const dismissed = localStorage.getItem('pwa-install-dismissed');
+        const dismissedTime = localStorage.getItem('pwa-install-dismissed-time');
+        const now = Date.now();
+        
+        // Show banner if not dismissed or dismissed more than 7 days ago
+        if (!dismissed || (dismissedTime && (now - parseInt(dismissedTime)) > 7 * 24 * 60 * 60 * 1000)) {
+            showInstallBanner();
+        }
     });
     
     // Check if app is already installed
     window.addEventListener('appinstalled', () => {
         console.log('PWA was installed');
         PWAState.isInstalled = true;
-        hideInstallPrompt();
+        hideInstallBanner();
         showNotification('App installed successfully! You can now access it from your home screen.', 'success');
-    });
-}
-
-// Show install prompt
-function showInstallPrompt() {
-    // Create install banner
-    const installBanner = document.createElement('div');
-    installBanner.id = 'install-banner';
-    installBanner.className = 'install-banner';
-    installBanner.innerHTML = `
-        <div class="install-banner-content">
-            <div class="install-banner-icon">
-                <i class="fas fa-download"></i>
-            </div>
-            <div class="install-banner-text">
-                <h4>Install DSI Placement Portal</h4>
-                <p>Add to your home screen for quick access</p>
-            </div>
-            <div class="install-banner-actions">
-                <button onclick="installApp()" class="install-btn">
-                    <i class="fas fa-plus"></i>
-                    Install
-                </button>
-                <button onclick="hideInstallPrompt()" class="install-dismiss">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(installBanner);
-    
-    // Auto-hide after 10 seconds
-    setTimeout(() => {
-        if (document.getElementById('install-banner')) {
-            hideInstallPrompt();
+        
+        // Track installation
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'pwa_install', {
+                event_category: 'PWA',
+                event_label: 'App Installed'
+            });
         }
-    }, 10000);
-}
-
-// Hide install prompt
-function hideInstallPrompt() {
-    const banner = document.getElementById('install-banner');
-    if (banner) {
-        banner.remove();
+    });
+    
+    // Check if running in standalone mode (already installed)
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+        PWAState.isInstalled = true;
+        console.log('App is running in standalone mode');
     }
 }
 
-// Install app
+// Show install banner
+function showInstallBanner() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner && !PWAState.isInstalled) {
+        banner.classList.add('show');
+        
+        // Track banner shown
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'pwa_banner_shown', {
+                event_category: 'PWA',
+                event_label: 'Install Banner Displayed'
+            });
+        }
+    }
+}
+
+// Hide install banner
+function hideInstallBanner() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) {
+        banner.classList.remove('show');
+    }
+}
+
+// Dismiss install banner
+function dismissInstallBanner() {
+    hideInstallBanner();
+    
+    // Remember dismissal for 7 days
+    localStorage.setItem('pwa-install-dismissed', 'true');
+    localStorage.setItem('pwa-install-dismissed-time', Date.now().toString());
+    
+    // Track dismissal
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'pwa_banner_dismissed', {
+            event_category: 'PWA',
+            event_label: 'Install Banner Dismissed'
+        });
+    }
+}
+
+// Install PWA
+async function installPWA() {
+    const device = detectDevice();
+    
+    if (device.isIOS) {
+        // For iOS, show install instructions
+        showIOSInstallModal();
+    } else if (PWAState.deferredPrompt) {
+        // For other platforms, use the native install prompt
+        try {
+            PWAState.deferredPrompt.prompt();
+            const { outcome } = await PWAState.deferredPrompt.userChoice;
+            console.log(`User response to the install prompt: ${outcome}`);
+            
+            if (outcome === 'accepted') {
+                showNotification('Installing app...', 'info');
+                
+                // Track successful installation attempt
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'pwa_install_attempt', {
+                        event_category: 'PWA',
+                        event_label: 'Install Prompt Accepted'
+                    });
+                }
+            } else {
+                // Track declined installation
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'pwa_install_declined', {
+                        event_category: 'PWA',
+                        event_label: 'Install Prompt Declined'
+                    });
+                }
+            }
+            
+            PWAState.deferredPrompt = null;
+            hideInstallBanner();
+        } catch (error) {
+            console.error('Install prompt failed:', error);
+            showNotification('Installation failed. Please try again.', 'error');
+        }
+    } else {
+        // Fallback for browsers that don't support beforeinstallprompt
+        showNotification('This app can be installed. Look for the "Add to Home Screen" option in your browser menu.', 'info');
+    }
+}
+
+// Legacy function for backward compatibility
 async function installApp() {
-    if (PWAState.deferredPrompt) {
-        PWAState.deferredPrompt.prompt();
-        const { outcome } = await PWAState.deferredPrompt.userChoice;
-        console.log(`User response to the install prompt: ${outcome}`);
-        PWAState.deferredPrompt = null;
-        hideInstallPrompt();
+    return installPWA();
+}
+
+// Show iOS install modal
+function showIOSInstallModal() {
+    const modal = document.getElementById('ios-install-modal');
+    if (modal) {
+        modal.classList.add('show');
+        
+        // Track iOS install instructions shown
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'ios_install_instructions_shown', {
+                event_category: 'PWA',
+                event_label: 'iOS Install Instructions'
+            });
+        }
+    }
+}
+
+// Close iOS install modal
+function closeIOSInstallModal() {
+    const modal = document.getElementById('ios-install-modal');
+    if (modal) {
+        modal.classList.remove('show');
     }
 }
 
@@ -4365,15 +9322,66 @@ async function installApp() {
 function setupOnlineDetection() {
     window.addEventListener('online', () => {
         PWAState.isOnline = true;
-        updateConnectionStatus('connected');
+        updatePWAStatus('online');
         showNotification('You are back online!', 'success');
+        
+        // Trigger background sync when back online
+        if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+            navigator.serviceWorker.ready.then(registration => {
+                return registration.sync.register('background-sync');
+            }).catch(error => {
+                console.log('Background sync registration failed:', error);
+            });
+        }
     });
     
     window.addEventListener('offline', () => {
         PWAState.isOnline = false;
-        updateConnectionStatus('offline');
+        updatePWAStatus('offline');
         showNotification('You are offline. Some features may be limited.', 'warning');
     });
+    
+    // Initial status update
+    updatePWAStatus(PWAState.isOnline ? 'online' : 'offline');
+}
+
+// Update PWA status indicator
+function updatePWAStatus(status) {
+    const statusElement = document.getElementById('pwa-status');
+    if (!statusElement) return;
+    
+    const icon = statusElement.querySelector('i');
+    const text = statusElement.querySelector('span');
+    
+    statusElement.className = 'pwa-status';
+    
+    switch (status) {
+        case 'online':
+            statusElement.classList.add('online');
+            icon.className = 'fas fa-wifi';
+            text.textContent = 'Online';
+            break;
+        case 'offline':
+            statusElement.classList.add('offline');
+            icon.className = 'fas fa-wifi-slash';
+            text.textContent = 'Offline';
+            break;
+        case 'syncing':
+            statusElement.classList.add('syncing');
+            icon.className = 'fas fa-sync-alt fa-spin';
+            text.textContent = 'Syncing...';
+            break;
+    }
+    
+    // Show status indicator
+    statusElement.style.display = 'flex';
+    
+    // Auto-hide after 3 seconds for online status
+    if (status === 'online') {
+        setTimeout(() => {
+            statusElement.style.display = 'none';
+        }, 3000);
+    }
 }
 
 // Request notification permission
@@ -4480,9 +9488,9 @@ function setupRealtimeNotifications() {
     });
 }
 
-// Handle real-time notifications
-function handleRealtimeNotification(data) {
-    console.log('Real-time notification received:', data);
+// Handle real-time notifications (legacy function - now handled by main handleRealtimeNotification)
+function handleRealtimeNotificationLegacy(data) {
+    console.log('Legacy real-time notification received:', data);
     
     if (data.action === 'NEW_JOB') {
         sendJobNotification(data.jobTitle, data.companyName);
@@ -4537,6 +9545,185 @@ async function checkForNewContent(lastCheck) {
     // For now, we'll randomly return true to demonstrate notifications
     const random = Math.random();
     return random > 0.8; // 20% chance of new content
+}
+
+// Create default notifications if none exist
+function createDefaultNotifications() {
+    // Only create default notifications if no notifications exist
+    if (AppState.notifications.length === 0) {
+        const defaultNotifications = [
+            {
+                id: Date.now() + 1,
+                title: 'Welcome to DSI Placement Portal',
+                message: 'Check this section regularly for important updates about placements and shortlisted candidates.',
+                type: 'info',
+                timestamp: new Date().toISOString(),
+                read: false
+            },
+            {
+                id: Date.now() + 2,
+                title: 'Test Notification - Firebase Working!',
+                message: `This test notification was created at ${new Date().toLocaleTimeString()}. If you can see this, Firebase is working correctly!`,
+                type: 'success',
+                timestamp: new Date().toISOString(),
+                read: false
+            }
+        ];
+        
+        AppState.notifications = defaultNotifications;
+        
+        // Save to Firebase
+        saveDataToStorage().then(() => {
+            console.log('✅ Default notifications created and saved');
+        }).catch(error => {
+            console.error('❌ Error saving default notifications:', error);
+        });
+    }
+}
+
+// Ensure notifications exist when student logs in
+function ensureNotificationsExist() {
+    console.log('🔔 Ensuring notifications exist...');
+    console.log('Current notifications count:', AppState.notifications.length);
+    
+    if (AppState.notifications.length === 0) {
+        console.log('⚠️ No notifications found, creating default ones...');
+        createDefaultNotifications();
+    } else {
+        console.log('✅ Notifications already exist:', AppState.notifications.length);
+    }
+}
+
+// Restore login state from localStorage
+function restoreLoginState() {
+    console.log('🔄 Checking for saved login state...');
+    
+    const loginType = localStorage.getItem('loginType');
+    const currentStudent = localStorage.getItem('currentStudent');
+    const currentUser = localStorage.getItem('currentUser');
+    
+    if (loginType === 'student' && currentStudent) {
+        try {
+            const studentData = JSON.parse(currentStudent);
+            console.log('✅ Restoring student login state:', studentData.usn);
+            
+            // Find the student in current data to ensure it's still valid
+            const student = AppState.students.find(s => s.usn === studentData.usn);
+            if (student) {
+                AppState.currentStudent = student;
+                // Ensure DOM is ready before updating navigation
+                setTimeout(() => {
+                    updateNavigationForStudent();
+                    showStudentPortal();
+                }, 100);
+                showNotification('Welcome back!', 'success');
+                return;
+            } else {
+                console.log('⚠️ Student not found in current data, clearing saved state');
+                localStorage.removeItem('currentStudent');
+                localStorage.removeItem('loginType');
+            }
+        } catch (error) {
+            console.error('❌ Error parsing saved student data:', error);
+            localStorage.removeItem('currentStudent');
+            localStorage.removeItem('loginType');
+        }
+    }
+    
+    if (loginType === 'admin' && currentUser) {
+        try {
+            const userData = JSON.parse(currentUser);
+            console.log('✅ Restoring admin login state:', userData.username);
+            
+            AppState.currentUser = userData;
+            // Ensure DOM is ready before updating navigation
+            setTimeout(() => {
+                updateNavigationForStudent();
+                showAdminDashboard();
+            }, 100);
+            showNotification('Welcome back!', 'success');
+            return;
+        } catch (error) {
+            console.error('❌ Error parsing saved user data:', error);
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('loginType');
+        }
+    }
+    
+    console.log('ℹ️ No valid login state found');
+}
+
+// SIMPLE DIRECT APPROACH - Create and display notifications immediately
+function createAndDisplayNotificationsDirectly() {
+    console.log('🚀 SIMPLE DIRECT APPROACH - Creating and displaying notifications...');
+    
+    if (!AppState.currentStudent) {
+        console.log('❌ No student logged in');
+        return;
+    }
+    
+    // Get the notifications list element
+    const notificationsList = document.getElementById('student-notifications-list');
+    if (!notificationsList) {
+        console.error('❌ Notifications list element not found!');
+        return;
+    }
+    
+    console.log('✅ Notifications list element found');
+    
+    // Create default notifications if none exist
+    if (AppState.notifications.length === 0) {
+        console.log('⚠️ Creating default notifications...');
+        AppState.notifications = [
+            {
+                id: Date.now() + 1,
+                title: 'Welcome to DSI Placement Portal',
+                message: 'Check this section regularly for important updates about placements and shortlisted candidates.',
+                type: 'info',
+                timestamp: new Date().toISOString(),
+                read: false
+            },
+            {
+                id: Date.now() + 2,
+                title: 'Test Notification - Firebase Working!',
+                message: `This test notification was created at ${new Date().toLocaleTimeString()}. If you can see this, Firebase is working correctly!`,
+                type: 'success',
+                timestamp: new Date().toISOString(),
+                read: false
+            }
+        ];
+    }
+    
+    console.log('✅ Notifications ready:', AppState.notifications.length);
+    
+    // Clear the list
+    notificationsList.innerHTML = '';
+    
+    // Create and append notifications directly
+    AppState.notifications.forEach((notification, index) => {
+        console.log(`Creating notification ${index + 1}:`, notification.title);
+        
+        const notificationElement = document.createElement('div');
+        notificationElement.className = `notification-item ${notification.read ? 'read' : 'unread'}`;
+        
+        const timeAgo = getTimeAgo(new Date(notification.timestamp));
+        
+        notificationElement.innerHTML = `
+            <div class="notification-icon">
+                <i class="fas fa-${getNotificationIcon(notification.type)}"></i>
+            </div>
+            <div class="notification-content">
+                <h4>${notification.title}</h4>
+                <p>${notification.message}</p>
+                <span class="notification-time">${timeAgo}</span>
+            </div>
+        `;
+        
+        notificationsList.appendChild(notificationElement);
+        console.log(`✅ Notification ${index + 1} appended to DOM`);
+    });
+    
+    console.log('✅ ALL NOTIFICATIONS DISPLAYED SUCCESSFULLY!');
 }
 
 // Set up immediate notifications for testing
@@ -4897,4 +10084,816 @@ function checkNotificationStatus() {
         return permission;
     }
     return 'not-supported';
+}
+
+// ==================== OFFLINE SUPPORT ====================
+
+// Offline data storage
+const OfflineStorage = {
+    // Store data offline
+    async storeOffline(key, data) {
+        try {
+            if ('serviceWorker' in navigator) {
+                const cache = await caches.open('dsi-dynamic-v1.1.0');
+                const response = new Response(JSON.stringify(data));
+                await cache.put(new Request(`/offline-${key}`), response);
+                console.log(`Stored offline data: ${key}`);
+            }
+        } catch (error) {
+            console.error('Failed to store offline data:', error);
+        }
+    },
+    
+    // Retrieve offline data
+    async getOffline(key) {
+        try {
+            if ('serviceWorker' in navigator) {
+                const cache = await caches.open('dsi-dynamic-v1.1.0');
+                const response = await cache.match(new Request(`/offline-${key}`));
+                if (response) {
+                    const data = await response.json();
+                    console.log(`Retrieved offline data: ${key}`);
+                    return data;
+                }
+            }
+        } catch (error) {
+            console.error('Failed to retrieve offline data:', error);
+        }
+        return null;
+    },
+    
+    // Store pending actions for sync when online
+    async storePendingAction(action, data) {
+        try {
+            const pendingActions = await this.getOffline('pending-actions') || [];
+            pendingActions.push({
+                id: Date.now(),
+                action: action,
+                data: data,
+                timestamp: Date.now()
+            });
+            await this.storeOffline('pending-actions', pendingActions);
+            console.log(`Stored pending action: ${action}`);
+        } catch (error) {
+            console.error('Failed to store pending action:', error);
+        }
+    },
+    
+    // Get pending actions
+    async getPendingActions() {
+        return await this.getOffline('pending-actions') || [];
+    },
+    
+    // Clear pending actions
+    async clearPendingActions() {
+        try {
+            if ('serviceWorker' in navigator) {
+                const cache = await caches.open('dsi-dynamic-v1.1.0');
+                await cache.delete(new Request('/offline-pending-actions'));
+                console.log('Cleared pending actions');
+            }
+        } catch (error) {
+            console.error('Failed to clear pending actions:', error);
+        }
+    }
+};
+
+// Enhanced offline detection
+function setupOfflineDetection() {
+    // Override the existing setupOfflineDetection if it exists
+    window.addEventListener('online', async () => {
+        console.log('Back online - syncing pending actions');
+        updatePWAStatus('syncing');
+        
+        try {
+            // Sync pending actions
+            const pendingActions = await OfflineStorage.getPendingActions();
+            if (pendingActions.length > 0) {
+                console.log(`Syncing ${pendingActions.length} pending actions`);
+                
+                for (const action of pendingActions) {
+                    try {
+                        await syncPendingAction(action);
+                    } catch (error) {
+                        console.error(`Failed to sync action ${action.id}:`, error);
+                    }
+                }
+                
+                // Clear pending actions after successful sync
+                await OfflineStorage.clearPendingActions();
+                showNotification('Offline actions synced successfully!', 'success');
+            }
+        } catch (error) {
+            console.error('Failed to sync pending actions:', error);
+            showNotification('Some offline actions could not be synced', 'warning');
+        }
+        
+        updatePWAStatus('online');
+    });
+    
+    window.addEventListener('offline', () => {
+        console.log('Gone offline');
+        updatePWAStatus('offline');
+        showNotification('You are offline. Your actions will be saved and synced when you\'re back online.', 'info');
+    });
+}
+
+// Sync pending action with server
+async function syncPendingAction(action) {
+    switch (action.action) {
+        case 'job-application':
+            // Sync job application
+            if (window.db && window.db.ref) {
+                const applicationsRef = window.db.ref('applications');
+                await applicationsRef.push(action.data);
+            }
+            break;
+        case 'profile-update':
+            // Sync profile update
+            if (window.db && window.db.ref) {
+                const profileRef = window.db.ref(`students/${action.data.uid}`);
+                await profileRef.update(action.data);
+            }
+            break;
+        case 'notification-preference':
+            // Sync notification preference
+            if (window.db && window.db.ref) {
+                const prefsRef = window.db.ref(`notification-preferences/${action.data.uid}`);
+                await prefsRef.set(action.data.preferences);
+            }
+            break;
+        default:
+            console.log(`Unknown action type: ${action.action}`);
+    }
+}
+
+// Offline-aware job application
+async function submitJobApplicationOffline(jobData, studentData) {
+    const applicationData = {
+        jobId: jobData.id,
+        jobTitle: jobData.title,
+        companyName: jobData.company,
+        studentId: studentData.uid,
+        studentName: studentData.name,
+        studentEmail: studentData.email,
+        appliedAt: new Date().toISOString(),
+        status: 'pending'
+    };
+    
+    if (PWAState.isOnline) {
+        // Submit directly if online
+        try {
+            if (window.db && window.db.ref) {
+                const applicationsRef = window.db.ref('applications');
+                await applicationsRef.push(applicationData);
+                showNotification('Application submitted successfully!', 'success');
+                return true;
+            }
+        } catch (error) {
+            console.error('Failed to submit application online:', error);
+            // Fall back to offline storage
+        }
+    }
+    
+    // Store offline if not online or if online submission failed
+    await OfflineStorage.storePendingAction('job-application', applicationData);
+    showNotification('Application saved offline. It will be submitted when you\'re back online.', 'info');
+    return false;
+}
+
+// Offline-aware profile update
+async function updateProfileOffline(profileData) {
+    if (PWAState.isOnline) {
+        try {
+            if (window.db && window.db.ref) {
+                const profileRef = window.db.ref(`students/${profileData.uid}`);
+                await profileRef.update(profileData);
+                showNotification('Profile updated successfully!', 'success');
+                return true;
+            }
+        } catch (error) {
+            console.error('Failed to update profile online:', error);
+            // Fall back to offline storage
+        }
+    }
+    
+    // Store offline if not online or if online update failed
+    await OfflineStorage.storePendingAction('profile-update', profileData);
+    showNotification('Profile changes saved offline. They will be synced when you\'re back online.', 'info');
+    return false;
+}
+
+// Check offline capabilities
+function checkOfflineCapabilities() {
+    const capabilities = {
+        serviceWorker: 'serviceWorker' in navigator,
+        cache: 'caches' in window,
+        backgroundSync: 'serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype,
+        notifications: 'Notification' in window,
+        pushManager: 'serviceWorker' in navigator && 'PushManager' in window
+    };
+    
+    console.log('PWA Capabilities:', capabilities);
+    return capabilities;
+}
+
+// ==================== PUSH NOTIFICATIONS ====================
+
+// Enhanced push notification system
+const PushNotificationManager = {
+    // Subscribe to push notifications
+    async subscribe() {
+        try {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                throw new Error('Push notifications not supported');
+            }
+            
+            const registration = await navigator.serviceWorker.ready;
+            const subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: this.urlBase64ToUint8Array(this.getVapidPublicKey())
+            });
+            
+            console.log('Push subscription successful:', subscription);
+            
+            // Send subscription to server
+            await this.sendSubscriptionToServer(subscription);
+            
+            return subscription;
+        } catch (error) {
+            console.error('Push subscription failed:', error);
+            throw error;
+        }
+    },
+    
+    // Unsubscribe from push notifications
+    async unsubscribe() {
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            const subscription = await registration.pushManager.getSubscription();
+            
+            if (subscription) {
+                await subscription.unsubscribe();
+                console.log('Push unsubscription successful');
+                
+                // Notify server
+                await this.removeSubscriptionFromServer(subscription);
+            }
+        } catch (error) {
+            console.error('Push unsubscription failed:', error);
+            throw error;
+        }
+    },
+    
+    // Check subscription status
+    async getSubscriptionStatus() {
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            const subscription = await registration.pushManager.getSubscription();
+            return {
+                subscribed: !!subscription,
+                subscription: subscription
+            };
+        } catch (error) {
+            console.error('Failed to get subscription status:', error);
+            return { subscribed: false, subscription: null };
+        }
+    },
+    
+    // Send subscription to server
+    async sendSubscriptionToServer(subscription) {
+        try {
+            // In a real app, you would send this to your backend server
+            // For now, we'll store it locally
+            localStorage.setItem('push-subscription', JSON.stringify(subscription));
+            console.log('Subscription stored locally');
+            
+            // You would typically send to your server like this:
+            // await fetch('/api/push-subscribe', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(subscription)
+            // });
+        } catch (error) {
+            console.error('Failed to send subscription to server:', error);
+        }
+    },
+    
+    // Remove subscription from server
+    async removeSubscriptionFromServer(subscription) {
+        try {
+            localStorage.removeItem('push-subscription');
+            console.log('Subscription removed locally');
+            
+            // You would typically send to your server like this:
+            // await fetch('/api/push-unsubscribe', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(subscription)
+            // });
+        } catch (error) {
+            console.error('Failed to remove subscription from server:', error);
+        }
+    },
+    
+    // Get VAPID public key (you would get this from your server)
+    getVapidPublicKey() {
+        // This is a placeholder - in a real app, you would get this from your server
+        return 'BEl62iUYgUivxIkv69yViEuiBIa40HI8U7nW3QzZWQX6fJ37SJifowUvQCNgIu0Yp6n8hjHwhJfXw6fU1cZ0p2E';
+    },
+    
+    // Convert VAPID key
+    urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding)
+            .replace(/-/g, '+')
+            .replace(/_/g, '/');
+        
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+};
+
+// Enhanced notification functions
+async function setupPushNotifications() {
+    try {
+        // Check if notifications are supported
+        if (!('Notification' in window)) {
+            console.log('Notifications not supported');
+            return false;
+        }
+        
+        // Check permission
+        if (Notification.permission === 'denied') {
+            console.log('Notifications denied by user');
+            return false;
+        }
+        
+        // Request permission if not granted
+        if (Notification.permission === 'default') {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                console.log('Notification permission denied');
+                return false;
+            }
+        }
+        
+        // Subscribe to push notifications
+        try {
+            await PushNotificationManager.subscribe();
+            console.log('Push notifications enabled');
+            return true;
+        } catch (error) {
+            console.log('Push subscription failed, using local notifications only');
+            return false;
+        }
+    } catch (error) {
+        console.error('Failed to setup push notifications:', error);
+        return false;
+    }
+}
+
+// Send enhanced job notification
+async function sendEnhancedJobNotification(jobData) {
+    try {
+        if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.ready;
+            
+            const notificationOptions = {
+                title: '🚀 New Job Opportunity!',
+                body: `${jobData.title} at ${jobData.company}`,
+                icon: './DSi.png',
+                badge: './DSi.png',
+                tag: `job-${jobData.id}`,
+                requireInteraction: true,
+                silent: false,
+                vibrate: [200, 100, 200, 100, 200],
+                data: {
+                    url: './#student-dashboard',
+                    jobId: jobData.id,
+                    jobTitle: jobData.title,
+                    company: jobData.company,
+                    timestamp: Date.now(),
+                    type: 'new-job'
+                },
+                actions: [
+                    {
+                        action: 'apply',
+                        title: 'Apply Now',
+                        icon: './DSi.png'
+                    },
+                    {
+                        action: 'view',
+                        title: 'View Details',
+                        icon: './DSi.png'
+                    },
+                    {
+                        action: 'dismiss',
+                        title: 'Dismiss'
+                    }
+                ]
+            };
+            
+            await registration.showNotification(notificationOptions.title, notificationOptions);
+            console.log('Enhanced job notification sent');
+        }
+    } catch (error) {
+        console.error('Failed to send enhanced job notification:', error);
+    }
+}
+
+// Send deadline reminder notification
+async function sendDeadlineReminderNotification(jobData) {
+    try {
+        if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.ready;
+            
+            const notificationOptions = {
+                title: '⏰ Application Deadline Soon!',
+                body: `${jobData.title} - Deadline: ${jobData.deadline}`,
+                icon: './DSi.png',
+                badge: './DSi.png',
+                tag: `deadline-${jobData.id}`,
+                requireInteraction: true,
+                silent: false,
+                vibrate: [300, 100, 300, 100, 300],
+                data: {
+                    url: './#student-dashboard',
+                    jobId: jobData.id,
+                    jobTitle: jobData.title,
+                    deadline: jobData.deadline,
+                    timestamp: Date.now(),
+                    type: 'deadline-reminder'
+                },
+                actions: [
+                    {
+                        action: 'apply',
+                        title: 'Apply Now',
+                        icon: './DSi.png'
+                    },
+                    {
+                        action: 'view',
+                        title: 'View Job',
+                        icon: './DSi.png'
+                    }
+                ]
+            };
+            
+            await registration.showNotification(notificationOptions.title, notificationOptions);
+            console.log('Deadline reminder notification sent');
+        }
+    } catch (error) {
+        console.error('Failed to send deadline reminder notification:', error);
+    }
+}
+
+// Send application status notification
+async function sendApplicationStatusNotification(applicationData) {
+    try {
+        if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.ready;
+            
+            let title, body, icon;
+            switch (applicationData.status) {
+                case 'shortlisted':
+                    title = '🎉 Application Shortlisted!';
+                    body = `Your application for ${applicationData.jobTitle} has been shortlisted!`;
+                    icon = './DSi.png';
+                    break;
+                case 'rejected':
+                    title = 'Application Update';
+                    body = `Your application for ${applicationData.jobTitle} was not selected this time.`;
+                    icon = './DSi.png';
+                    break;
+                case 'interview':
+                    title = '📅 Interview Scheduled!';
+                    body = `Interview scheduled for ${applicationData.jobTitle}`;
+                    icon = './DSi.png';
+                    break;
+                default:
+                    title = 'Application Update';
+                    body = `Update on your application for ${applicationData.jobTitle}`;
+                    icon = './DSi.png';
+            }
+            
+            const notificationOptions = {
+                title: title,
+                body: body,
+                icon: icon,
+                badge: './DSi.png',
+                tag: `status-${applicationData.id}`,
+                requireInteraction: true,
+                silent: false,
+                vibrate: [200, 100, 200],
+                data: {
+                    url: './#applications',
+                    applicationId: applicationData.id,
+                    jobTitle: applicationData.jobTitle,
+                    status: applicationData.status,
+                    timestamp: Date.now(),
+                    type: 'application-status'
+                },
+                actions: [
+                    {
+                        action: 'view',
+                        title: 'View Details',
+                        icon: './DSi.png'
+                    }
+                ]
+            };
+            
+            await registration.showNotification(notificationOptions.title, notificationOptions);
+            console.log('Application status notification sent');
+        }
+    } catch (error) {
+        console.error('Failed to send application status notification:', error);
+    }
+}
+
+// Schedule notification
+function scheduleNotification(title, body, delay) {
+    setTimeout(async () => {
+        try {
+            if ('serviceWorker' in navigator) {
+                const registration = await navigator.serviceWorker.ready;
+                await registration.showNotification(title, {
+                    body: body,
+                    icon: './DSi.png',
+                    badge: './DSi.png',
+                    tag: `scheduled-${Date.now()}`,
+                    requireInteraction: false,
+                    silent: false,
+                    vibrate: [200, 100, 200]
+                });
+            }
+        } catch (error) {
+            console.error('Failed to send scheduled notification:', error);
+        }
+    }, delay);
+}
+
+// Test notification function
+async function testNotification() {
+    try {
+        if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.ready;
+            await registration.showNotification('🔔 Test Notification', {
+                body: 'This is a test notification from DSI Placement Portal',
+                icon: './DSi.png',
+                badge: './DSi.png',
+                tag: 'test-notification',
+                requireInteraction: true,
+                silent: false,
+                vibrate: [200, 100, 200],
+                data: {
+                    url: './',
+                    timestamp: Date.now(),
+                    type: 'test'
+                }
+            });
+            console.log('Test notification sent');
+        }
+    } catch (error) {
+        console.error('Failed to send test notification:', error);
+    }
+}
+
+// Test function for debugging notification management
+function testNotificationManagement() {
+    console.log('=== Testing Notification Management ===');
+    console.log('Total notifications:', AppState.notifications.length);
+    console.log('Notifications:', AppState.notifications);
+    
+    if (AppState.notifications.length === 0) {
+        console.log('Creating test notification...');
+        addNotification({
+            type: 'info',
+            title: 'Test Notification',
+            message: 'This is a test notification for debugging.'
+        });
+    }
+    
+    const firstNotification = AppState.notifications[0];
+    if (firstNotification) {
+        console.log('Testing edit with notification ID:', firstNotification.id);
+        console.log('Notification details:', firstNotification);
+        
+        // Test edit function
+        console.log('Calling editNotification...');
+        editNotification(firstNotification.id);
+        
+        // Test delete function (commented out to avoid accidental deletion)
+        // console.log('Calling deleteNotification...');
+        // deleteNotification(firstNotification.id);
+    }
+    
+    console.log('=== Test Complete ===');
+}
+
+// Simple test function to test edit/delete with specific notification
+function testEditDelete(notificationId) {
+    console.log('=== Testing Edit/Delete for Notification ID:', notificationId, '===');
+    
+    // Test edit
+    console.log('Testing edit function...');
+    editNotification(notificationId);
+    
+    // Wait a bit then test delete
+    setTimeout(() => {
+        console.log('Testing delete function...');
+        deleteNotification(notificationId);
+    }, 2000);
+}
+
+// Function to show all notification IDs for testing
+function showNotificationIds() {
+    console.log('=== All Notification IDs ===');
+    AppState.notifications.forEach((notification, index) => {
+        console.log(`Index ${index}: ID = ${notification.id} (${typeof notification.id}), Title = "${notification.title}"`);
+    });
+    console.log('=== End of List ===');
+}
+
+// Direct test function to test edit with the first notification
+function testEditFirst() {
+    if (AppState.notifications.length === 0) {
+        console.log('No notifications to test');
+        return;
+    }
+    
+    const firstNotification = AppState.notifications[0];
+    console.log('Testing edit with first notification:', firstNotification);
+    console.log('Notification ID:', firstNotification.id, 'Type:', typeof firstNotification.id);
+    
+    // Try to find the notification directly
+    const found = AppState.notifications.find(n => n.id === firstNotification.id);
+    console.log('Found notification:', found);
+    
+    if (found) {
+        console.log('Opening edit modal...');
+        editNotification(firstNotification.id);
+    } else {
+        console.log('Could not find notification with ID:', firstNotification.id);
+    }
+}
+
+// Direct test function to test delete with the first notification
+function testDeleteFirst() {
+    if (AppState.notifications.length === 0) {
+        console.log('No notifications to test');
+        return;
+    }
+    
+    const firstNotification = AppState.notifications[0];
+    console.log('Testing delete with first notification:', firstNotification);
+    console.log('Notification ID:', firstNotification.id, 'Type:', typeof firstNotification.id);
+    
+    // Try to find the notification directly
+    const found = AppState.notifications.find(n => n.id === firstNotification.id);
+    console.log('Found notification:', found);
+    
+    if (found) {
+        console.log('Deleting notification...');
+        deleteNotification(firstNotification.id);
+    } else {
+        console.log('Could not find notification with ID:', firstNotification.id);
+    }
+}
+
+// Function to check AppState and notification data integrity
+function checkNotificationData() {
+    console.log('=== Checking Notification Data Integrity ===');
+    console.log('AppState exists:', !!AppState);
+    console.log('AppState.notifications exists:', !!AppState.notifications);
+    console.log('AppState.notifications is array:', Array.isArray(AppState.notifications));
+    console.log('AppState.notifications length:', AppState.notifications.length);
+    
+    if (AppState.notifications && AppState.notifications.length > 0) {
+        console.log('First notification:', AppState.notifications[0]);
+        console.log('All notifications:');
+        AppState.notifications.forEach((n, i) => {
+            console.log(`  ${i}: ID=${n.id} (${typeof n.id}), Title="${n.title}", Has ID: ${!!n.id}`);
+        });
+    }
+    
+    console.log('=== End of Data Check ===');
+}
+
+// Function to clear all notifications and create fresh ones
+function resetNotifications() {
+    console.log('=== Resetting Notifications ===');
+    
+    // Clear existing notifications
+    AppState.notifications = [];
+    saveDataToStorage();
+    
+    // Create fresh test notifications
+    addNotification({
+        type: 'info',
+        title: 'Test Notification 1',
+        message: 'This is a fresh test notification for debugging.'
+    });
+    
+    addNotification({
+        type: 'success',
+        title: 'Test Notification 2',
+        message: 'This is another fresh test notification.'
+    });
+    
+    console.log('Created fresh notifications:', AppState.notifications.length);
+    console.log('New notifications:', AppState.notifications);
+    
+    // Reload the management page
+    loadAdminNotificationsManagement();
+    
+    console.log('=== Reset Complete ===');
+}
+
+// Comprehensive debugging function to check everything
+function debugNotificationSystem() {
+    console.log('=== COMPREHENSIVE NOTIFICATION SYSTEM DEBUG ===');
+    
+    // Check AppState
+    console.log('1. AppState Check:');
+    console.log('   - AppState exists:', !!AppState);
+    console.log('   - AppState type:', typeof AppState);
+    
+    if (AppState) {
+        console.log('   - AppState.notifications exists:', !!AppState.notifications);
+        console.log('   - AppState.notifications type:', typeof AppState.notifications);
+        console.log('   - AppState.notifications is array:', Array.isArray(AppState.notifications));
+        console.log('   - AppState.notifications length:', AppState.notifications ? AppState.notifications.length : 'N/A');
+        
+        if (AppState.notifications && AppState.notifications.length > 0) {
+            console.log('   - First notification:', AppState.notifications[0]);
+            console.log('   - All notification IDs:', AppState.notifications.map(n => ({ id: n.id, type: typeof n.id, title: n.title })));
+        }
+    }
+    
+    // Check DOM elements
+    console.log('2. DOM Elements Check:');
+    const notificationsList = document.getElementById('notifications-management-list');
+    console.log('   - notifications-management-list exists:', !!notificationsList);
+    console.log('   - notifications-management-list element:', notificationsList);
+    
+    const editModal = document.getElementById('edit-notification-modal');
+    console.log('   - edit-notification-modal exists:', !!editModal);
+    
+    const editIdField = document.getElementById('edit-notification-id');
+    console.log('   - edit-notification-id exists:', !!editIdField);
+    
+    // Check functions
+    console.log('3. Functions Check:');
+    console.log('   - editNotification function exists:', typeof editNotification === 'function');
+    console.log('   - deleteNotification function exists:', typeof deleteNotification === 'function');
+    console.log('   - showNotification function exists:', typeof showNotification === 'function');
+    console.log('   - loadAdminNotificationsManagement function exists:', typeof loadAdminNotificationsManagement === 'function');
+    
+    // Check localStorage
+    console.log('4. LocalStorage Check:');
+    try {
+        const storedData = localStorage.getItem('dsi-placement-portal-data');
+        console.log('   - localStorage data exists:', !!storedData);
+        if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            console.log('   - Parsed data has notifications:', !!parsedData.notifications);
+            console.log('   - Parsed notifications length:', parsedData.notifications ? parsedData.notifications.length : 'N/A');
+        }
+    } catch (error) {
+        console.log('   - Error reading localStorage:', error);
+    }
+    
+    console.log('=== END DEBUG ===');
+}
+
+// Function to force reload all data from localStorage
+function reloadFromStorage() {
+    console.log('=== RELOADING FROM STORAGE ===');
+    try {
+        const storedData = localStorage.getItem('dsi-placement-portal-data');
+        if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            console.log('Loaded data from storage:', parsedData);
+            
+            // Update AppState
+            if (parsedData.notifications) {
+                AppState.notifications = parsedData.notifications;
+                console.log('Reloaded notifications:', AppState.notifications.length);
+            }
+            
+            // Reload the management page
+            loadAdminNotificationsManagement();
+            console.log('Reloaded management page');
+        } else {
+            console.log('No data found in localStorage');
+        }
+    } catch (error) {
+        console.error('Error reloading from storage:', error);
+    }
+    console.log('=== RELOAD COMPLETE ===');
 }

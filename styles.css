@@ -6,77 +6,175 @@
 }
 
 :root {
-    /* Firebase-inspired Light Theme */
-    --primary-color: #ff6f00;
-    --primary-dark: #e65100;
-    --secondary-color: #1976d2;
-    --secondary-dark: #1565c0;
-    --accent-color: #00bcd4;
-    --success-color: #4caf50;
-    --warning-color: #ff9800;
-    --error-color: #f44336;
+    /* Firebase Official Design System - Light Theme */
+    /* Primary Colors */
+    --firebase-orange: #ff6f00;
+    --firebase-orange-dark: #e65100;
+    --firebase-orange-light: #ff8f00;
     
-    /* Light theme colors - improved contrast */
-    --bg-primary: #ffffff;
-    --bg-secondary: #f5f5f5;
-    --bg-tertiary: #e8f4f8;
-    --text-primary: #1a1a1a;
-    --text-secondary: #4a4a4a;
-    --text-muted: #6b7280;
-    --border-color: #d1d5db;
-    --shadow-light: rgba(0, 0, 0, 0.08);
-    --shadow-medium: rgba(0, 0, 0, 0.12);
-    --shadow-heavy: rgba(0, 0, 0, 0.2);
+    /* Secondary Colors */
+    --firebase-blue: #1976d2;
+    --firebase-blue-dark: #1565c0;
+    --firebase-blue-light: #42a5f5;
     
-    /* Gradient backgrounds */
-    --gradient-primary: linear-gradient(135deg, #ff6f00 0%, #ff8f00 100%);
-    --gradient-secondary: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-    --gradient-accent: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
-    --gradient-bg: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    /* Accent Colors */
+    --firebase-cyan: #00bcd4;
+    --firebase-cyan-dark: #0097a7;
+    --firebase-cyan-light: #26c6da;
+    
+    /* Status Colors */
+    --firebase-green: #4caf50;
+    --firebase-green-dark: #388e3c;
+    --firebase-green-light: #66bb6a;
+    
+    --firebase-yellow: #ff9800;
+    --firebase-yellow-dark: #f57c00;
+    --firebase-yellow-light: #ffb74d;
+    
+    --firebase-red: #f44336;
+    --firebase-red-dark: #d32f2f;
+    --firebase-red-light: #ef5350;
+    
+    /* Firebase Background System */
+    --firebase-bg-primary: #ffffff;
+    --firebase-bg-secondary: #fafafa;
+    --firebase-bg-tertiary: #f5f5f5;
+    --firebase-bg-elevated: #ffffff;
+    --firebase-bg-overlay: rgba(0, 0, 0, 0.04);
+    
+    /* Firebase Text System */
+    --firebase-text-primary: #212121;
+    --firebase-text-secondary: #757575;
+    --firebase-text-disabled: #bdbdbd;
+    --firebase-text-hint: #9e9e9e;
+    
+    /* Firebase Surface Colors */
+    --firebase-surface: #ffffff;
+    --firebase-surface-variant: #f5f5f5;
+    --firebase-surface-container: #fafafa;
+    --firebase-surface-container-high: #f0f0f0;
+    
+    /* Firebase Border System */
+    --firebase-outline: #e0e0e0;
+    --firebase-outline-variant: #f0f0f0;
+    --firebase-divider: #e0e0e0;
+    
+    /* Firebase Shadow System */
+    --firebase-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --firebase-shadow-2: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    --firebase-shadow-3: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    --firebase-shadow-4: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    
+    /* Firebase Gradients */
+    --firebase-gradient-primary: linear-gradient(135deg, #ff6f00 0%, #ff8f00 100%);
+    --firebase-gradient-secondary: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+    --firebase-gradient-accent: linear-gradient(135deg, #00bcd4 0%, #26c6da 100%);
+    --firebase-gradient-bg: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    --firebase-gradient-surface: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+    
+    /* Legacy compatibility */
+    --primary-color: var(--firebase-orange);
+    --primary-dark: var(--firebase-orange-dark);
+    --secondary-color: var(--firebase-blue);
+    --secondary-dark: var(--firebase-blue-dark);
+    --accent-color: var(--firebase-cyan);
+    --success-color: var(--firebase-green);
+    --warning-color: var(--firebase-yellow);
+    --error-color: var(--firebase-red);
+    
+    --bg-primary: var(--firebase-bg-primary);
+    --bg-secondary: var(--firebase-bg-secondary);
+    --bg-tertiary: var(--firebase-bg-tertiary);
+    --text-primary: var(--firebase-text-primary);
+    --text-secondary: var(--firebase-text-secondary);
+    --text-muted: var(--firebase-text-hint);
+    --border-color: var(--firebase-outline);
+    --shadow-light: var(--firebase-shadow-1);
+    --shadow-medium: var(--firebase-shadow-2);
+    --shadow-heavy: var(--firebase-shadow-3);
+    
+    --gradient-primary: var(--firebase-gradient-primary);
+    --gradient-secondary: var(--firebase-gradient-secondary);
+    --gradient-accent: var(--firebase-gradient-accent);
+    --gradient-bg: var(--firebase-gradient-bg);
 }
 
 [data-theme="dark"] {
-    /* Firebase-inspired Dark Theme */
-    --bg-primary: #121212;
-    --bg-secondary: #1e1e1e;
-    --bg-tertiary: #2d2d2d;
-    --text-primary: #ffffff;
-    --text-secondary: #b3b3b3;
-    --text-muted: #666666;
-    --border-color: #333333;
-    --shadow-light: rgba(0, 0, 0, 0.3);
-    --shadow-medium: rgba(0, 0, 0, 0.4);
-    --shadow-heavy: rgba(0, 0, 0, 0.6);
+    /* Firebase Official Design System - Dark Theme */
+    /* Firebase Dark Background System */
+    --firebase-bg-primary: #121212;
+    --firebase-bg-secondary: #1e1e1e;
+    --firebase-bg-tertiary: #2d2d2d;
+    --firebase-bg-elevated: #1e1e1e;
+    --firebase-bg-overlay: rgba(255, 255, 255, 0.05);
     
-    /* Dark theme gradients */
-    --gradient-bg: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    /* Firebase Dark Text System */
+    --firebase-text-primary: #ffffff;
+    --firebase-text-secondary: #b3b3b3;
+    --firebase-text-disabled: #666666;
+    --firebase-text-hint: #757575;
+    
+    /* Firebase Dark Surface Colors */
+    --firebase-surface: #1e1e1e;
+    --firebase-surface-variant: #2d2d2d;
+    --firebase-surface-container: #1e1e1e;
+    --firebase-surface-container-high: #2d2d2d;
+    
+    /* Firebase Dark Border System */
+    --firebase-outline: #333333;
+    --firebase-outline-variant: #2d2d2d;
+    --firebase-divider: #333333;
+    
+    /* Firebase Dark Shadow System */
+    --firebase-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.4);
+    --firebase-shadow-2: 0 3px 6px rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.5);
+    --firebase-shadow-3: 0 10px 20px rgba(0, 0, 0, 0.5), 0 6px 6px rgba(0, 0, 0, 0.6);
+    --firebase-shadow-4: 0 14px 28px rgba(0, 0, 0, 0.6), 0 10px 10px rgba(0, 0, 0, 0.7);
+    
+    /* Firebase Dark Gradients */
+    --firebase-gradient-bg: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+    --firebase-gradient-surface: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+    
+    /* Legacy compatibility */
+    --bg-primary: var(--firebase-bg-primary);
+    --bg-secondary: var(--firebase-bg-secondary);
+    --bg-tertiary: var(--firebase-bg-tertiary);
+    --text-primary: var(--firebase-text-primary);
+    --text-secondary: var(--firebase-text-secondary);
+    --text-muted: var(--firebase-text-hint);
+    --border-color: var(--firebase-outline);
+    --shadow-light: var(--firebase-shadow-1);
+    --shadow-medium: var(--firebase-shadow-2);
+    --shadow-heavy: var(--firebase-shadow-3);
+    
+    --gradient-bg: var(--firebase-gradient-bg);
 }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     line-height: 1.6;
-    color: var(--text-primary);
-    background: var(--gradient-bg);
+    color: var(--firebase-text-primary);
+    background: var(--firebase-gradient-bg);
     min-height: 100vh;
     transition: all 0.3s ease;
 }
 
 /* Navigation */
 .navbar {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--firebase-surface);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--firebase-outline);
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 20px var(--shadow-light);
+    box-shadow: var(--firebase-shadow-1);
 }
 
 [data-theme="dark"] .navbar {
-    background: rgba(18, 18, 18, 0.95);
-    border-bottom: 1px solid var(--border-color);
+    background: var(--firebase-surface);
+    border-bottom: 1px solid var(--firebase-outline);
 }
 
 .nav-container {
@@ -263,7 +361,7 @@ body {
     display: none;
     min-height: 100vh;
     padding-top: 100px;
-    background: var(--bg-primary);
+    background: var(--firebase-bg-primary);
 }
 
 .page-content.active {
@@ -274,11 +372,11 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
-    background: var(--bg-primary);
+    background: var(--firebase-surface);
     border-radius: 20px;
     margin-top: 1rem;
+    box-shadow: var(--firebase-shadow-2);
     margin-bottom: 2rem;
-    box-shadow: 0 4px 20px var(--shadow-light);
 }
 
 /* Dashboard Header */
@@ -439,6 +537,50 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
     background: linear-gradient(45deg, #f57c00, #ef6c00);
+}
+
+.test-realtime-btn {
+    background: linear-gradient(45deg, var(--accent-color), #0097a7);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.test-realtime-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
+    background: linear-gradient(45deg, #0097a7, #00838f);
+}
+
+.test-simple-btn {
+    background: linear-gradient(45deg, var(--secondary-color), #1565c0);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.test-simple-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    background: linear-gradient(45deg, #1565c0, #0d47a1);
 }
 
 .clear-notifications-btn {
@@ -806,11 +948,11 @@ body {
 }
 
 .job-card {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
+    background: var(--firebase-surface);
+    border: 1px solid var(--firebase-outline);
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 4px 6px var(--shadow-light);
+    box-shadow: var(--firebase-shadow-1);
     transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
@@ -825,8 +967,8 @@ body {
 
 .job-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 40px var(--shadow-heavy);
-    border-color: var(--primary-color);
+    box-shadow: var(--firebase-shadow-3);
+    border-color: var(--firebase-orange);
 }
 
 .job-card::before {
@@ -836,7 +978,7 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: var(--gradient-primary);
+    background: var(--firebase-gradient-primary);
 }
 
 .job-header {
@@ -849,14 +991,14 @@ body {
 .company-name {
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--firebase-text-primary);
     margin-bottom: 0.25rem;
 }
 
 .job-title {
     font-size: 1.3rem;
     font-weight: 700;
-    color: var(--primary-color);
+    color: var(--firebase-orange);
     margin-bottom: 0.5rem;
 }
 
@@ -870,19 +1012,19 @@ body {
 
 .status-badge.open {
     background: rgba(76, 175, 80, 0.1);
-    color: var(--success-color);
+    color: var(--firebase-green);
     border: 1px solid rgba(76, 175, 80, 0.2);
 }
 
 .status-badge.interviewing {
     background: rgba(255, 152, 0, 0.1);
-    color: var(--warning-color);
+    color: var(--firebase-yellow);
     border: 1px solid rgba(255, 152, 0, 0.2);
 }
 
 .status-badge.closed {
     background: rgba(244, 67, 54, 0.1);
-    color: var(--error-color);
+    color: var(--firebase-red);
     border: 1px solid rgba(244, 67, 54, 0.2);
 }
 
@@ -908,6 +1050,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.5rem;
     margin-top: auto;
     padding-top: 1.5rem;
     border-top: 1px solid var(--border-color);
@@ -1148,7 +1291,7 @@ body {
 }
 
 .apply-btn {
-    background: var(--gradient-primary);
+    background: var(--firebase-gradient-primary);
     color: white;
     border: none;
     padding: 1rem 2rem;
@@ -1166,8 +1309,8 @@ body {
 
 .apply-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 24px var(--shadow-heavy);
-    background: var(--gradient-secondary);
+    box-shadow: var(--firebase-shadow-3);
+    background: var(--firebase-gradient-secondary);
 }
 
 /* Admin Login */
@@ -1180,11 +1323,11 @@ body {
 }
 
 .login-card {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
+    background: var(--firebase-surface);
+    border: 1px solid var(--firebase-outline);
     border-radius: 16px;
     padding: 3rem;
-    box-shadow: 0 20px 40px var(--shadow-heavy);
+    box-shadow: var(--firebase-shadow-3);
     width: 100%;
     max-width: 400px;
     text-align: center;
@@ -1272,6 +1415,1254 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 2rem;
+    background: var(--firebase-surface-container);
+    border-radius: 16px;
+    box-shadow: var(--firebase-shadow-1);
+}
+
+/* Page Header Styles */
+.page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.back-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.back-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateX(-2px);
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.page-header p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Admin Management Grid */
+.admin-management-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.management-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px var(--shadow-light);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.management-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.management-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.management-card:hover::before {
+    transform: scaleX(1);
+}
+
+.management-card:hover .management-arrow {
+    transform: translateX(4px);
+    color: var(--primary-color);
+}
+
+.management-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.management-card:nth-child(1) .management-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.management-card:nth-child(2) .management-icon {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.management-card:nth-child(3) .management-icon {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.management-card:nth-child(4) .management-icon {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.management-card:nth-child(5) .management-icon {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.management-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.management-content h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.3;
+}
+
+.management-content h3 span {
+    font-weight: 400;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+}
+
+.management-content p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0 0 0.75rem 0;
+    line-height: 1.4;
+}
+
+.management-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.management-stats .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.management-stats .stat-item i {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.management-arrow {
+    color: var(--text-muted);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+/* Responsive Design for Management Cards */
+@media (max-width: 768px) {
+    .admin-management-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .management-card {
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+    
+    .management-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .management-content h3 {
+        font-size: 1rem;
+    }
+    
+    .management-content p {
+        font-size: 0.8rem;
+    }
+}
+
+/* Firebase-inspired Color Scheme */
+:root {
+    /* Firebase Colors */
+    --firebase-orange: #FFA000;
+    --firebase-yellow: #FFCA28;
+    --firebase-red: #F44336;
+    --firebase-blue: #2196F3;
+    --firebase-green: #4CAF50;
+    --firebase-purple: #9C27B0;
+    --firebase-teal: #009688;
+    --firebase-indigo: #3F51B5;
+    
+    /* Firebase Background Colors */
+    --firebase-bg-light: #FAFAFA;
+    --firebase-bg-dark: #1E1E1E;
+    --firebase-card-light: #FFFFFF;
+    --firebase-card-dark: #2D2D2D;
+    --firebase-border-light: #E0E0E0;
+    --firebase-border-dark: #404040;
+}
+
+/* Firebase-like styling for management cards */
+.management-card:nth-child(1) .management-icon {
+    background: linear-gradient(135deg, var(--firebase-blue), var(--firebase-indigo));
+}
+
+.management-card:nth-child(2) .management-icon {
+    background: linear-gradient(135deg, var(--firebase-orange), var(--firebase-red));
+}
+
+.management-card:nth-child(3) .management-icon {
+    background: linear-gradient(135deg, var(--firebase-teal), var(--firebase-green));
+}
+
+.management-card:nth-child(4) .management-icon {
+    background: linear-gradient(135deg, var(--firebase-purple), var(--firebase-indigo));
+}
+
+.management-card:nth-child(5) .management-icon {
+    background: linear-gradient(135deg, var(--firebase-yellow), var(--firebase-orange));
+}
+
+/* Firebase-like styling for action cards */
+.action-card:nth-child(1) .action-icon {
+    background: linear-gradient(135deg, var(--firebase-blue), var(--firebase-indigo));
+}
+
+.action-card:nth-child(2) .action-icon {
+    background: linear-gradient(135deg, var(--firebase-green), var(--firebase-teal));
+}
+
+.action-card:nth-child(3) .action-icon {
+    background: linear-gradient(135deg, var(--firebase-orange), var(--firebase-red));
+}
+
+.action-card:nth-child(4) .action-icon {
+    background: linear-gradient(135deg, var(--firebase-purple), var(--firebase-indigo));
+}
+
+/* Firebase-like styling for stat cards */
+.stat-card:nth-child(1) .stat-icon {
+    background: linear-gradient(135deg, var(--firebase-blue), var(--firebase-indigo));
+}
+
+.stat-card:nth-child(2) .stat-icon.eligible {
+    background: linear-gradient(135deg, var(--firebase-green), var(--firebase-teal));
+}
+
+.stat-card:nth-child(3) .stat-icon.ineligible {
+    background: linear-gradient(135deg, var(--firebase-red), var(--firebase-orange));
+}
+
+/* Firebase-like styling for tool cards */
+.tool-card .tool-icon {
+    background: linear-gradient(135deg, var(--firebase-blue), var(--firebase-indigo));
+}
+
+/* Admin Tools Modal Styles */
+.admin-tools-modal {
+    max-width: 800px;
+    width: 90%;
+}
+
+.admin-tools-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.tool-section {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.tool-section h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.tool-cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.tool-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.tool-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.tool-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.tool-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.tool-card p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .admin-tools-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .tool-card {
+        padding: 1rem;
+    }
+    
+    .tool-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .tool-card h3 {
+        font-size: 0.9rem;
+    }
+    
+    .tool-card p {
+        font-size: 0.75rem;
+    }
+}
+
+/* Admin Student List Styles */
+.admin-student-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.admin-student-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px var(--shadow-light);
+    transition: all 0.3s ease;
+}
+
+.admin-student-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.student-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.student-identity {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.student-identity h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.student-eligible-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: fit-content;
+}
+
+.student-eligible-badge.eligible {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.student-eligible-badge.ineligible {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.student-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.student-actions .edit-btn,
+.student-actions .delete-btn {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.student-actions .edit-btn {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.student-actions .edit-btn:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+.student-actions .delete-btn {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.student-actions .delete-btn:hover {
+    background: #ef4444;
+    color: white;
+}
+
+.student-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.detail-value {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+}
+
+.password-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.password-text {
+    font-family: 'Courier New', monospace;
+    background: var(--bg-secondary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.copy-btn {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+}
+
+.copy-btn:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+.no-data-message {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-secondary);
+}
+
+.no-data-icon {
+    font-size: 3rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.no-data-message h3 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+}
+
+.no-data-message p {
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+/* Responsive Design for Admin Student Cards */
+@media (max-width: 768px) {
+    .admin-student-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .admin-student-card {
+        padding: 1rem;
+    }
+    
+    .student-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .student-actions {
+        justify-content: flex-end;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .detail-value {
+        max-width: 100%;
+        text-align: left;
+    }
+}
+
+/* Sample Data Button */
+.sample-data-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-right: 1rem;
+}
+
+.sample-data-btn:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.section-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Student Statistics Grid */
+.student-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.stat-icon.eligible {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.stat-icon.ineligible {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.stat-icon.placed {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+}
+
+/* Placed Students Page Styles */
+.placed-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.placed-students-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.placed-student-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.placed-student-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.placed-student-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.placed-student-info h3 {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.placed-student-info p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.placed-badge {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.placed-student-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.detail-value {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.salary-highlight {
+    color: var(--success-color);
+    font-size: 1.1rem;
+}
+
+.placed-student-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.placed-student-actions .btn {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.view-offer-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.view-offer-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.download-offer-btn {
+    background: var(--success-color);
+    color: white;
+    border: none;
+}
+
+.download-offer-btn:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.no-placed-students {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+}
+
+.no-placed-students i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.no-placed-students h3 {
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.no-placed-students p {
+    margin: 0;
+}
+
+.stat-content h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1;
+}
+
+.stat-content p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0 0;
+}
+
+/* Student Actions Grid */
+.student-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.action-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px var(--shadow-light);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+    width: 100%;
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.action-card.export-card {
+    position: relative;
+}
+
+.action-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.action-content {
+    flex: 1;
+}
+
+.action-content h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.action-content p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Search Section */
+.search-section {
+    margin-bottom: 2rem;
+}
+
+.search-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.search-input-group {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input-group i {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-muted);
+    z-index: 1;
+}
+
+.search-input-group input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.search-input-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-options select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-options select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .student-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .student-actions-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .search-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .search-input-group {
+        width: 100%;
+    }
+    
+    .filter-options {
+        width: 100%;
+    }
+    
+    .filter-options select {
+        width: 100%;
+    }
+}
+
+/* Admin Notifications Grid */
+.admin-notifications-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.notification-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px var(--shadow-light);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.notification-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.notification-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    flex: 1;
+}
+
+.notification-timestamp {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    white-space: nowrap;
+}
+
+.notification-message {
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.notification-actions .edit-btn,
+.notification-actions .delete-btn {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.notification-actions .edit-btn {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.notification-actions .edit-btn:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+.notification-actions .delete-btn {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.notification-actions .delete-btn:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* Admin Grid */
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.admin-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px var(--shadow-light);
+    transition: all 0.3s ease;
+}
+
+.admin-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-identity {
+    flex: 1;
+}
+
+.admin-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.admin-email {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.admin-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+}
+
+.admin-role-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.admin-role-badge.default {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.admin-status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.admin-status-badge.active {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.admin-created {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Add Notification Button */
+.add-notification-btn {
+    background: linear-gradient(135deg, var(--firebase-orange), var(--firebase-red));
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.add-notification-btn:hover {
+    background: linear-gradient(135deg, var(--firebase-red), var(--firebase-orange));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 160, 0, 0.3);
+}
+
+/* Add Admin Button */
+.add-admin-btn {
+    background: linear-gradient(135deg, var(--firebase-purple), var(--firebase-indigo));
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.add-admin-btn:hover {
+    background: linear-gradient(135deg, var(--firebase-indigo), var(--firebase-purple));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
 }
 
 .admin-header {
@@ -2517,7 +3908,7 @@ body {
 }
 
 .notifications-header h3 i {
-    color: var(--primary-color);
+    color: var(--firebase-orange);
 }
 
 .mark-read-btn {
@@ -2607,15 +3998,15 @@ body {
 }
 
 .notification-icon.success {
-    background: var(--gradient-primary);
+    background: var(--firebase-gradient-primary);
 }
 
 .notification-icon.info {
-    background: var(--gradient-secondary);
+    background: var(--firebase-gradient-primary);
 }
 
 .notification-icon.warning {
-    background: linear-gradient(45deg, var(--warning-color), #f57c00);
+    background: var(--firebase-gradient-primary);
 }
 
 .notification-content {
@@ -3451,6 +4842,2566 @@ body {
     }
 }
 
+/* ==================== STUDENT PORTAL STYLES ==================== */
+
+/* Student Login Styles */
+.login-footer {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.login-footer p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Student Portal Styles */
+.student-logout-section {
+    margin-top: 1rem;
+}
+
+.student-info-card,
+.eligibility-criteria-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px var(--shadow-light);
+}
+
+.card-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-header h4 {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-header h4 i {
+    color: var(--accent-color);
+    font-size: 1rem;
+}
+
+.card-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-header h3 i {
+    color: var(--primary-color);
+}
+
+.student-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.student-info-grid .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.student-info-grid .info-item label {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.student-info-grid .info-item span {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-item label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.info-item span {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.eligible-yes {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.eligible-no {
+    color: var(--error-color);
+    font-weight: 600;
+}
+
+.criteria-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.criteria-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.criteria-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.criteria-item h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.criteria-item p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.criteria-item span {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Job Detail Eligibility Criteria */
+.eligibility-criteria-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.criteria-value {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.cancel-btn {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--text-muted);
+}
+
+/* Student Management Actions */
+.student-management-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Export Dropdown Styles */
+.export-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.export-btn {
+    background: var(--success-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+}
+
+.export-btn:hover {
+    background: #16a34a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.export-btn i.fa-chevron-down {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.export-dropdown.active .export-btn i.fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.export-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px var(--shadow-heavy);
+    min-width: 200px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.export-dropdown.active .export-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.export-option {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.export-option:last-child {
+    border-bottom: none;
+}
+
+.export-option:hover {
+    background: var(--hover-color);
+    color: var(--primary-color);
+}
+
+.export-option i {
+    width: 16px;
+    text-align: center;
+}
+
+.export-option i.fa-file-csv {
+    color: #22c55e;
+}
+
+.export-option i.fa-file-excel {
+    color: #16a34a;
+}
+
+.export-option i.fa-file-pdf {
+    color: #dc2626;
+}
+
+/* Apply Button Styles */
+.apply-btn.disabled {
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.apply-btn.disabled:hover {
+    background: var(--bg-tertiary);
+    transform: none;
+}
+
+/* Small Apply Button for Job Cards */
+.apply-btn-small {
+    background: var(--firebase-gradient-primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-width: 80px;
+    justify-content: center;
+}
+
+.apply-btn-small:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--firebase-shadow-2);
+    background: var(--firebase-gradient-secondary);
+}
+
+.apply-btn-small.disabled {
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.apply-btn-small.disabled:hover {
+    background: var(--bg-tertiary);
+    transform: none;
+    box-shadow: none;
+}
+
+/* Eligibility Reasons Styles */
+.eligibility-reasons {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border-left: 4px solid var(--firebase-orange);
+}
+
+.eligibility-reasons h4 {
+    color: var(--firebase-orange);
+    margin: 0 0 0.5rem 0;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.eligibility-reasons ul {
+    margin: 0;
+    padding-left: 1.2rem;
+}
+
+.eligibility-reasons li {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    line-height: 1.4;
+}
+
+/* Eligibility Status Styles */
+.eligible-yes {
+    color: #10b981;
+    font-weight: 600;
+}
+
+.eligible-no {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.student-eligible-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.student-eligible-badge.eligible {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.student-eligible-badge.ineligible {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+/* Criteria Input Styles */
+.criteria-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.criteria-input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.criteria-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.criteria-unit {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    min-width: 40px;
+}
+
+/* Homepage Styles */
+.homepage-content {
+    text-align: center;
+    padding: 4rem 0;
+}
+
+/* Download Section */
+.download-section {
+    margin: 3rem 0;
+    padding: 2rem;
+    background: var(--firebase-surface);
+    border-radius: 20px;
+    border: 1px solid var(--firebase-outline);
+    box-shadow: var(--firebase-shadow-2);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.download-content h3 {
+    color: var(--firebase-text-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.download-content p {
+    color: var(--firebase-text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.download-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.download-btn, .install-btn {
+    background: var(--firebase-gradient-primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--firebase-shadow-1);
+}
+
+.download-btn:hover, .install-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--firebase-shadow-3);
+}
+
+.download-btn i, .install-btn i {
+    font-size: 1.1rem;
+}
+
+.device-info {
+    font-size: 0.9rem;
+    color: var(--firebase-text-secondary);
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .login-options {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .homepage-content {
+        padding: 2rem 1rem;
+    }
+    
+    .download-section {
+        margin: 2rem 0;
+        padding: 1.5rem;
+    }
+    
+    .download-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .download-btn, .install-btn {
+        width: 100%;
+        max-width: 250px;
+        justify-content: center;
+    }
+    
+    .homepage-title {
+        font-size: 2.5rem;
+    }
+    
+    .homepage-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .login-options {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .login-option-card {
+        padding: 2rem 1.5rem;
+    }
+    
+    .navbar {
+        padding: 1rem;
+    }
+    
+    .nav-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--firebase-surface);
+        border-top: 1px solid var(--firebase-outline);
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: var(--firebase-shadow-2);
+    }
+    
+    .nav-menu.active {
+        display: flex;
+    }
+    
+    .nav-link {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin: 0.25rem 0;
+    }
+    
+    .mobile-menu-toggle {
+        display: flex;
+    }
+}
+
+@media (max-width: 480px) {
+    .homepage-content {
+        padding: 1rem 0.5rem;
+    }
+    
+    .download-section {
+        padding: 1rem;
+        margin: 1.5rem 0;
+    }
+    
+    .download-content h3 {
+        font-size: 1.3rem;
+    }
+    
+    .download-content p {
+        font-size: 0.9rem;
+    }
+    
+    .homepage-title {
+        font-size: 2rem;
+    }
+    
+    .homepage-subtitle {
+        font-size: 1rem;
+    }
+    
+    .login-option-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .login-option-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .login-option-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .container {
+        padding: 0 0.5rem;
+    }
+    
+    .navbar {
+        padding: 0.75rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+    
+    .navbar-brand img {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* Tablet specific styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .login-options {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 600px;
+    }
+    
+    .homepage-title {
+        font-size: 3rem;
+    }
+    
+    .download-section {
+        max-width: 400px;
+    }
+}
+
+/* Large screens */
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1200px;
+    }
+    
+    .login-options {
+        max-width: 900px;
+    }
+}
+
+/* Student Portal Responsive */
+@media (max-width: 768px) {
+    .student-portal-nav {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .portal-nav-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .header-content {
+        width: 100%;
+    }
+    
+    .student-info-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .student-avatar {
+        margin: 0 auto 1rem;
+    }
+    
+    .job-card {
+        margin-bottom: 1rem;
+    }
+    
+    .job-card-content {
+        padding: 1rem;
+    }
+    
+    .job-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .apply-btn,
+    .apply-btn-small {
+        width: 100%;
+    }
+}
+
+/* Admin Dashboard Responsive */
+@media (max-width: 768px) {
+    .admin-dashboard {
+        padding: 1rem;
+    }
+    
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .dashboard-actions {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .action-card {
+        padding: 1.5rem;
+    }
+    
+    .action-icon {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .action-icon i {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 0.75rem;
+    }
+    
+    .stat-number {
+        font-size: 1.3rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+}
+
+/* Modal Responsive */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-width: none;
+        margin: 1rem;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .form-group {
+        width: 100%;
+    }
+}
+
+/* Table Responsive */
+@media (max-width: 768px) {
+    .data-table {
+        font-size: 0.8rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .table-actions {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Notification Responsive */
+@media (max-width: 768px) {
+    .notification-item {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .notification-content h4 {
+        font-size: 1rem;
+    }
+    
+    .notification-content p {
+        font-size: 0.9rem;
+    }
+    
+    .notification-time {
+        font-size: 0.8rem;
+    }
+}
+
+/* PWA Install Modal Styles */
+.install-instructions {
+    text-align: center;
+    padding: 1rem;
+}
+
+/* iOS Install Guide */
+.ios-install-guide {
+    text-align: center;
+    padding: 1rem;
+}
+
+.ios-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    background: linear-gradient(135deg, #000000, #333333);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--firebase-shadow-2);
+}
+
+.ios-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+.ios-install-guide h3 {
+    color: var(--firebase-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.ios-install-guide p {
+    color: var(--firebase-text-secondary);
+    margin-bottom: 2rem;
+}
+
+.install-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--firebase-surface-container);
+    border-radius: 12px;
+    border: 1px solid var(--firebase-outline);
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    background: var(--firebase-gradient-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-content strong {
+    color: var(--firebase-text-primary);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.step-content p {
+    color: var(--firebase-text-secondary);
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.ios-benefits, .desktop-benefits {
+    background: var(--firebase-surface-container);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--firebase-outline);
+    text-align: left;
+}
+
+.ios-benefits h4, .desktop-benefits h4 {
+    color: var(--firebase-text-primary);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.ios-benefits ul, .desktop-benefits ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ios-benefits li, .desktop-benefits li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    color: var(--firebase-text-secondary);
+}
+
+.ios-benefits li i, .desktop-benefits li i {
+    color: var(--firebase-green);
+    font-size: 1rem;
+}
+
+/* Desktop Install Guide */
+.desktop-install-guide {
+    text-align: center;
+    padding: 1rem;
+}
+
+.desktop-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    background: var(--firebase-gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--firebase-shadow-2);
+}
+
+.desktop-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+.desktop-install-guide h3 {
+    color: var(--firebase-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.desktop-install-guide p {
+    color: var(--firebase-text-secondary);
+    margin-bottom: 2rem;
+}
+
+.install-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    background: var(--firebase-gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--firebase-shadow-2);
+}
+
+.install-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+.install-instructions h3 {
+    color: var(--firebase-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.install-instructions p {
+    color: var(--firebase-text-secondary);
+    margin-bottom: 2rem;
+}
+
+.browser-instructions {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.browser-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--firebase-surface-container);
+    border-radius: 12px;
+    border: 1px solid var(--firebase-outline);
+}
+
+.browser-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.browser-icon.chrome {
+    background: linear-gradient(45deg, #4285f4, #34a853);
+    color: white;
+}
+
+.browser-icon.edge {
+    background: linear-gradient(45deg, #0078d4, #00bcf2);
+    color: white;
+}
+
+.browser-icon.firefox {
+    background: linear-gradient(45deg, #ff7139, #ff9500);
+    color: white;
+}
+
+.browser-icon i {
+    font-size: 1.5rem;
+}
+
+.browser-steps {
+    flex: 1;
+}
+
+.browser-steps h4 {
+    color: var(--firebase-text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.browser-steps ol {
+    color: var(--firebase-text-secondary);
+    padding-left: 1.2rem;
+    margin: 0;
+}
+
+.browser-steps li {
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+}
+
+.install-benefits {
+    background: var(--firebase-surface-container);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--firebase-outline);
+}
+
+.install-benefits h4 {
+    color: var(--firebase-text-primary);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.install-benefits ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.install-benefits li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    color: var(--firebase-text-secondary);
+}
+
+.install-benefits li i {
+    color: var(--firebase-green);
+    font-size: 1rem;
+}
+
+/* Responsive PWA Modal */
+@media (max-width: 768px) {
+    .browser-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .browser-icon {
+        margin: 0 auto;
+    }
+    
+    .browser-steps {
+        text-align: left;
+    }
+    
+    .install-benefits {
+        padding: 1rem;
+    }
+    
+    .install-benefits ul {
+        text-align: left;
+    }
+    
+    .install-steps {
+        gap: 1rem;
+    }
+    
+    .step {
+        padding: 0.75rem;
+    }
+    
+    .step-number {
+        width: 25px;
+        height: 25px;
+        font-size: 0.8rem;
+    }
+    
+    .ios-benefits, .desktop-benefits {
+        padding: 1rem;
+    }
+}
+
+.homepage-hero {
+    margin-bottom: 4rem;
+}
+
+.homepage-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--firebase-text-primary);
+    margin-bottom: 1rem;
+    background: var(--firebase-gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.homepage-subtitle {
+    font-size: 1.25rem;
+    color: var(--firebase-text-secondary);
+    margin-bottom: 0;
+}
+
+.login-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.login-option-card {
+    background: var(--firebase-surface);
+    border: 1px solid var(--firebase-outline);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--firebase-shadow-1);
+}
+
+.login-option-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--firebase-bg-overlay);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.login-option-card:hover::before {
+    opacity: 1;
+}
+
+.login-option-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--firebase-shadow-3);
+    border-color: var(--firebase-orange);
+}
+
+.login-option-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: var(--firebase-gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    position: relative;
+    z-index: 1;
+}
+
+.login-option-card h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--firebase-text-primary);
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.login-option-card p {
+    color: var(--firebase-text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+}
+
+.login-option-btn {
+    background: var(--firebase-gradient-primary);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.login-option-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--firebase-shadow-2);
+}
+
+/* Student Portal Header */
+.dashboard-header {
+    margin-bottom: 2.5rem;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: var(--firebase-surface);
+    border: 1px solid var(--firebase-outline);
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: var(--firebase-shadow-1);
+}
+
+.header-text {
+    flex: 1;
+    text-align: left;
+}
+
+.header-actions {
+    margin-left: 2rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.page-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.75rem 0;
+    line-height: 1.2;
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.logout-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logout-btn:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* Student Portal Navigation */
+.student-portal-nav {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2.5rem;
+    background: var(--firebase-surface);
+    border: 1px solid var(--firebase-outline);
+    border-radius: 12px;
+    padding: 0.5rem;
+    box-shadow: var(--firebase-shadow-1);
+}
+
+.portal-nav-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--firebase-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    position: relative;
+}
+
+.portal-nav-btn:hover {
+    background: var(--firebase-surface-container);
+    color: var(--firebase-text-primary);
+}
+
+.portal-nav-btn.active {
+    background: var(--firebase-orange);
+    color: white;
+    box-shadow: var(--firebase-shadow-1);
+}
+
+.portal-nav-btn i {
+    font-size: 1.1rem;
+}
+
+.student-section {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.student-section.active {
+    display: block;
+}
+
+.student-section .section-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.student-section .section-header h3 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.student-section .section-header h3 i {
+    color: #3b82f6;
+    font-size: 1.5rem;
+}
+
+.student-section .section-header p {
+    color: #64748b;
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced Notifications Styling */
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.notification-item {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    transition: all 0.2s ease;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.notification-item:hover {
+    box-shadow: 0 4px 12px var(--shadow-light);
+    border-color: var(--accent-color);
+}
+
+.notification-item.unread {
+    border-left: 4px solid var(--accent-color);
+}
+
+.notification-item.read {
+    opacity: 0.8;
+}
+
+.notification-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--firebase-orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-content h4 {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+}
+
+.notification-content p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0 0 0.75rem 0;
+}
+
+.notification-time {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.no-notifications {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+.eligible-jobs-section {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px var(--shadow-light);
+}
+
+.eligible-jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.eligible-job-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px var(--shadow-light);
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.eligible-job-card:hover {
+    box-shadow: 0 4px 12px var(--shadow-light);
+    border-color: var(--accent-color);
+}
+
+.eligible-job-card h4 {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+}
+
+.eligible-job-card .company-name {
+    color: var(--accent-color);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+}
+
+.eligible-job-card .job-details {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+}
+
+.eligible-job-card .view-details-btn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.eligible-job-card .view-details-btn:hover {
+    background: #e55a00;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.eligible-job-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px var(--shadow-light);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+}
+
+.eligible-job-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px var(--shadow-heavy);
+    border-color: var(--primary-color);
+}
+
+.eligible-job-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-primary);
+}
+
+.no-eligible-jobs {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    border: 2px dashed var(--border-color);
+}
+
+.no-eligible-jobs p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Admin Student Management Styles */
+.student-management-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.student-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.student-search-section {
+    margin-bottom: 2rem;
+}
+
+.student-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.student-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.student-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px var(--shadow-medium);
+    transform: translateY(-2px);
+}
+
+.student-info {
+    flex: 1;
+}
+
+.student-info h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.student-info p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+}
+
+.student-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.student-eligible-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-right: 1rem;
+}
+
+.student-eligible-badge.eligible {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--success-color);
+    border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.student-eligible-badge.ineligible {
+    background: rgba(244, 67, 54, 0.1);
+    color: var(--error-color);
+    border: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+/* Placement Status Styles */
+.placement-info {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.placed-status {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.not-placed-status {
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.placement-info p {
+    margin: 0.25rem 0;
+    font-size: 0.85rem;
+}
+
+/* Student Offer Letter Section Styles */
+.status-card, .upload-card, .download-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.status-card::before, .upload-card::before, .download-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+}
+
+.status-card:hover, .upload-card:hover, .download-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    border-color: #3b82f6;
+}
+
+.status-card h4, .upload-card h4, .download-card h4 {
+    margin: 0 0 1.5rem 0;
+    color: #1e293b;
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-card h4::before, .upload-card h4::before, .download-card h4::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 2px;
+}
+
+.status-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.status-item:last-child {
+    border-bottom: none;
+}
+
+.status-item label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+.status-item .status-value {
+    font-weight: 500;
+    color: #1f2937;
+    padding: 0.5rem 1rem;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    min-width: 120px;
+    text-align: center;
+}
+
+.status-item .status-value.not-placed {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #f59e0b;
+}
+
+.status-item .status-value.all-jobs {
+    background: #dbeafe;
+    color: #1e40af;
+    border-color: #3b82f6;
+}
+
+/* Form Styling Improvements */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: #ffffff;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--firebase-gradient-primary);
+    color: white;
+    box-shadow: var(--firebase-shadow-1);
+}
+
+.btn-primary:hover {
+    background: var(--firebase-gradient-secondary);
+    transform: translateY(-1px);
+    box-shadow: var(--firebase-shadow-2);
+}
+
+/* File Input Styling */
+input[type="file"] {
+    padding: 0.75rem;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+input[type="file"]:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+input[type="file"]:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Upload Card Special Styling */
+.upload-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    border: 2px solid #e0f2fe;
+}
+
+.upload-card::before {
+    background: linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6);
+}
+
+/* Status Card Special Styling */
+.status-card {
+    background: linear-gradient(135deg, #ffffff 0%, #fefce8 100%);
+    border: 2px solid #fef3c7;
+}
+
+.status-card::before {
+    background: linear-gradient(90deg, #f59e0b, #f97316, #ef4444);
+}
+
+/* Dark Mode Styling */
+[data-theme="dark"] .status-card, 
+[data-theme="dark"] .upload-card, 
+[data-theme="dark"] .download-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .status-card:hover, 
+[data-theme="dark"] .upload-card:hover, 
+[data-theme="dark"] .download-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    border-color: #3b82f6;
+}
+
+[data-theme="dark"] .status-card h4, 
+[data-theme="dark"] .upload-card h4, 
+[data-theme="dark"] .download-card h4 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .status-info {
+    background: #0f172a;
+    border: 1px solid #334155;
+}
+
+[data-theme="dark"] .status-item {
+    border-bottom: 1px solid #334155;
+}
+
+[data-theme="dark"] .status-item label {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .status-item .status-value {
+    background: #1e293b;
+    color: #f1f5f9;
+    border: 1px solid #475569;
+}
+
+[data-theme="dark"] .status-item .status-value.not-placed {
+    background: #451a03;
+    color: #fbbf24;
+    border-color: #f59e0b;
+}
+
+[data-theme="dark"] .status-item .status-value.all-jobs {
+    background: #1e3a8a;
+    color: #93c5fd;
+    border-color: #3b82f6;
+}
+
+/* Dark Mode Form Styling */
+[data-theme="dark"] .form-group label {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .form-group input, 
+[data-theme="dark"] .form-group select {
+    background: #1e293b;
+    border: 2px solid #475569;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-group input:focus, 
+[data-theme="dark"] .form-group select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] input[type="file"] {
+    background: #1e293b;
+    border: 2px dashed #475569;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] input[type="file"]:hover {
+    border-color: #3b82f6;
+    background: #1e3a8a;
+}
+
+[data-theme="dark"] input[type="file"]:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Dark Mode Section Header */
+[data-theme="dark"] .student-section .section-header {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+}
+
+[data-theme="dark"] .student-section .section-header h3 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .student-section .section-header p {
+    color: #94a3b8;
+}
+
+/* Dark Mode Special Card Styling */
+[data-theme="dark"] .upload-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0c4a6e 100%);
+    border: 2px solid #075985;
+}
+
+[data-theme="dark"] .status-card {
+    background: linear-gradient(135deg, #1e293b 0%, #451a03 100%);
+    border: 2px solid #92400e;
+}
+
+/* Dark Mode Student Info Card */
+[data-theme="dark"] .student-info-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .student-info-card .card-header h4 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .student-info-grid .info-item label {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .student-info-grid .info-item span {
+    color: #f1f5f9;
+    background: #0f172a;
+    border: 1px solid #334155;
+}
+
+[data-theme="dark"] .student-info-grid .info-item .eligible-status {
+    background: #065f46;
+    color: #6ee7b7;
+    border-color: #10b981;
+}
+
+/* Dark Mode Notification Styling */
+[data-theme="dark"] .notification-item {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .notification-item:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .notification-item.unread {
+    border-left: 4px solid #3b82f6;
+    background: linear-gradient(135deg, #1e293b 0%, #1e3a8a 100%);
+}
+
+[data-theme="dark"] .notification-icon {
+    background: var(--firebase-orange);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .notification-icon.success {
+    background: var(--firebase-orange);
+}
+
+[data-theme="dark"] .notification-icon.info {
+    background: var(--firebase-orange);
+}
+
+[data-theme="dark"] .notification-icon.warning {
+    background: var(--firebase-orange);
+}
+
+[data-theme="dark"] .notification-content h4 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .notification-content p {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .notification-time {
+    color: #94a3b8;
+}
+
+/* Dark Mode Notifications Section */
+[data-theme="dark"] .notifications-section {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+}
+
+[data-theme="dark"] .notifications-header h3 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .notifications-header h3 i {
+    color: var(--firebase-orange);
+}
+
+/* Dark Mode Notification Cards (Admin) */
+[data-theme="dark"] .notification-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .notification-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .notification-title {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .notification-timestamp {
+    background: #0f172a;
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .notification-message {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .notification-actions .edit-btn {
+    background: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+}
+
+[data-theme="dark"] .notification-actions .edit-btn:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+[data-theme="dark"] .notification-actions .delete-btn {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .notification-actions .delete-btn:hover {
+    background: #ef4444;
+    color: white;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.placed {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-badge.not-placed {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+    border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.eligibility-info {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.application-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.job-info h5 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.job-info p {
+    margin: 0.25rem 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.application-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.no-applications {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+}
+
+.no-applications p {
+    margin: 0;
+    font-style: italic;
+}
+
+/* Salary Range Eligibility Styles */
+.salary-range-eligibility {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.eligibility-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.eligibility-option:hover {
+    background: var(--bg-hover);
+    border-color: var(--primary-color);
+}
+
+.eligibility-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+
+.eligibility-option label {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    flex: 1;
+}
+
+.form-help {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Download Section Styles */
+.download-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.download-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.offer-details {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.offer-details p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.download-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Button Styles for Offer Letter Actions */
+.view-btn, .download-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.view-btn {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.view-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+}
+
+.download-btn {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.download-btn:hover {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: #16a34a;
+}
+
+/* Modal Actions */
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Student Details in Modal */
+.student-details {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.detail-value {
+    color: var(--text-secondary);
+}
+
+/* Offer Letter Preview */
+.offer-letter-preview {
+    margin: 1.5rem 0;
+}
+
+.offer-letter-preview h3 {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+/* Upload Instructions */
+.upload-instructions {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.upload-instructions h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.upload-instructions p {
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.upload-instructions ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.upload-instructions li {
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.upload-instructions strong {
+    color: var(--text-primary);
+}
+
+/* Upload Errors */
+.upload-errors {
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.upload-errors h4 {
+    color: var(--error-color);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.upload-errors ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.upload-errors li {
+    color: var(--error-color);
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+/* Responsive Design for Student Portal */
+@media (max-width: 768px) {
+    .student-info-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .criteria-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .eligible-jobs-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .student-stats {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .student-management-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .student-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .student-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
 /* ==================== PWA STYLES ==================== */
 
 /* Install Banner */
@@ -3833,5 +7784,685 @@ body {
     .ios-enable-btn {
         padding: 0.625rem 1.25rem;
         font-size: 0.875rem;
+    }
+}
+
+/* Basic Notification Styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px var(--shadow-medium);
+    z-index: 10000;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease, top 0.3s ease;
+    max-width: 400px;
+    font-size: 0.9rem;
+}
+
+.notification.show {
+    transform: translateY(0);
+}
+
+.notification.success {
+    border-left: 4px solid var(--success-color);
+}
+
+.notification.error {
+    border-left: 4px solid var(--error-color);
+}
+
+.notification.warning {
+    border-left: 4px solid var(--warning-color);
+}
+
+.notification.info {
+    border-left: 4px solid var(--secondary-color);
+}
+
+/* Real-time Notification Styles */
+.realtime-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--bg-primary);
+    border: 2px solid var(--primary-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px var(--shadow-heavy);
+    z-index: 10001;
+    transform: translateY(-100%) scale(0.9);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.3s ease;
+    max-width: 420px;
+    min-width: 320px;
+    backdrop-filter: blur(10px);
+    animation: realtimePulse 2s infinite;
+}
+
+.realtime-notification.show {
+    transform: translateY(0) scale(1);
+}
+
+.realtime-notification.success {
+    border-color: var(--success-color);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(76, 175, 80, 0.1) 100%);
+}
+
+.realtime-notification.error {
+    border-color: var(--error-color);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(244, 67, 54, 0.1) 100%);
+}
+
+.realtime-notification.warning {
+    border-color: var(--warning-color);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(255, 152, 0, 0.1) 100%);
+}
+
+.realtime-notification.info {
+    border-color: var(--secondary-color);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(25, 118, 210, 0.1) 100%);
+}
+
+.realtime-notification-content {
+    padding: 1.5rem;
+}
+
+.notification-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.notification-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.2rem;
+}
+
+.notification-icon.success {
+    background: var(--success-color);
+    color: white;
+}
+
+.notification-icon.error {
+    background: var(--error-color);
+    color: white;
+}
+
+.notification-icon.warning {
+    background: var(--warning-color);
+    color: white;
+}
+
+.notification-icon.info {
+    background: var(--firebase-orange);
+    color: white;
+}
+
+.notification-info {
+    flex: 1;
+}
+
+.notification-info h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.notification-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.notification-close:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.notification-time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.notification-action {
+    margin-top: 1rem;
+}
+
+.action-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 111, 0, 0.3);
+}
+
+/* Notification Badge */
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--error-color);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--bg-primary);
+}
+
+/* Real-time notification animations */
+@keyframes realtimePulse {
+    0%, 100% {
+        box-shadow: 0 8px 32px var(--shadow-heavy);
+    }
+    50% {
+        box-shadow: 0 8px 32px var(--shadow-heavy), 0 0 0 4px rgba(255, 111, 0, 0.2);
+    }
+}
+
+@keyframes notificationSlideIn {
+    from {
+        transform: translateY(-100%) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes notificationSlideOut {
+    from {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-100%) scale(0.9);
+        opacity: 0;
+    }
+}
+
+/* Notification Toggle Button */
+.notification-toggle {
+    position: relative;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+.notification-toggle:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.notification-toggle i {
+    font-size: 1.1rem;
+}
+
+/* Mobile responsive notifications */
+@media (max-width: 768px) {
+    .notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        transform: translateY(-100%);
+    }
+    
+    .notification.show {
+        transform: translateY(0);
+    }
+    
+    .realtime-notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        min-width: auto;
+        transform: translateY(-100%) scale(0.9);
+    }
+    
+    .realtime-notification.show {
+        transform: translateY(0) scale(1);
+    }
+    
+    .notification-toggle {
+        padding: 0.5rem;
+    }
+}
+
+/* ========================================
+   PWA SPECIFIC STYLES
+   ======================================== */
+
+/* Install Banner Styles */
+.pwa-install-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--firebase-gradient-primary);
+    color: white;
+    padding: 1rem;
+    box-shadow: var(--firebase-shadow-3);
+    z-index: 10000;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+    display: none;
+    align-items: center;
+    gap: 1rem;
+    border-top: 3px solid var(--firebase-orange-dark);
+}
+
+.pwa-install-banner.show {
+    transform: translateY(0);
+    display: flex;
+}
+
+.pwa-install-banner .app-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--firebase-shadow-2);
+    flex-shrink: 0;
+}
+
+.pwa-install-banner .app-icon img {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+}
+
+.pwa-install-banner .banner-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.pwa-install-banner .banner-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: white;
+}
+
+.pwa-install-banner .banner-description {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.pwa-install-banner .banner-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.pwa-install-banner .install-btn {
+    background: white;
+    color: var(--firebase-orange);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--firebase-shadow-1);
+}
+
+.pwa-install-banner .install-btn:hover {
+    background: var(--firebase-bg-secondary);
+    transform: translateY(-1px);
+    box-shadow: var(--firebase-shadow-2);
+}
+
+.pwa-install-banner .dismiss-btn {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pwa-install-banner .dismiss-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* iOS Install Instructions Modal */
+.ios-install-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.ios-install-modal.show {
+    display: flex;
+}
+
+.ios-install-content {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: var(--firebase-shadow-4);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ios-install-content .ios-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--firebase-gradient-primary);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    box-shadow: var(--firebase-shadow-2);
+}
+
+.ios-install-content .ios-icon i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.ios-install-content h3 {
+    color: var(--firebase-text-primary);
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.ios-install-content p {
+    color: var(--firebase-text-secondary);
+    margin: 0 0 1.5rem 0;
+    line-height: 1.6;
+}
+
+.ios-install-steps {
+    text-align: left;
+    margin: 1.5rem 0;
+}
+
+.ios-install-step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: var(--firebase-bg-secondary);
+    border-radius: 12px;
+    border-left: 4px solid var(--firebase-orange);
+}
+
+.ios-install-step .step-number {
+    width: 32px;
+    height: 32px;
+    background: var(--firebase-orange);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.ios-install-step .step-text {
+    flex: 1;
+    color: var(--firebase-text-primary);
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.ios-install-content .close-btn {
+    background: var(--firebase-orange);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 1rem;
+}
+
+.ios-install-content .close-btn:hover {
+    background: var(--firebase-orange-dark);
+    transform: translateY(-1px);
+}
+
+/* PWA Status Indicator */
+.pwa-status {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: var(--firebase-green);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--firebase-shadow-2);
+    animation: slideInRight 0.3s ease-out;
+}
+
+.pwa-status.offline {
+    background: var(--firebase-red);
+}
+
+.pwa-status.syncing {
+    background: var(--firebase-yellow);
+    color: var(--firebase-text-primary);
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.pwa-status i {
+    font-size: 0.875rem;
+}
+
+/* App-like Experience Styles */
+@media (display-mode: standalone) {
+    body {
+        /* Remove browser UI spacing when in standalone mode */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    
+    .pwa-install-banner {
+        /* Hide install banner when already installed */
+        display: none !important;
+    }
+    
+    /* Add app-like styling */
+    .main-header {
+        padding-top: calc(1rem + env(safe-area-inset-top));
+    }
+    
+    .main-footer {
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+    }
+}
+
+/* Mobile-specific PWA styles */
+@media (max-width: 768px) {
+    .pwa-install-banner {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        padding: 1.5rem 1rem;
+    }
+    
+    .pwa-install-banner .banner-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .pwa-install-banner .install-btn,
+    .pwa-install-banner .dismiss-btn {
+        flex: 1;
+        max-width: 150px;
+    }
+    
+    .ios-install-content {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .pwa-status {
+        top: 0.5rem;
+        right: 0.5rem;
+        left: 0.5rem;
+        text-align: center;
+        border-radius: 12px;
+    }
+}
+
+/* Dark mode support for PWA elements */
+@media (prefers-color-scheme: dark) {
+    .ios-install-content {
+        background: var(--firebase-surface);
+        color: var(--firebase-text-primary);
+    }
+    
+    .ios-install-step {
+        background: var(--firebase-surface-variant);
+    }
+    
+    .pwa-status {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .pwa-install-banner {
+        border-top: 4px solid var(--firebase-orange-dark);
+    }
+    
+    .pwa-install-banner .install-btn {
+        border: 2px solid var(--firebase-orange-dark);
+    }
+    
+    .pwa-install-banner .dismiss-btn {
+        border-width: 3px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .pwa-install-banner,
+    .ios-install-content,
+    .pwa-status {
+        transition: none;
+        animation: none;
+    }
+    
+    .pwa-install-banner .install-btn:hover,
+    .pwa-install-banner .dismiss-btn:hover,
+    .ios-install-content .close-btn:hover {
+        transform: none;
     }
 }
