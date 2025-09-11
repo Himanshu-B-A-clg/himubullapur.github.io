@@ -3840,13 +3840,15 @@ function uploadOfferLetter(event) {
     
     const studentId = document.getElementById('student-select').value;
     const fileInput = document.getElementById('offer-letter-file');
+    const companyName = document.getElementById('company-name').value.trim();
+    const offerType = document.getElementById('offer-type').value;
     const salary = parseFloat(document.getElementById('placed-salary').value);
     const salaryRange = document.getElementById('salary-range').value;
     
     console.log('Upload offer letter - studentId:', studentId);
     console.log('Available students:', AppState.students.map(s => ({ id: s.id, usn: s.usn })));
     
-    if (!studentId || !fileInput.files[0] || !salary || !salaryRange) {
+    if (!studentId || !fileInput.files[0] || !companyName || !offerType || !salary || !salaryRange) {
         showNotification('Please fill in all fields', 'error');
         return;
     }
@@ -3868,6 +3870,8 @@ function uploadOfferLetter(event) {
         student.isPlaced = true;
         student.placedSalary = salary;
         student.salaryRange = salaryRange;
+        student.companyName = companyName;
+        student.offerType = offerType;
         student.offerLetter = e.target.result; // Base64 encoded file
         student.placedDate = new Date().toISOString();
         
@@ -3882,7 +3886,7 @@ function uploadOfferLetter(event) {
         updateStudentStatistics();
         closeOfferLetterUploadModal();
         
-        showNotification(`Offer letter uploaded for ${student.usn} (${salary} LPA)`, 'success');
+        showNotification(`Offer letter uploaded for ${student.usn} at ${companyName} (${offerType}, ${salary} LPA)`, 'success');
     };
     
     reader.onerror = function() {
@@ -4036,10 +4040,12 @@ function uploadStudentOfferLetter(event) {
     }
     
     const fileInput = document.getElementById('student-offer-file');
+    const companyName = document.getElementById('student-company-name').value.trim();
+    const offerType = document.getElementById('student-offer-type').value;
     const salary = parseFloat(document.getElementById('student-salary').value);
     const salaryRange = document.getElementById('student-salary-range').value;
     
-    if (!fileInput.files[0] || !salary || !salaryRange) {
+    if (!fileInput.files[0] || !companyName || !offerType || !salary || !salaryRange) {
         showNotification('Please fill in all fields', 'error');
         return;
     }
@@ -4053,6 +4059,8 @@ function uploadStudentOfferLetter(event) {
         AppState.currentStudent.isPlaced = true;
         AppState.currentStudent.placedSalary = salary;
         AppState.currentStudent.salaryRange = salaryRange;
+        AppState.currentStudent.companyName = companyName;
+        AppState.currentStudent.offerType = offerType;
         AppState.currentStudent.offerLetter = e.target.result; // Base64 encoded file
         AppState.currentStudent.placedDate = new Date().toISOString();
         
@@ -4090,7 +4098,7 @@ function uploadStudentOfferLetter(event) {
         // Reset form
         document.getElementById('student-offer-letter-form').reset();
         
-        showNotification(`Offer letter uploaded successfully! (${salary} LPA)`, 'success');
+        showNotification(`Offer letter uploaded successfully! ${companyName} (${offerType}, ${salary} LPA)`, 'success');
     };
     
     reader.onerror = function() {
@@ -4130,6 +4138,14 @@ function loadStudentOfferLetterSection() {
                 </div>
                 ${student.isPlaced ? `
                     <div class="status-item">
+                        <strong>Company Name:</strong>
+                        <span>${student.companyName || 'N/A'}</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Type of Offer:</strong>
+                        <span>${student.offerType || 'N/A'}</span>
+                    </div>
+                    <div class="status-item">
                         <strong>Salary:</strong>
                         <span>${student.placedSalary} LPA (${AppState.salaryRanges[student.salaryRange]})</span>
                     </div>
@@ -4161,6 +4177,8 @@ function loadStudentOfferLetterSection() {
             <div class="download-info">
                 <p><strong>You have an offer letter available for download.</strong></p>
                 <div class="offer-details">
+                    <p><strong>Company Name:</strong> ${student.companyName || 'N/A'}</p>
+                    <p><strong>Type of Offer:</strong> ${student.offerType || 'N/A'}</p>
                     <p><strong>Salary:</strong> ${student.placedSalary} LPA (${AppState.salaryRanges[student.salaryRange]})</p>
                     <p><strong>Placed Date:</strong> ${new Date(student.placedDate).toLocaleDateString()}</p>
                 </div>
@@ -4169,9 +4187,9 @@ function loadStudentOfferLetterSection() {
                         <i class="fas fa-eye"></i>
                         View Offer Letter
                     </button>
-                    <button onclick="downloadStudentOfferLetter()" class="btn btn-primary">
-                        <i class="fas fa-download"></i>
-                        Download Offer Letter
+                    <button onclick="downloadStudentOfferLetter()" class="btn btn-outline">
+                        <i class="fas fa-file-pdf"></i>
+                        Download Letter Only
                     </button>
                 </div>
             </div>
@@ -4494,7 +4512,7 @@ function viewOfferLetter(studentId) {
     modal.style.display = 'block';
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
-            <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+            <span class="close" onclick="closeOfferLetterModal(this)">&times;</span>
             <h2>Offer Letter - ${student.usn}</h2>
             
             <div class="student-details">
@@ -4509,6 +4527,14 @@ function viewOfferLetter(studentId) {
                 <div class="detail-row">
                     <span class="detail-label">Email:</span>
                     <span class="detail-value">${student.email}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Company Name:</span>
+                    <span class="detail-value">${student.companyName || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Type of Offer:</span>
+                    <span class="detail-value">${student.offerType || 'N/A'}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Salary:</span>
@@ -4529,11 +4555,11 @@ function viewOfferLetter(studentId) {
             </div>
             
             <div class="modal-actions">
-                <button onclick="downloadOfferLetter('${student.id}')" class="btn btn-primary">
-                    <i class="fas fa-download"></i>
-                    Download Offer Letter
+                <button onclick="downloadOfferLetter('${student.id}')" class="btn btn-outline">
+                    <i class="fas fa-file-pdf"></i>
+                    Download Letter Only
                 </button>
-                <button onclick="this.closest('.modal').remove()" class="btn btn-secondary">
+                <button onclick="closeOfferLetterModal(this)" class="btn btn-secondary">
                     Close
                 </button>
             </div>
@@ -4542,6 +4568,22 @@ function viewOfferLetter(studentId) {
     
     document.body.appendChild(modal);
     document.body.style.overflow = 'hidden';
+    
+    // Add click outside to close functionality
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeOfferLetterModal(e.target);
+        }
+    });
+}
+
+// Close offer letter modal and restore body scroll
+function closeOfferLetterModal(element) {
+    const modal = element.closest('.modal');
+    if (modal) {
+        modal.remove();
+        document.body.style.overflow = ''; // Restore body scroll
+    }
 }
 
 // Download offer letter
@@ -4573,6 +4615,218 @@ function downloadOfferLetter(studentId) {
     }
 }
 
+
+function downloadOfferLetterWithDetailsOld(studentId) {
+    const student = AppState.students.find(s => s.id === studentId);
+    if (!student || !student.offerLetter) {
+        showNotification('Offer letter not found', 'error');
+        return;
+    }
+    
+    try {
+        console.log('Generating PDF with offer letter details for:', student.usn);
+        showNotification('Generating PDF... Please wait', 'info');
+        
+        // Create a new window with the offer letter content
+        const printWindow = window.open('', '_blank');
+        
+        // Create HTML content that matches the modal view exactly
+        const pdfContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Offer Letter - ${student.usn}</title>
+                <style>
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        margin: 20px; 
+                        line-height: 1.6;
+                        color: #333;
+                        background: #fff;
+                    }
+                    .header { 
+                        text-align: center; 
+                        border-bottom: 2px solid #ff6f00; 
+                        padding-bottom: 20px; 
+                        margin-bottom: 30px;
+                    }
+                    .header h1 {
+                        color: #ff6f00;
+                        margin: 0;
+                        font-size: 28px;
+                    }
+                    .section { 
+                        margin-bottom: 30px; 
+                        page-break-inside: avoid;
+                    }
+                    .section h2 { 
+                        color: #ff6f00; 
+                        border-bottom: 1px solid #ddd; 
+                        padding-bottom: 10px;
+                        font-size: 20px;
+                    }
+                    .student-details {
+                        background: #f9f9f9;
+                        padding: 20px;
+                        border-radius: 8px;
+                        margin-bottom: 20px;
+                    }
+                    .detail-row {
+                        display: flex;
+                        margin-bottom: 10px;
+                        padding: 5px 0;
+                    }
+                    .detail-label {
+                        font-weight: bold;
+                        width: 150px;
+                        color: #555;
+                    }
+                    .detail-value {
+                        flex: 1;
+                        color: #333;
+                    }
+                    .offer-letter-section {
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        margin-top: 20px;
+                    }
+                    .offer-letter-header {
+                        background: #f5f5f5;
+                        padding: 15px;
+                        border-bottom: 1px solid #ddd;
+                        font-weight: bold;
+                        color: #333;
+                    }
+                    .offer-letter-content {
+                        padding: 20px;
+                        min-height: 400px;
+                    }
+                    .offer-letter-iframe {
+                        width: 100%;
+                        height: 600px;
+                        border: none;
+                        border-radius: 4px;
+                        background: #fff;
+                    }
+                    .offer-letter-image {
+                        max-width: 100%;
+                        height: auto;
+                        border-radius: 4px;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                        display: block;
+                        margin: 0 auto;
+                    }
+                    .offer-letter-content {
+                        padding: 20px;
+                        min-height: 400px;
+                        background: #fff;
+                    }
+                    @media print {
+                        .no-print { display: none !important; }
+                        body { margin: 0; }
+                        .section { page-break-inside: avoid; }
+                        .offer-letter-section { page-break-inside: avoid; }
+                        .offer-letter-iframe { 
+                            height: 800px !important;
+                            width: 100% !important;
+                            background: #fff !important;
+                        }
+                        .offer-letter-content {
+                            background: #fff !important;
+                            padding: 10px !important;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>Offer Letter - ${student.usn}</h1>
+                    <p>Generated on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+                </div>
+                
+                <div class="section">
+                    <h2>Student Details</h2>
+                    <div class="student-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Student Name:</span>
+                            <span class="detail-value">${student.name || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">USN:</span>
+                            <span class="detail-value">${student.usn}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">${student.email}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Company Name:</span>
+                            <span class="detail-value">${student.companyName || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Type of Offer:</span>
+                            <span class="detail-value">${student.offerType || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Salary:</span>
+                            <span class="detail-value">${student.placedSalary} LPA (${AppState.salaryRanges[student.salaryRange]})</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Placed Date:</span>
+                            <span class="detail-value">${new Date(student.placedDate).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Offer Letter</h2>
+                    <div class="offer-letter-section">
+                        <div class="offer-letter-header">
+                            Offer Letter Content
+                        </div>
+                        <div class="offer-letter-content">
+                            ${student.offerLetter.startsWith('data:image/') 
+                                ? `<img src="${student.offerLetter}" class="offer-letter-image" alt="Offer Letter">`
+                                : `<iframe src="${student.offerLetter}" class="offer-letter-iframe" title="Offer Letter" allow="fullscreen" referrerpolicy="no-referrer-when-downgrade"></iframe>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+        
+        // Write content to new window
+        printWindow.document.write(pdfContent);
+        printWindow.document.close();
+        
+        // Wait for content to load, then trigger print
+        setTimeout(() => {
+            // Ensure iframe is fully loaded before printing
+            const iframe = printWindow.document.querySelector('.offer-letter-iframe');
+            if (iframe) {
+                iframe.onload = function() {
+                    setTimeout(() => {
+                        printWindow.print();
+                        printWindow.close();
+                        showNotification('PDF download initiated! Check your print dialog.', 'success');
+                    }, 1000);
+                };
+            } else {
+                // For images, print immediately
+                printWindow.print();
+                printWindow.close();
+                showNotification('PDF download initiated! Check your print dialog.', 'success');
+            }
+        }, 3000); // Wait longer for iframe to load
+        
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        showNotification('Error generating PDF: ' + error.message, 'error');
+    }
+}
+
 // Student offer letter view and download functions
 function viewStudentOfferLetter() {
     if (!AppState.currentStudent || !AppState.currentStudent.offerLetter) {
@@ -4588,7 +4842,7 @@ function viewStudentOfferLetter() {
     modal.style.display = 'block';
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
-            <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+            <span class="close" onclick="closeOfferLetterModal(this)">&times;</span>
             <h2>Your Offer Letter</h2>
             
             <div class="student-details">
@@ -4603,6 +4857,14 @@ function viewStudentOfferLetter() {
                 <div class="detail-row">
                     <span class="detail-label">Email:</span>
                     <span class="detail-value">${student.email}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Company Name:</span>
+                    <span class="detail-value">${student.companyName || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Type of Offer:</span>
+                    <span class="detail-value">${student.offerType || 'N/A'}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Salary:</span>
@@ -4623,11 +4885,11 @@ function viewStudentOfferLetter() {
             </div>
             
             <div class="modal-actions">
-                <button onclick="downloadStudentOfferLetter()" class="btn btn-primary">
-                    <i class="fas fa-download"></i>
-                    Download Offer Letter
+                <button onclick="downloadStudentOfferLetter()" class="btn btn-outline">
+                    <i class="fas fa-file-pdf"></i>
+                    Download Letter Only
                 </button>
-                <button onclick="this.closest('.modal').remove()" class="btn btn-secondary">
+                <button onclick="closeOfferLetterModal(this)" class="btn btn-secondary">
                     Close
                 </button>
             </div>
@@ -4636,6 +4898,13 @@ function viewStudentOfferLetter() {
     
     document.body.appendChild(modal);
     document.body.style.overflow = 'hidden';
+    
+    // Add click outside to close functionality
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeOfferLetterModal(e.target);
+        }
+    });
 }
 
 function downloadStudentOfferLetter() {
@@ -4665,6 +4934,633 @@ function downloadStudentOfferLetter() {
         console.error('Error downloading offer letter:', error);
         showNotification('Error downloading offer letter', 'error');
     }
+}
+
+
+function downloadStudentOfferLetterWithDetailsOld() {
+    if (!AppState.currentStudent || !AppState.currentStudent.offerLetter) {
+        showNotification('No offer letter found', 'error');
+        return;
+    }
+    
+    const student = AppState.currentStudent;
+    
+    try {
+        console.log('Generating PDF with offer letter details...');
+        showNotification('Generating PDF... Please wait', 'info');
+        
+        // Create a new window with the offer letter content
+        const printWindow = window.open('', '_blank');
+        
+        // Add error handling for blocked content
+        printWindow.addEventListener('error', function(e) {
+            console.log('Window error detected:', e);
+        });
+        
+        // Create HTML content that matches the modal view exactly
+        const pdfContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Your Offer Letter - ${student.usn}</title>
+                <style>
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        margin: 20px; 
+                        line-height: 1.6;
+                        color: #333;
+                        background: #fff;
+                    }
+                    .header { 
+                        text-align: center; 
+                        border-bottom: 2px solid #ff6f00; 
+                        padding-bottom: 20px; 
+                        margin-bottom: 30px;
+                    }
+                    .header h1 {
+                        color: #ff6f00;
+                        margin: 0;
+                        font-size: 28px;
+                    }
+                    .section { 
+                        margin-bottom: 30px; 
+                        page-break-inside: avoid;
+                    }
+                    .section h2 { 
+                        color: #ff6f00; 
+                        border-bottom: 1px solid #ddd; 
+                        padding-bottom: 10px;
+                        font-size: 20px;
+                    }
+                    .student-details {
+                        background: #f9f9f9;
+                        padding: 20px;
+                        border-radius: 8px;
+                        margin-bottom: 20px;
+                    }
+                    .detail-row {
+                        display: flex;
+                        margin-bottom: 10px;
+                        padding: 5px 0;
+                    }
+                    .detail-label {
+                        font-weight: bold;
+                        width: 150px;
+                        color: #555;
+                    }
+                    .detail-value {
+                        flex: 1;
+                        color: #333;
+                    }
+                    .offer-letter-section {
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        margin-top: 20px;
+                    }
+                    .offer-letter-header {
+                        background: #f5f5f5;
+                        padding: 15px;
+                        border-bottom: 1px solid #ddd;
+                        font-weight: bold;
+                        color: #333;
+                    }
+                    .offer-letter-content {
+                        padding: 20px;
+                        min-height: 400px;
+                        background: #fff;
+                    }
+                    .offer-letter-iframe {
+                        width: 100%;
+                        height: 600px;
+                        border: none;
+                        border-radius: 4px;
+                        background: #fff;
+                    }
+                    .offer-letter-image {
+                        max-width: 100%;
+                        height: auto;
+                        border-radius: 4px;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                        display: block;
+                        margin: 0 auto;
+                    }
+                    @media print {
+                        .no-print { display: none !important; }
+                        body { margin: 0; }
+                        .section { page-break-inside: avoid; }
+                        .offer-letter-section { page-break-inside: avoid; }
+                        .offer-letter-iframe { 
+                            height: 800px !important;
+                            width: 100% !important;
+                            background: #fff !important;
+                        }
+                        .offer-letter-content {
+                            background: #fff !important;
+                            padding: 10px !important;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>Your Offer Letter</h1>
+                    <p>Generated on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+                </div>
+                
+                <div class="section">
+                    <h2>Student Details</h2>
+                    <div class="student-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Student Name:</span>
+                            <span class="detail-value">${student.name || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">USN:</span>
+                            <span class="detail-value">${student.usn}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">${student.email}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Company Name:</span>
+                            <span class="detail-value">${student.companyName || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Type of Offer:</span>
+                            <span class="detail-value">${student.offerType || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Salary:</span>
+                            <span class="detail-value">${student.placedSalary} LPA (${AppState.salaryRanges[student.salaryRange]})</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Placed Date:</span>
+                            <span class="detail-value">${new Date(student.placedDate).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Offer Letter</h2>
+                    <div class="offer-letter-section">
+                        <div class="offer-letter-header">
+                            Offer Letter Content
+                        </div>
+                        <div class="offer-letter-content">
+                            ${student.offerLetter.startsWith('data:image/') 
+                                ? `<img src="${student.offerLetter}" class="offer-letter-image" alt="Offer Letter">`
+                                : `<iframe src="${student.offerLetter}" class="offer-letter-iframe" title="Offer Letter" allow="fullscreen" referrerpolicy="no-referrer-when-downgrade"></iframe>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+        
+        // Write content to new window
+        printWindow.document.write(pdfContent);
+        printWindow.document.close();
+        
+        // Wait for content to load, then trigger print
+        setTimeout(() => {
+            // Ensure iframe is fully loaded before printing
+            const iframe = printWindow.document.querySelector('.offer-letter-iframe');
+            if (iframe) {
+                iframe.onload = function() {
+                    setTimeout(() => {
+                        printWindow.print();
+                        printWindow.close();
+                        showNotification('PDF download initiated! Check your print dialog.', 'success');
+                    }, 1000);
+                };
+            } else {
+                // For images, print immediately
+                printWindow.print();
+                printWindow.close();
+                showNotification('PDF download initiated! Check your print dialog.', 'success');
+            }
+        }, 3000); // Wait longer for iframe to load
+        
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        showNotification('Error generating PDF: ' + error.message, 'error');
+    }
+}
+
+// Helper function to create simple offer letter representation
+function createSimpleOfferLetterRepresentation(ctx, student) {
+    // Create a simple representation that shows the actual offer letter content
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 800, 600);
+    
+    // Add border to match modal styling
+    ctx.strokeStyle = '#ddd';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, 800, 600);
+    
+    // Add a simple note that this is the offer letter content
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Offer Letter Content', 400, 50);
+    
+    ctx.font = '14px Arial';
+    ctx.fillText('(This is the actual offer letter content from the modal)', 400, 80);
+    
+    // Add a placeholder for the actual content
+    ctx.fillStyle = '#f8f9fa';
+    ctx.fillRect(50, 120, 700, 400);
+    
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(50, 120, 700, 400);
+    
+    // Add text indicating this is the offer letter
+    ctx.fillStyle = '#666';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('The actual offer letter content would be displayed here', 400, 200);
+    ctx.fillText('as it appears in the modal view', 400, 220);
+    
+    // Add note at bottom
+    ctx.font = '10px Arial';
+    ctx.fillText('Note: This represents the offer letter content from the modal', 400, 550);
+}
+
+// Helper function to capture iframe content more effectively
+function captureIframeContent(iframe, doc, yPosition, student) {
+    return new Promise((resolve, reject) => {
+        if (!window.html2canvas) {
+            reject(new Error('html2canvas not available'));
+            return;
+        }
+
+        console.log('Starting iframe capture for:', iframe.src);
+
+        // Try multiple approaches to capture the iframe content
+        const captureAttempts = [
+            // Attempt 1: Direct iframe capture
+            () => {
+                console.log('Attempt 1: Direct iframe capture');
+                return html2canvas(iframe, {
+                    useCORS: true,
+                    allowTaint: true,
+                    scale: 1,
+                    width: 800,
+                    height: 600,
+                    backgroundColor: '#ffffff'
+                });
+            },
+            
+            // Attempt 2: Capture iframe content document
+            () => {
+                console.log('Attempt 2: Capture iframe content document');
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                if (!iframeDoc || !iframeDoc.body) {
+                    throw new Error('Cannot access iframe document');
+                }
+                
+                console.log('Iframe document body found, creating temp div');
+                const tempDiv = document.createElement('div');
+                tempDiv.style.width = '800px';
+                tempDiv.style.height = '600px';
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                tempDiv.style.top = '-9999px';
+                tempDiv.style.overflow = 'hidden';
+                tempDiv.style.backgroundColor = '#ffffff';
+                tempDiv.innerHTML = iframeDoc.body.innerHTML;
+                
+                document.body.appendChild(tempDiv);
+                
+                return html2canvas(tempDiv, {
+                    useCORS: true,
+                    allowTaint: true,
+                    scale: 1,
+                    backgroundColor: '#ffffff'
+                }).then(canvas => {
+                    document.body.removeChild(tempDiv);
+                    return canvas;
+                });
+            },
+            
+            // Attempt 3: Capture iframe window content
+            () => {
+                console.log('Attempt 3: Capture iframe window content');
+                const iframeWindow = iframe.contentWindow;
+                if (!iframeWindow || !iframeWindow.document) {
+                    throw new Error('Cannot access iframe window');
+                }
+                
+                return html2canvas(iframeWindow.document.body, {
+                    useCORS: true,
+                    allowTaint: true,
+                    scale: 1,
+                    backgroundColor: '#ffffff'
+                });
+            }
+        ];
+
+        // Try each capture method
+        let attemptIndex = 0;
+        const tryNextAttempt = () => {
+            if (attemptIndex >= captureAttempts.length) {
+                console.log('All capture attempts failed');
+                reject(new Error('All capture attempts failed'));
+                return;
+            }
+
+            console.log(`Trying capture attempt ${attemptIndex + 1}`);
+            captureAttempts[attemptIndex]()
+                .then(canvas => {
+                    console.log(`Capture attempt ${attemptIndex + 1} succeeded`);
+                    const imgData = canvas.toDataURL('image/png');
+                    addImageToPDF(doc, imgData, yPosition, student);
+                    resolve(canvas);
+                })
+                .catch(error => {
+                    console.error(`Capture attempt ${attemptIndex + 1} failed:`, error);
+                    attemptIndex++;
+                    tryNextAttempt();
+                });
+        };
+
+        tryNextAttempt();
+    });
+}
+
+// Helper function to add image to PDF
+function addImageToPDF(doc, imgData, yPosition, student) {
+    try {
+        // Calculate dimensions to fit on page
+        const maxWidth = 170;
+        const maxHeight = 200;
+        let imgWidth = 170;
+        let imgHeight = 150;
+        
+        // Add image to PDF
+        doc.addImage(imgData, 'PNG', 20, yPosition, imgWidth, imgHeight);
+        
+        // Save the PDF
+        const filename = `PlacementDetails_${student.usn}_${student.companyName || 'Company'}_${student.placedSalary}LPA.pdf`;
+        doc.save(filename);
+        
+        showNotification(`Placement details PDF downloaded: ${filename}`, 'success');
+    } catch (error) {
+        console.error('Error adding image to PDF:', error);
+        showNotification('Error generating PDF. Please try again.', 'error');
+    }
+}
+
+// Helper function to create fallback content when iframe capture fails
+function createFallbackContent(doc, yPosition, student) {
+    try {
+        // Create a canvas to draw the fallback content
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 800;
+        canvas.height = 600;
+        
+        // Create a more informative fallback
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, 800, 600);
+        
+        // Add border
+        ctx.strokeStyle = '#ddd';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0, 0, 800, 600);
+        
+        // Add title
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Offer Letter Content', 400, 50);
+        
+        // Add note about the content
+        ctx.font = '14px Arial';
+        ctx.fillText('This section contains the actual offer letter content', 400, 80);
+        ctx.fillText('as displayed in the modal view', 400, 100);
+        
+        // Add a placeholder box
+        ctx.fillStyle = '#f8f9fa';
+        ctx.fillRect(50, 150, 700, 400);
+        
+        ctx.strokeStyle = '#ccc';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(50, 150, 700, 400);
+        
+        // Add content description
+        ctx.fillStyle = '#666';
+        ctx.font = '12px Arial';
+        ctx.fillText('The offer letter content from the modal would be displayed here', 400, 200);
+        ctx.fillText('This includes the actual PDF or image content', 400, 220);
+        
+        // Add technical note
+        ctx.font = '10px Arial';
+        ctx.fillStyle = '#999';
+        ctx.fillText('Note: If you see this message, the iframe content capture failed', 400, 500);
+        ctx.fillText('This may be due to cross-origin restrictions or loading issues', 400, 520);
+        
+        // Convert to image and add to PDF
+        const imgData = canvas.toDataURL('image/png');
+        addImageToPDF(doc, imgData, yPosition, student);
+        
+    } catch (error) {
+        console.error('Error creating fallback content:', error);
+        showNotification('Error generating PDF. Please try again.', 'error');
+    }
+}
+
+// New function to handle PDF offer letter content more reliably
+function handlePDFOfferLetterContent(doc, yPosition, student) {
+    return new Promise((resolve, reject) => {
+        console.log('Starting PDF offer letter content handling for:', student.offerLetter);
+        
+        // Create a visible iframe to capture content
+        const iframe = document.createElement('iframe');
+        iframe.src = student.offerLetter;
+        iframe.style.width = '800px';
+        iframe.style.height = '600px';
+        iframe.style.border = '1px solid #ddd';
+        iframe.style.borderRadius = '8px';
+        iframe.style.position = 'fixed';
+        iframe.style.left = '50%';
+        iframe.style.top = '50%';
+        iframe.style.transform = 'translate(-50%, -50%)';
+        iframe.style.zIndex = '9999';
+        iframe.style.backgroundColor = '#ffffff';
+        
+        // Add loading overlay
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        overlay.style.zIndex = '9998';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.innerHTML = '<div style="color: white; font-size: 18px; text-align: center;"><div>Capturing offer letter content...</div><div style="font-size: 14px; margin-top: 10px;">Please wait while we capture the content</div></div>';
+        
+        document.body.appendChild(overlay);
+        document.body.appendChild(iframe);
+        
+        let captureAttempted = false;
+        
+        iframe.onload = function() {
+            console.log('Iframe loaded, waiting for content...');
+            setTimeout(() => {
+                if (captureAttempted) return;
+                captureAttempted = true;
+                
+                try {
+                    console.log('Attempting to capture iframe content...');
+                    
+                    if (window.html2canvas) {
+                        // Try direct iframe capture first
+                        html2canvas(iframe, {
+                            useCORS: true,
+                            allowTaint: true,
+                            scale: 1,
+                            width: 800,
+                            height: 600,
+                            backgroundColor: '#ffffff',
+                            logging: true
+                        }).then(canvas => {
+                            console.log('Direct iframe capture successful');
+                            const imgData = canvas.toDataURL('image/png');
+                            addImageToPDF(doc, imgData, yPosition, student);
+                            
+                            // Clean up
+                            document.body.removeChild(iframe);
+                            document.body.removeChild(overlay);
+                            resolve();
+                        }).catch(error => {
+                            console.error('Direct iframe capture failed:', error);
+                            
+                            // Try alternative approach
+                            try {
+                                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                                if (iframeDoc && iframeDoc.body) {
+                                    console.log('Trying content document capture...');
+                                    
+                                    const tempDiv = document.createElement('div');
+                                    tempDiv.style.width = '800px';
+                                    tempDiv.style.height = '600px';
+                                    tempDiv.style.position = 'absolute';
+                                    tempDiv.style.left = '-9999px';
+                                    tempDiv.style.top = '-9999px';
+                                    tempDiv.style.overflow = 'hidden';
+                                    tempDiv.style.backgroundColor = '#ffffff';
+                                    tempDiv.innerHTML = iframeDoc.body.innerHTML;
+                                    
+                                    document.body.appendChild(tempDiv);
+                                    
+                                    html2canvas(tempDiv, {
+                                        useCORS: true,
+                                        allowTaint: true,
+                                        scale: 1,
+                                        backgroundColor: '#ffffff',
+                                        logging: true
+                                    }).then(canvas => {
+                                        console.log('Content document capture successful');
+                                        const imgData = canvas.toDataURL('image/png');
+                                        addImageToPDF(doc, imgData, yPosition, student);
+                                        
+                                        // Clean up
+                                        document.body.removeChild(tempDiv);
+                                        document.body.removeChild(iframe);
+                                        document.body.removeChild(overlay);
+                                        resolve();
+                                    }).catch(error2 => {
+                                        console.error('Content document capture failed:', error2);
+                                        // Final fallback
+                                        createFallbackContent(doc, yPosition, student);
+                                        
+                                        // Clean up
+                                        document.body.removeChild(tempDiv);
+                                        document.body.removeChild(iframe);
+                                        document.body.removeChild(overlay);
+                                        resolve();
+                                    });
+                                } else {
+                                    console.error('Cannot access iframe document');
+                                    // Final fallback
+                                    createFallbackContent(doc, yPosition, student);
+                                    
+                                    // Clean up
+                                    document.body.removeChild(iframe);
+                                    document.body.removeChild(overlay);
+                                    resolve();
+                                }
+                            } catch (error3) {
+                                console.error('Alternative capture failed:', error3);
+                                // Final fallback
+                                createFallbackContent(doc, yPosition, student);
+                                
+                                // Clean up
+                                document.body.removeChild(iframe);
+                                document.body.removeChild(overlay);
+                                resolve();
+                            }
+                        });
+                    } else {
+                        console.error('html2canvas not available');
+                        // Final fallback
+                        createFallbackContent(doc, yPosition, student);
+                        
+                        // Clean up
+                        document.body.removeChild(iframe);
+                        document.body.removeChild(overlay);
+                        resolve();
+                    }
+                } catch (error) {
+                    console.error('Error processing iframe:', error);
+                    // Final fallback
+                    createFallbackContent(doc, yPosition, student);
+                    
+                    // Clean up
+                    document.body.removeChild(iframe);
+                    document.body.removeChild(overlay);
+                    resolve();
+                }
+            }, 3000); // Wait 3 seconds for iframe to fully load
+        };
+        
+        iframe.onerror = function() {
+            console.error('Iframe failed to load');
+            if (captureAttempted) return;
+            captureAttempted = true;
+            
+            // Final fallback
+            createFallbackContent(doc, yPosition, student);
+            
+            // Clean up
+            document.body.removeChild(iframe);
+            document.body.removeChild(overlay);
+            resolve();
+        };
+        
+        // Timeout fallback
+        setTimeout(() => {
+            if (captureAttempted) return;
+            captureAttempted = true;
+            
+            console.error('Iframe capture timeout');
+            // Final fallback
+            createFallbackContent(doc, yPosition, student);
+            
+            // Clean up
+            document.body.removeChild(iframe);
+            document.body.removeChild(overlay);
+            resolve();
+        }, 10000); // 10 second timeout
+    });
 }
 
 // Manual Student Entry Functions
@@ -5266,6 +6162,14 @@ function loadPlacedStudentsList() {
                     <div class="detail-value">${student.cgpa}</div>
                 </div>
                 <div class="detail-item">
+                    <div class="detail-label">Company Name</div>
+                    <div class="detail-value">${student.companyName || 'N/A'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Type of Offer</div>
+                    <div class="detail-value">${student.offerType || 'N/A'}</div>
+                </div>
+                <div class="detail-item">
                     <div class="detail-label">Placed Salary</div>
                     <div class="detail-value salary-highlight">${student.placedSalary} LPA</div>
                 </div>
@@ -5280,9 +6184,9 @@ function loadPlacedStudentsList() {
                     <i class="fas fa-eye"></i>
                     View Offer
                 </button>
-                <button class="btn download-offer-btn" onclick="downloadOfferLetter('${student.id}')">
-                    <i class="fas fa-download"></i>
-                    Download
+                <button class="btn download-letter-btn" onclick="downloadOfferLetter('${student.id}')">
+                    <i class="fas fa-file-pdf"></i>
+                    Download Letter
                 </button>
             </div>
         </div>
@@ -5361,6 +6265,14 @@ function filterPlacedStudents() {
                     <div class="detail-value">${student.cgpa}</div>
                 </div>
                 <div class="detail-item">
+                    <div class="detail-label">Company Name</div>
+                    <div class="detail-value">${student.companyName || 'N/A'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Type of Offer</div>
+                    <div class="detail-value">${student.offerType || 'N/A'}</div>
+                </div>
+                <div class="detail-item">
                     <div class="detail-label">Placed Salary</div>
                     <div class="detail-value salary-highlight">${student.placedSalary} LPA</div>
                 </div>
@@ -5375,9 +6287,9 @@ function filterPlacedStudents() {
                     <i class="fas fa-eye"></i>
                     View Offer
                 </button>
-                <button class="btn download-offer-btn" onclick="downloadOfferLetter('${student.id}')">
-                    <i class="fas fa-download"></i>
-                    Download
+                <button class="btn download-letter-btn" onclick="downloadOfferLetter('${student.id}')">
+                    <i class="fas fa-file-pdf"></i>
+                    Download Letter
                 </button>
             </div>
         </div>
@@ -5394,7 +6306,7 @@ function exportPlacedStudentsData() {
     }
     
     // Create CSV content
-    const headers = ['USN', 'Name', 'Email', 'CGPA', 'Placed Salary (LPA)', 'Placed Date', 'Salary Range'];
+    const headers = ['USN', 'Name', 'Email', 'CGPA', 'Company Name', 'Type of Offer', 'Placed Salary (LPA)', 'Placed Date', 'Salary Range'];
     const csvContent = [
         headers.join(','),
         ...placedStudents.map(student => [
@@ -5402,6 +6314,8 @@ function exportPlacedStudentsData() {
             `"${student.name}"`,
             student.email,
             student.cgpa,
+            `"${student.companyName || 'N/A'}"`,
+            `"${student.offerType || 'N/A'}"`,
             student.placedSalary || 0,
             formatDate(student.placedDate),
             student.salaryRange || 'N/A'

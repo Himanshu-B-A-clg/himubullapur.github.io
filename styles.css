@@ -2244,6 +2244,17 @@ body {
     transform: translateY(-1px);
 }
 
+.download-letter-btn {
+    background: var(--info-color);
+    color: white;
+    border: none;
+}
+
+.download-letter-btn:hover {
+    background: #0369a1;
+    transform: translateY(-1px);
+}
+
 .no-placed-students {
     text-align: center;
     padding: 3rem;
